@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sistema de Tickets – Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="dark">
+
+<div class="layout">
+
+  <!-- MENU LATERAL -->
+  <aside class="sidebar">
+    <h2>🎫 Tickets</h2>
+    <button onclick="abrirAba('denuncia')">⚠️ Denúncia</button>
+    <button onclick="abrirAba('juiz')">⚖️ Falar com o Juiz</button>
+    <button onclick="abrirAba('suporte')">🛠️ Suporte</button>
+    <button onclick="abrirAba('processos')">📂 Processos</button>
+    <hr />
+    <button onclick="abrirAba('historico')">🧾 Histórico</button>
+  </aside>
+
+  <!-- CONTEÚDO -->
+  <main class="content">
+
+    <!-- DENÚNCIA -->
+    <section id="denuncia" class="aba">
+      <h2>⚠️ Denúncia</h2>
+      <textarea id="texto-denuncia" placeholder="Descreva a denúncia"></textarea>
+      <button onclick="criarTicket('Denúncia', 'texto-denuncia')">Abrir Ticket</button>
+    </section>
+
+    <!-- JUIZ -->
+    <section id="juiz" class="aba">
+      <h2>⚖️ Falar com o Juiz</h2>
+      <textarea id="texto-juiz" placeholder="Descreva sua solicitação"></textarea>
+      <button onclick="criarTicket('Juiz', 'texto-juiz')">Abrir Ticket</button>
+    </section>
+
+    <!-- SUPORTE -->
+    <section id="suporte" class="aba">
+      <h2>🛠️ Suporte</h2>
+      <textarea id="texto-suporte" placeholder="Descreva o problema"></textarea>
+      <button onclick="criarTicket('Suporte', 'texto-suporte')">Abrir Ticket</button>
+    </section>
+
+    <!-- PROCESSOS -->
+    <section id="processos" class="aba">
+      <h2>📂 Processos</h2>
+
+      <div class="processos">
+        <button onclick="processo('Adoção')">👶 Adoção</button>
+        <button onclick="processo('Troca de Nome')">📜 Troca de Nome</button>
+        <button onclick="processo('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+        <button onclick="processo('Divórcio')">💔 Divórcio</button>
+        <button onclick="processo('Casamento')">💍 Casamento</button>
+        <button onclick="processo('Nascimento')">👼 Nascimento</button>
+        <button onclick="processo('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
+        <button onclick="processo('Porte de Arma')">🔫 Porte de Arma</button>
+        <button onclick="processo('Abertura de CNPJ')">🏢 Abertura de CNPJ</button>
+      </div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section id="historico" class="aba">
+      <h2>🧾 Histórico de Tickets</h2>
+      <ul id="lista-historico"></ul>
+    </section>
+
+  </main>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
