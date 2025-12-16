@@ -13,27 +13,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-document.getElementById("btnVerificar").addEventListener("click", async () => {
-  const nome = document.getElementById("nome").value.trim();
-  const cid = document.getElementById("cid").value.trim();
+document.getElementById("btnVerificar").onclick = async () => {
+  const nome = nome.value.trim();
+  const cid = cid.value.trim();
 
-  if (!nome || !cid) {
-    alert("Preencha todos os campos");
-    return;
-  }
+  if (!nome || !cid) return alert("Preencha todos os campos");
 
-  // salvar local
   localStorage.setItem("usuario", JSON.stringify({ nome, cid }));
 
-  // salvar firebase
   await setDoc(doc(db, "users", cid), {
-    nome,
-    cid,
-    criadoEm: serverTimestamp()
+    nome, cid, criadoEm: serverTimestamp()
   });
 
-  alert("Verificação concluída com sucesso!");
-
-  // redirecionar
   window.location.href = "tickets.html";
-});
+};
