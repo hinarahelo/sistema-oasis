@@ -1,32 +1,42 @@
-/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* VARIÁVEIS */
 :root {
-  --bg: #0f1115;
-  --bg-card: #151821;
-  --bg-sidebar: #0c0e13;
-  --primary: #4aa3ff;
-  --secondary: #1f2430;
-  --text: #e6e6e6;
-  --muted: #9aa0aa;
-  --danger: #ff4a4a;
-  --radius: 14px;
+  --bg-main: #0b0f14;
+  --bg-card: #121826;
+  --bg-sidebar: #0a0d13;
+  --bg-soft: #1a2233;
+  --primary: #2f80ed;
+  --primary-hover: #1f6fe0;
+  --text: #e4e6eb;
+  --muted: #9aa0b3;
+  --radius: 18px;
 }
 
-/* BODY */
+/* BACKGROUND + LOGO WATERMARK */
 body.dark {
-  background: linear-gradient(180deg, #0f1115, #0b0d12);
+  background: radial-gradient(circle at top, #121a2b, #05070c);
   color: var(--text);
   min-height: 100vh;
+  position: relative;
 }
 
-/* CENTRALIZAÇÃO */
+body.dark::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("logo-oasis.png") center no-repeat;
+  background-size: 420px;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* CENTER */
 body.center {
   display: flex;
   align-items: center;
@@ -36,42 +46,39 @@ body.center {
 /* CARD */
 .card {
   background: var(--bg-card);
-  width: 420px;
-  padding: 35px;
+  width: 480px;
+  padding: 45px;
   border-radius: var(--radius);
-  box-shadow: 0 0 40px rgba(0,0,0,.6);
+  box-shadow: 0 40px 90px rgba(0,0,0,.8);
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .card h2 {
-  margin-bottom: 25px;
-  font-size: 1.6rem;
+  margin-bottom: 28px;
+  font-size: 1.8rem;
 }
 
 /* INPUTS */
 input, textarea {
   width: 100%;
-  background: var(--secondary);
+  background: var(--bg-soft);
   border: none;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 16px;
+  border-radius: 14px;
   color: var(--text);
-  margin-bottom: 15px;
+  margin-bottom: 18px;
   font-size: 15px;
 }
 
-textarea {
-  min-height: 120px;
-  resize: none;
-}
-
-/* BOTÕES */
+/* BUTTON */
 button {
   width: 100%;
-  background: linear-gradient(135deg, var(--primary), #2e7adf);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   border: none;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 16px;
+  border-radius: 14px;
   color: #fff;
   font-size: 15px;
   cursor: pointer;
@@ -79,85 +86,71 @@ button {
 }
 
 button:hover {
-  opacity: 0.85;
+  filter: brightness(1.12);
 }
 
-/* LAYOUT TICKETS */
+/* LAYOUT */
 .layout {
   display: flex;
   min-height: 100vh;
+  position: relative;
+  z-index: 2;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 260px;
+  width: 290px;
   background: var(--bg-sidebar);
-  padding: 25px;
-  box-shadow: 2px 0 20px rgba(0,0,0,.6);
+  padding: 32px;
+  box-shadow: 5px 0 40px rgba(0,0,0,.6);
 }
 
 .sidebar h2 {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-size: 1.4rem;
 }
 
 .sidebar button {
-  margin-bottom: 10px;
-  background: var(--secondary);
+  background: var(--bg-soft);
+  margin-bottom: 12px;
 }
 
 .sidebar button:hover {
   background: var(--primary);
 }
 
-.sidebar hr {
-  border: none;
-  height: 1px;
-  background: #222;
-  margin: 15px 0;
-}
-
-/* CONTEÚDO */
+/* CONTENT */
 .content {
   flex: 1;
-  padding: 40px;
+  padding: 50px;
 }
 
-/* ABAS */
+/* ABA */
 .aba {
   display: none;
   background: var(--bg-card);
-  padding: 30px;
+  padding: 40px;
   border-radius: var(--radius);
-  box-shadow: 0 0 30px rgba(0,0,0,.4);
+  box-shadow: 0 30px 70px rgba(0,0,0,.6);
 }
 
 .aba h2 {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 /* PROCESSOS */
 .processos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 15px;
-}
-
-.processos button {
-  background: var(--secondary);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
 }
 
 /* HISTÓRICO */
-#lista-historico {
-  list-style: none;
-}
-
 #lista-historico li {
-  background: var(--secondary);
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  font-size: 14px;
+  background: var(--bg-soft);
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
 }
 
 /* RESPONSIVO */
@@ -165,12 +158,10 @@ button:hover {
   .layout {
     flex-direction: column;
   }
-
   .sidebar {
     width: 100%;
   }
-
   .card {
-    width: 90%;
+    width: 92%;
   }
 }
