@@ -13,17 +13,35 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-document.getElementById("btnVerificar").onclick = async () => {
-  const nome = nome.value.trim();
-  const cid = cid.value.trim();
+const botao = document.getElementById("btnVerificar");
 
-  if (!nome || !cid) return alert("Preencha todos os campos");
+botao.addEventListener("click", async () => {
+  const campoNome = document.getElementById("nome");
+  const campoCid  = document.getElementById("cid");
 
-  localStorage.setItem("usuario", JSON.stringify({ nome, cid }));
+  const valorNome = campoNome.value.trim();
+  const valorCid  = campoCid.value.trim();
 
-  await setDoc(doc(db, "users", cid), {
-    nome, cid, criadoEm: serverTimestamp()
-  });
+  if (valorNome === "" || valorCid === "") {
+    alert("Preencha todos os campos");
+    return;
+  }
 
-  window.location.href = "tickets.html";
-};
+  localStorage.setItem(
+    "usuario",
+    JSON.stringify({ nome: valorNome, cid: valorCid })
+  );
+
+  try {
+    await setDoc(doc(db, "users", valorCid), {
+      nome: valorNome,
+      cid: valorCid,
+      criadoEm: serverTimestamp()
+    });
+
+    window.location.href = "tickets.html";
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao salvar no Firebase");
+  }
+});
