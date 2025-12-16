@@ -11,40 +11,37 @@
 
   <aside class="sidebar">
     <h2>🎫 Atendimento</h2>
-    <button onclick="abrirAba('denuncia')">⚠️ Denúncia</button>
     <button onclick="abrirAba('solicitacoes')">🛒 Solicitações</button>
     <button onclick="abrirAba('historico')">🧾 Histórico</button>
   </aside>
 
   <main class="content">
 
-    <!-- DENÚNCIA -->
-    <section id="denuncia" class="aba">
-      <h2>⚠️ Denúncia</h2>
-      <textarea id="texto-denuncia" placeholder="Descreva o ocorrido..."></textarea>
-      <button onclick="criarTicket('Denúncia','texto-denuncia')">
-        Abrir Ticket
-      </button>
-    </section>
-
     <!-- SOLICITAÇÕES -->
     <section id="solicitacoes" class="aba">
       <h2>🛒 Solicitações</h2>
-
       <div class="processos">
-        <button onclick="processo('Troca de Nome')">📜 Troca de Nome</button>
-        <button onclick="processo('Adoção')">👶 Adoção</button>
-        <button onclick="processo('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
-        <button onclick="processo('Nascimento')">👼 Nascimento</button>
-        <button onclick="processo('Porte de Arma')">🔫 Porte de Arma</button>
-        <button onclick="processo('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
+        <button onclick="abrirSolicitacao('Troca de Nome')">📜 Troca de Nome</button>
+        <button onclick="abrirSolicitacao('Adoção')">👶 Adoção</button>
+        <button onclick="abrirSolicitacao('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+        <button onclick="abrirSolicitacao('Nascimento')">👼 Nascimento</button>
+        <button onclick="abrirSolicitacao('Porte de Arma')">🔫 Porte de Arma</button>
+        <button onclick="abrirSolicitacao('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
       </div>
     </section>
 
     <!-- HISTÓRICO -->
     <section id="historico" class="aba">
-      <h2>🧾 Histórico</h2>
+      <h2>🧾 Meus Tickets</h2>
       <ul id="lista-historico"></ul>
+    </section>
+
+    <!-- CHAT -->
+    <section id="chat" class="aba">
+      <h2 id="chat-titulo"></h2>
+      <div id="mensagens" style="height:300px;overflow:auto;margin-bottom:10px;"></div>
+      <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
+      <button onclick="enviarMensagem()">Enviar</button>
     </section>
 
   </main>
