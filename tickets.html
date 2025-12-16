@@ -8,35 +8,46 @@
 <body class="dark">
 
 <div class="layout">
-<aside class="sidebar">
-  <h2>🎫 Atendimento</h2>
-  <button onclick="abrirAba('denuncia')">⚠️ Denúncia</button>
-  <button onclick="abrirAba('processos')">📂 Processos</button>
-  <button onclick="abrirAba('historico')">🧾 Histórico</button>
-</aside>
 
-<main class="content">
-<section id="denuncia" class="aba">
-  <h2>⚠️ Denúncia</h2>
-  <textarea id="texto-denuncia"></textarea>
-  <button onclick="criarTicket('Denúncia','texto-denuncia')">Abrir Ticket</button>
-</section>
+  <aside class="sidebar">
+    <h2>🎫 Atendimento</h2>
+    <button onclick="abrirAba('denuncia')">⚠️ Denúncia</button>
+    <button onclick="abrirAba('solicitacoes')">🛒 Solicitações</button>
+    <button onclick="abrirAba('historico')">🧾 Histórico</button>
+  </aside>
 
-<section id="processos" class="aba">
-  <h2>📂 Processos</h2>
-  <div class="processos">
-    <button onclick="processo('Adoção')">👶 Adoção</button>
-    <button onclick="processo('Casamento')">💍 Casamento</button>
-    <button onclick="processo('Divórcio')">💔 Divórcio</button>
-    <button onclick="processo('CNPJ')">🏢 CNPJ</button>
-  </div>
-</section>
+  <main class="content">
 
-<section id="historico" class="aba">
-  <h2>🧾 Histórico</h2>
-  <ul id="lista-historico"></ul>
-</section>
-</main>
+    <!-- DENÚNCIA -->
+    <section id="denuncia" class="aba">
+      <h2>⚠️ Denúncia</h2>
+      <textarea id="texto-denuncia" placeholder="Descreva o ocorrido..."></textarea>
+      <button onclick="criarTicket('Denúncia','texto-denuncia')">
+        Abrir Ticket
+      </button>
+    </section>
+
+    <!-- SOLICITAÇÕES -->
+    <section id="solicitacoes" class="aba">
+      <h2>🛒 Solicitações</h2>
+
+      <div class="processos">
+        <button onclick="processo('Troca de Nome')">📜 Troca de Nome</button>
+        <button onclick="processo('Adoção')">👶 Adoção</button>
+        <button onclick="processo('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+        <button onclick="processo('Nascimento')">👼 Nascimento</button>
+        <button onclick="processo('Porte de Arma')">🔫 Porte de Arma</button>
+        <button onclick="processo('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
+      </div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section id="historico" class="aba">
+      <h2>🧾 Histórico</h2>
+      <ul id="lista-historico"></ul>
+    </section>
+
+  </main>
 </div>
 
 <script type="module" src="script.js"></script>
