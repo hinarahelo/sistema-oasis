@@ -1,37 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Central de Atendimento – Oasis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Verificação – Sistema Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body class="dark">
+<body class="dark center">
 
-  <div class="verify-box">
-    <h2>Verificação de Acesso</h2>
-    <p>Informe seu nome na cidade e seu ID para continuar</p>
+  <div class="card">
+    <h2>🔐 Verificação</h2>
 
-    <input 
-      type="text" 
-      id="nome" 
-      placeholder="Nome na cidade"
-      autocomplete="off"
-    >
-
-    <input 
-      type="text" 
-      id="cid" 
-      placeholder="ID do cidadão"
-      autocomplete="off"
-    >
+    <input type="text" id="nome" placeholder="Nome na cidade" />
+    <input type="text" id="cid" placeholder="ID" />
 
     <button onclick="verificar()">Verificar</button>
   </div>
 
-  <!-- Firebase / Script -->
-  <script type="module" src="script.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
+      authDomain: "sistema-oasis-75979.firebaseapp.com",
+      projectId: "sistema-oasis-75979",
+      storageBucket: "sistema-oasis-75979.firebasestorage.app",
+      messagingSenderId: "925698565602",
+      appId: "1:925698565602:web:127df3a95aad70484ac5bb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.verificar = async function () {
+      const nome = document.getElementById("nome").value.trim();
+      const cid = document.getElementById("cid").value.trim();
+
+      if (!nome || !cid) {
+        alert("Preencha todos os campos");
+        return;
+      }
+
+      // 🔐 Salva no navegador
+      localStorage.setItem("usuario", JSON.stringify({ nome, cid }));
+
+      // 🔥 Salva no Firebase
+      await setDoc(doc(db, "users", cid), {
+        nome,
+        cid,
+        criadoEm: serverTimestamp()
+      });
+
+      alert("Verificação concluída com sucesso!");
+
+      // 🚀 REDIRECIONAMENTO CORRETO
+      window.location.href = "tickets.html";
+    };
+  </script>
 
 </body>
 </html>
