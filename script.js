@@ -31,19 +31,32 @@ window.abrirAba = (id) => {
   document.getElementById(id).style.display = "block";
 };
 
-/* ABRE POR PADRÃO */
+/* ABRE PADRÃO */
 abrirAba("denuncia");
 
-/* CRIAR TICKET */
+/* CRIAR TICKET (DENÚNCIA) */
 window.criarTicket = async (categoria, campoTexto) => {
-  const texto = document.getElementById(campoTexto)?.value.trim();
+  const texto = document.getElementById(campoTexto).value.trim();
 
   if (!texto) {
     alert("Descreva o problema");
     return;
   }
 
-  /* VERIFICA SE JÁ EXISTE TICKET ABERTO */
+  await criarRegistro(categoria, texto);
+};
+
+/* CRIAR SOLICITAÇÃO */
+window.processo = async (categoria) => {
+  const confirmar = confirm(`Deseja abrir a solicitação: ${categoria}?`);
+  if (!confirmar) return;
+
+  await criarRegistro(categoria, "Solicitação iniciada");
+};
+
+/* FUNÇÃO CENTRAL */
+async function criarRegistro(categoria, mensagem) {
+
   const q = query(
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
@@ -53,45 +66,23 @@ window.criarTicket = async (categoria, campoTexto) => {
 
   const snap = await getDocs(q);
   if (!snap.empty) {
-    alert("Você já possui um ticket aberto nessa categoria");
+    alert("Você já possui uma solicitação aberta nesta categoria");
     return;
   }
 
-  /* CRIA */
   await addDoc(collection(db, "tickets"), {
     nome: usuario.nome,
     cid: usuario.cid,
     categoria,
-    mensagem: texto,
+    mensagem,
     status: "aberto",
     criadoEm: serverTimestamp()
   });
 
-  document.getElementById(campoTexto).value = "";
-  alert(`Ticket de ${categoria} aberto com sucesso`);
-
+  alert(`Solicitação "${categoria}" aberta com sucesso`);
   abrirAba("historico");
   carregarHistorico();
-};
-
-/* PROCESSOS */
-window.processo = async (categoria) => {
-  const confirmar = confirm(`Deseja abrir um processo de ${categoria}?`);
-  if (!confirmar) return;
-
-  await addDoc(collection(db, "tickets"), {
-    nome: usuario.nome,
-    cid: usuario.cid,
-    categoria,
-    mensagem: "Processo iniciado",
-    status: "aberto",
-    criadoEm: serverTimestamp()
-  });
-
-  alert(`Processo de ${categoria} iniciado`);
-  abrirAba("historico");
-  carregarHistorico();
-};
+}
 
 /* HISTÓRICO */
 async function carregarHistorico() {
