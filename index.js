@@ -13,35 +13,36 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const botao = document.getElementById("btnVerificar");
+const btn = document.getElementById("btnVerificar");
+const status = document.getElementById("status");
 
-botao.addEventListener("click", async () => {
-  const campoNome = document.getElementById("nome");
-  const campoCid  = document.getElementById("cid");
+btn.addEventListener("click", async () => {
+  const nome = document.getElementById("nome").value.trim();
+  const cid  = document.getElementById("cid").value.trim();
 
-  const valorNome = campoNome.value.trim();
-  const valorCid  = campoCid.value.trim();
-
-  if (valorNome === "" || valorCid === "") {
-    alert("Preencha todos os campos");
+  if (!nome || !cid) {
+    status.innerText = "⚠️ Preencha todos os campos";
     return;
   }
 
-  localStorage.setItem(
-    "usuario",
-    JSON.stringify({ nome: valorNome, cid: valorCid })
-  );
+  status.innerText = "⏳ Verificando...";
 
   try {
-    await setDoc(doc(db, "users", valorCid), {
-      nome: valorNome,
-      cid: valorCid,
+    await setDoc(doc(db, "users", cid), {
+      nome,
+      cid,
       criadoEm: serverTimestamp()
     });
 
-    window.location.href = "tickets.html";
+    status.innerText = "✅ Verificação concluída! Redirecionando...";
+    localStorage.setItem("usuario", JSON.stringify({ nome, cid }));
+
+    setTimeout(() => {
+      window.location.href = "tickets.html";
+    }, 1200);
+
   } catch (e) {
     console.error(e);
-    alert("Erro ao salvar no Firebase");
+    status.innerText = "❌ Erro ao verificar (veja o console)";
   }
 });
