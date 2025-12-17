@@ -4,54 +4,13 @@
     <meta charset="UTF-8">
     <title>Central de Atendimento</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            background-color: #330000;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-
-        h1 {
-            color: #ffdddd;
-        }
-
-        .btn-login {
-            display: inline-block;
-            padding: 10px 20px;
-            margin-top: 20px;
-            background-color: #550000;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .btn-login:hover {
-            background-color: #770000;
-        }
-    </style>
 </head>
-<body>
-
-<div class="login-container">
-    <h1>Central de Atendimento</h1>
-    <a id="login-discord" class="btn-login" href="#">
-        Login com Discord
-    </a>
-</div>
-
-<script type="module">
-    import { DISCORD_OAUTH_URL } from "./config.js";
-
-    const loginBtn = document.getElementById("login-discord");
-    loginBtn.href = DISCORD_OAUTH_URL;
-</script>
-
+<body class="center">
+    <div class="card">
+        <h1>Central de Atendimento</h1>
+        <a class="btn-login" href="https://discord.com/api/oauth2/authorize?client_id=1450905109083979785&redirect_uri=https%3A%2F%2Fhinarahelo.github.io%2Fsistema-oasis%2Fcallback.html&response_type=code&scope=identify">
+            Login com Discord
+        </a>
+    </div>
 </body>
 </html>
