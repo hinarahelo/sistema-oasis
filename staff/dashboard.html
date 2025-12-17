@@ -4,29 +4,198 @@
   <meta charset="UTF-8">
   <title>Staff</title>
   <link rel="stylesheet" href="../style.css">
+  <style>
+    /* Correções de cores e tema dark */
+    body.dark {
+      background-color: #330000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .sidebar {
+      background-color: #440000;
+      padding: 15px;
+      min-width: 200px;
+    }
+
+    .sidebar h2 {
+      color: #ffdddd;
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      background-color: #550000;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .layout {
+      display: flex;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 20px;
+    }
+
+    .aba {
+      display: none;
+    }
+
+    .aba.active {
+      display: block;
+    }
+
+    #lista-abertos, #lista-fechados {
+      background-color: #440000;
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .ticket {
+      background-color: #550000;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .ticket button {
+      margin-top: 5px;
+    }
+
+    .chat {
+      background-color: #660000;
+      padding: 5px;
+      border-radius: 5px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 5px;
+    }
+
+    .chat p {
+      margin: 2px 0;
+    }
+
+    input[type=text] {
+      width: 80%;
+      padding: 5px;
+      border-radius: 3px;
+      border: none;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body class="dark">
 
 <div class="layout">
-<aside class="sidebar">
-  <h2>👮 Staff</h2>
-  <button onclick="abrirAba('abertos')">📂 Abertos</button>
-  <button onclick="abrirAba('fechados')">🧾 Fechados</button>
-</aside>
+  <aside class="sidebar">
+    <h2>👮 Staff</h2>
+    <button onclick="abrirAba('abertos')">📂 Abertos</button>
+    <button onclick="abrirAba('fechados')">🧾 Fechados</button>
+  </aside>
 
-<main class="content">
-<section id="abertos" class="aba">
-  <h2>Tickets Abertos</h2>
-  <div id="lista-abertos"></div>
-</section>
+  <main class="content">
+    <section id="abertos" class="aba active">
+      <h2>Tickets Abertos</h2>
+      <div id="lista-abertos"></div>
+    </section>
 
-<section id="fechados" class="aba">
-  <h2>Tickets Fechados</h2>
-  <div id="lista-fechados"></div>
-</section>
-</main>
+    <section id="fechados" class="aba">
+      <h2>Tickets Fechados</h2>
+      <div id="lista-fechados"></div>
+    </section>
+  </main>
 </div>
 
-<script type="module" src="staff.js"></script>
+<script type="module">
+  // ====== Funções de navegação entre abas ======
+  function abrirAba(aba) {
+    document.querySelectorAll('.aba').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(aba).classList.add('active');
+  }
+
+  // ====== Sistema de tickets ======
+  let tickets = [
+    // Exemplo de ticket
+    // {id:1, usuarioID:"123", categoria:"Suporte", aberto:true, mensagens:[{remetente:"User", texto:"Olá"}], staff:null}
+  ];
+
+  const staffID = "USER_DISCORD_ID"; // Substituir pelo ID do staff logado
+  const staffIDs = ["123456789012345678"]; // IDs autorizados
+
+  if (!staffIDs.includes(staffID)) {
+    alert("Acesso negado!");
+    window.location.href = "../index.html";
+  }
+
+  function atualizarLista() {
+    const listaA = document.getElementById("lista-abertos");
+    const listaF = document.getElementById("lista-fechados");
+    listaA.innerHTML = "";
+    listaF.innerHTML = "";
+
+    tickets.forEach(ticket => {
+      const divTicket = document.createElement("div");
+      divTicket.classList.add("ticket");
+      divTicket.innerHTML = `<strong>Ticket #${ticket.id}</strong> - ${ticket.categoria}<br>Usuário: ${ticket.usuarioID}`;
+
+      // Chat do ticket
+      const chatDiv = document.createElement("div");
+      chatDiv.classList.add("chat");
+      ticket.mensagens.forEach(msg => {
+        const p = document.createElement("p");
+        p.textContent = `${msg.remetente}: ${msg.texto}`;
+        chatDiv.appendChild(p);
+      });
+      divTicket.appendChild(chatDiv);
+
+      // Input para responder
+      if (ticket.aberto) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Digite sua mensagem";
+        input.onkeydown = (e) => {
+          if (e.key === "Enter") {
+            enviarMensagem(ticket, e.target.value);
+            e.target.value = "";
+          }
+        };
+        divTicket.appendChild(input);
+
+        const btnAssumir = document.createElement("button");
+        btnAssumir.textContent = ticket.staff ? "Assumido" : "Assumir Ticket";
+        btnAssumir.onclick = () => {
+          ticket.staff = staffID;
+          atualizarLista();
+        };
+        divTicket.appendChild(btnAssumir);
+      }
+
+      if (ticket.aberto) {
+        listaA.appendChild(divTicket);
+      } else {
+        listaF.appendChild(divTicket);
+      }
+    });
+  }
+
+  function enviarMensagem(ticket, texto) {
+    if (!texto) return;
+    const remetente = staffID;
+    ticket.mensagens.push({ remetente, texto });
+    atualizarLista();
+  }
+
+  // Atualiza a lista a cada 2 segundos
+  setInterval(atualizarLista, 2000);
+</script>
+
 </body>
 </html>
