@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Callback Discord</title>
+  <meta charset="UTF-8">
+  <title>Login Discord</title>
 </head>
 <body>
-    <h1>Processando login...</h1>
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
+  <p>Processando login...</p>
 
-        if (code) {
-            window.location.href = `https://oasis-backend.hinarahelo.repl.co/callback?code=${code}`;
-        } else {
-            alert("Nenhum código encontrado!");
-        }
-    </script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (!code) {
+      document.body.innerHTML = "Erro: código não recebido.";
+    } else {
+      // 🔁 ENVIA O CODE PARA O BACKEND
+      window.location.href =
+        "https://oasis-backend.hinarahelo.repl.co/callback?code=" + code;
+    }
+  </script>
 </body>
 </html>
