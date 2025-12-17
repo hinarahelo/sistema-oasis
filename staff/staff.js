@@ -1,85 +1,73 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore, collection, onSnapshot,
-  updateDoc, doc, addDoc, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ====== CONFIGURAÇÃO FIREBASE ======
 const firebaseConfig = {
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ====== AUTORIZAÇÃO STAFF ======
 const STAFF_IDS = ["1","admin"];
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-if(!usuario || !STAFF_IDS.includes(usuario.cid)){
-  location.href="../index.html";
+if (!usuario || !STAFF_IDS.includes(usuario.cid)) {
+  location.href = "../index.html";
 }
 
 let ticketAtual = null;
 
-// ====== LISTAGEM DE TICKETS ABERTOS ======
+// LISTA DE ABERTOS
 onSnapshot(collection(db,"tickets"), snap=>{
   const lista = document.getElementById("lista-abertos");
+  const listaFechados = document.getElementById("lista-fechados");
   lista.innerHTML = "";
+  listaFechados.innerHTML = "";
   snap.forEach(d=>{
     const t = d.data();
-    if(t.status !== "fechado"){
-      lista.innerHTML += `
-        <div class="card">
-          <b>${t.categoria}</b> - ${t.nome}<br>
-          <small>Usuário: ${t.usuarioID || 'Desconhecido'}</small><br>
-          <button onclick="abrirTicket('${d.id}')">Abrir</button>
-        </div>`;
-    }
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<b>${t.categoria}</b><br>${t.nome}`;
+    const btn = document.createElement("button");
+    btn.textContent = "Abrir";
+    btn.onclick = () => abrir(d.id);
+    div.appendChild(btn);
+    if(t.status !== "fechado") lista.appendChild(div);
+    else listaFechados.appendChild(div);
   });
 });
 
-// ====== ABRIR TICKET ======
-window.abrirTicket = id => {
+// ABRIR CHAT
+window.abrir = id =>{
   ticketAtual = id;
-  abrirAba('mensagens'); // muda para aba de chat
-
-  const box = document.getElementById("mensagens");
-  box.innerHTML = "";
-
-  // Atualiza mensagens em tempo real
-  onSnapshot(collection(db,"tickets",id,"mensagens"), snap=>{
-    box.innerHTML = "";
+  onSnapshot(collection(db,"tickets",id,"mensagens"),snap=>{
+    const box=document.getElementById("mensagens");
+    if(!box) return;
+    box.innerHTML="";
     snap.forEach(d=>{
-      const m = d.data();
-      box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
+      const m=d.data();
+      box.innerHTML+=`<p><b>${m.autor}:</b> ${m.texto}</p>`;
     });
     box.scrollTop = box.scrollHeight;
   });
 };
 
-// ====== ENVIAR MENSAGEM ======
+// RESPONDER
 window.responder = async () => {
-  const msgInput = document.getElementById("msg");
-  const texto = msgInput.value.trim();
-  if(!texto) return;
-
+  const msg = document.getElementById("mensagem");
+  const texto = msg.value.trim();
+  if(!texto || !ticketAtual) return;
   await addDoc(collection(db,"tickets",ticketAtual,"mensagens"),{
-    autor: "Staff",
+    autor:"Staff",
     texto,
-    criadoEm: serverTimestamp()
+    criadoEm:serverTimestamp()
   });
-  msgInput.value = "";
+  msg.value="";
 };
 
-// ====== MUDAR STATUS ======
+// MUDAR STATUS
 window.mudarStatus = async status => {
-  if(!ticketAtual) return alert("Nenhum ticket aberto!");
-  await updateDoc(doc(db,"tickets",ticketAtual), { status });
-};
-
-// ====== FUNÇÃO PARA ABRIR ABAS ======
-window.abrirAba = (aba) => {
-  document.querySelectorAll('.aba').forEach(s => s.classList.remove('active'));
-  document.getElementById(aba).classList.add('active');
+  if(!ticketAtual) return;
+  await updateDoc(doc(db,"tickets",ticketAtual),{status});
 };
