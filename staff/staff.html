@@ -1,204 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Painel Staff</title>
-  <link rel="stylesheet" href="../style.css">
-  <style>
-    body {
-      background-color: #330000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-
-    .layout {
-      display: flex;
-    }
-
-    .sidebar {
-      background-color: #440000;
-      padding: 15px;
-      min-width: 200px;
-    }
-
-    .sidebar h2 {
-      color: #ffdddd;
-    }
-
-    .sidebar button {
-      display: block;
-      width: 100%;
-      background-color: #550000;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      margin: 5px 0;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .content {
-      flex-grow: 1;
-      padding: 20px;
-    }
-
-    .card {
-      background-color: #550000;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 10px;
-    }
-
-    #mensagens {
-      background-color: #660000;
-      padding: 10px;
-      border-radius: 5px;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 10px;
-    }
-
-    input[type=text] {
-      width: 80%;
-      padding: 5px;
-      border-radius: 3px;
-      border: none;
-      margin-top: 5px;
-    }
-
-    button.send {
-      padding: 5px 10px;
-      margin-left: 5px;
-      background-color: #550000;
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .status-buttons button {
-      margin-top: 5px;
-      margin-right: 5px;
-      background-color: #550000;
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Staff</title>
+<link rel="stylesheet" href="../style.css">
 </head>
-<body>
-
+<body class="dark">
 <div class="layout">
-  <aside class="sidebar">
-    <h2>👮 Staff</h2>
-    <button onclick="abrirAba('abertos')">📂 Tickets Abertos</button>
-    <button onclick="abrirAba('mensagens')">💬 Conversa</button>
-  </aside>
-
-  <main class="content">
-    <section id="abertos" class="aba active">
-      <h2>Tickets Abertos</h2>
-      <div id="lista-abertos"></div>
-    </section>
-
-    <section id="mensagens" class="aba">
-      <h2>Chat do Ticket</h2>
-      <div id="mensagens"></div>
-      <input type="text" id="msg" placeholder="Digite sua mensagem">
-      <button class="send" onclick="responder()">Enviar</button>
-      <div class="status-buttons">
-        <button onclick="mudarStatus('em atendimento')">Em Atendimento</button>
-        <button onclick="mudarStatus('fechado')">Fechar Ticket</button>
-      </div>
-    </section>
-  </main>
+<aside class="sidebar">
+<h2>👮 Staff</h2>
+<button onclick="abrirAba('abertos')">📂 Abertos</button>
+<button onclick="abrirAba('fechados')">🧾 Fechados</button>
+</aside>
+<main class="content">
+<section id="abertos" class="aba active">
+<h2>Tickets Abertos</h2>
+<div id="lista-abertos"></div>
+</section>
+<section id="fechados" class="aba">
+<h2>Tickets Fechados</h2>
+<div id="lista-fechados"></div>
+</section>
+</main>
 </div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, onSnapshot,
-  updateDoc, doc, addDoc, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// ====== CONFIG FIREBASE ======
-const firebaseConfig = {
-  apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
-  authDomain: "sistema-oasis-75979.firebaseapp.com",
-  projectId: "sistema-oasis-75979"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ====== AUTORIZAÇÃO STAFF ======
-const STAFF_IDS = ["1","admin"];
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario || !STAFF_IDS.includes(usuario.cid)) {
-  location.href = "../index.html";
-}
-
-// ====== VARIÁVEL GLOBAL ======
-let ticketAtual = null;
-
-// ====== FUNÇÃO ABRIR ABA ======
-function abrirAba(aba) {
-  document.querySelectorAll('.aba').forEach(s => s.classList.remove('active'));
-  document.getElementById(aba).classList.add('active');
-}
-
-// ====== LISTAGEM DE TICKETS ABERTOS ======
-onSnapshot(collection(db,"tickets"), snap=>{
-  const lista = document.getElementById("lista-abertos");
-  lista.innerHTML = "";
-  snap.forEach(d=>{
-    const t=d.data();
-    if(t.status!=="fechado"){
-      lista.innerHTML += `
-        <div class="card">
-          <b>${t.categoria}</b><br>${t.nome}
-          <button onclick="abrirTicket('${d.id}')">Abrir</button>
-        </div>`;
-    }
-  });
-});
-
-// ====== ABRIR TICKET ======
-window.abrirTicket = id =>{
-  ticketAtual = id;
-  abrirAba('mensagens');
-  onSnapshot(collection(db,"tickets",id,"mensagens"),snap=>{
-    const box=document.getElementById("mensagens");
-    box.innerHTML="";
-    snap.forEach(d=>{
-      const m=d.data();
-      box.innerHTML+=`<p><b>${m.autor}:</b> ${m.texto}</p>`;
-    });
-  });
-};
-
-// ====== ENVIAR MENSAGEM ======
-window.responder = async ()=>{
-  const msg = document.getElementById("msg");
-  const texto = msg.value.trim();
-  if(!texto) return;
-  await addDoc(collection(db,"tickets",ticketAtual,"mensagens"),{
-    autor:"Staff",
-    texto,
-    criadoEm:serverTimestamp()
-  });
-  msg.value="";
-};
-
-// ====== MUDAR STATUS ======
-window.mudarStatus = async status=>{
-  if(!ticketAtual) return alert("Nenhum ticket aberto!");
-  await updateDoc(doc(db,"tickets",ticketAtual),{status});
-};
-
-window.abrirAba = abrirAba; // expor função global
-</script>
-
+<script type="module" src="staff.js"></script>
 </body>
 </html>
