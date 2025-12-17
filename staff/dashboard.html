@@ -2,133 +2,28 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title>Staff</title>
   <link rel="stylesheet" href="../style.css">
-  <style>
-    body {
-      background-color: #330000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-
-    h1,h2 {
-      color: #ffdddd;
-    }
-
-    #tickets-container, #chat-container {
-      background-color: #440000;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
-
-    .ticket {
-      background-color: #550000;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 10px;
-    }
-
-    .chat {
-      background-color: #660000;
-      padding: 10px;
-      border-radius: 5px;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 10px;
-    }
-
-    input[type=text], select, button {
-      padding: 5px;
-      border-radius: 3px;
-      border: none;
-      margin-top: 5px;
-    }
-
-    button {
-      background-color: #550000;
-      color: #fff;
-      cursor: pointer;
-    }
-  </style>
 </head>
-<body>
+<body class="dark">
+<div class="layout">
+  <aside class="sidebar">
+    <h2>👮 Staff</h2>
+    <button onclick="abrirAba('abertos')">📂 Abertos</button>
+    <button onclick="abrirAba('fechados')">🧾 Fechados</button>
+  </aside>
 
-<h1>Central de Atendimento</h1>
-
-<div id="tickets-container">
-  <h2>Criar Ticket</h2>
-  <select id="categoria">
-    <option value="Suporte">Suporte</option>
-    <option value="Financeiro">Financeiro</option>
-    <option value="Outros">Outros</option>
-  </select>
-  <button onclick="criarTicket()">Abrir Ticket</button>
+  <main class="content">
+    <section id="abertos" class="aba active">
+      <h2>Tickets Abertos</h2>
+      <div id="lista-abertos"></div>
+    </section>
+    <section id="fechados" class="aba">
+      <h2>Tickets Fechados</h2>
+      <div id="lista-fechados"></div>
+    </section>
+  </main>
 </div>
-
-<div id="chat-container">
-  <h2>Chat do Ticket</h2>
-  <div id="chat" class="chat"></div>
-  <input type="text" id="mensagem" placeholder="Digite sua mensagem">
-  <button onclick="enviarMensagem()">Enviar</button>
-</div>
-
-<script>
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if(!usuario){
-    alert("Você precisa estar logado!");
-    window.location.href = "/index.html";
-  }
-
-  let tickets = [];
-
-  function criarTicket() {
-    const categoria = document.getElementById("categoria").value;
-
-    // Limita 1 ticket ativo por categoria
-    const ativo = tickets.find(t => t.usuarioID === usuario.id && t.categoria === categoria && t.aberto);
-    if(ativo) return alert("Você já tem um ticket aberto nesta categoria!");
-
-    const ticket = {
-      id: Date.now(),
-      usuarioID: usuario.id,
-      categoria,
-      aberto: true,
-      mensagens: []
-    };
-    tickets.push(ticket);
-    abrirChat(ticket);
-  }
-
-  function abrirChat(ticket) {
-    const chatDiv = document.getElementById("chat");
-    chatDiv.innerHTML = "";
-    ticket.mensagens.forEach(msg=>{
-      const p = document.createElement("p");
-      p.textContent = `${msg.remetente}: ${msg.texto}`;
-      chatDiv.appendChild(p);
-    });
-    chatDiv.scrollTop = chatDiv.scrollHeight;
-    ticketAtual = ticket;
-  }
-
-  let ticketAtual = null;
-
-  function enviarMensagem() {
-    if(!ticketAtual) return alert("Nenhum ticket aberto!");
-    const texto = document.getElementById("mensagem").value.trim();
-    if(!texto) return;
-
-    ticketAtual.mensagens.push({ remetente: "Você", texto });
-    document.getElementById("mensagem").value = "";
-    abrirChat(ticketAtual);
-  }
-
-  // Atualiza automaticamente o chat
-  setInterval(()=>{
-    if(ticketAtual) abrirChat(ticketAtual);
-  },2000);
-</script>
-
+<script type="module" src="staff.js"></script>
 </body>
 </html>
