@@ -17,30 +17,18 @@
       margin-bottom: 10px;
     }
 
-    #mensagens p {
-      margin: 4px 0;
-    }
-
-    button {
-      margin-top: 5px;
-    }
+    #mensagens p { margin:4px 0; }
+    button { margin-top: 5px; }
   </style>
 </head>
 <body class="dark">
-
 <div class="layout">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>🎫 Atendimento</h2>
     <button onclick="abrirAba('solicitacoes')">🛒 Solicitações</button>
     <button onclick="abrirAba('historico')">🧾 Histórico</button>
   </aside>
-
-  <!-- CONTEÚDO PRINCIPAL -->
   <main class="content">
-
-    <!-- SOLICITAÇÕES -->
     <section id="solicitacoes" class="aba active">
       <h2>🛒 Solicitações</h2>
       <div class="processos">
@@ -52,24 +40,18 @@
         <button onclick="abrirSolicitacao('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
       </div>
     </section>
-
-    <!-- HISTÓRICO -->
     <section id="historico" class="aba">
       <h2>🧾 Meus Tickets</h2>
       <ul id="lista-historico"></ul>
     </section>
-
-    <!-- CHAT -->
     <section id="chat" class="aba">
       <h2 id="chat-titulo"></h2>
       <div id="mensagens" class="chat"></div>
       <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
       <button onclick="enviarMensagem()">Enviar</button>
     </section>
-
   </main>
 </div>
-
 <script type="module" src="script.js"></script>
 </body>
 </html>
