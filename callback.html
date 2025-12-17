@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Callback Discord</title>
+</head>
+<body>
+    <h1>Processando login...</h1>
+    <script>
+        // Pega o "code" da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (code) {
+            // Redireciona para seu backend para trocar o code por token
+            window.location.href = `https://SEU_BACKEND/callback?code=${code}`;
+        } else {
+            alert("Nenhum código encontrado!");
+        }
+    </script>
+</body>
+</html>
