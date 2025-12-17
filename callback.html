@@ -3,55 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Callback Discord</title>
-    <style>
-        body {
-            background-color: #330000;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-        h1 {
-            color: #ffdddd;
-        }
-    </style>
 </head>
 <body>
     <h1>Processando login...</h1>
-
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
 
-        if (!code) {
-            alert("Nenhum código encontrado!");
+        if (code) {
+            window.location.href = `https://oasis-backend.hinarahelo.repl.co/callback?code=${code}`;
         } else {
-            // Redireciona para o backend Node.js que troca code por token
-            // Após receber o usuário do backend, salvar no localStorage e ir para dashboard
-            fetch(`https://oasis-backend.hinarahelo.repl.co/callback?code=${code}`)
-            .then(res => res.json())
-            .then(user => {
-                if(user && user.id){
-                    // Salva dados do usuário para dashboard/staff
-                    localStorage.setItem("usuario", JSON.stringify({
-                        id: user.id,
-                        username: user.username,
-                        cid: user.id // usar id como cid para staff
-                    }));
-
-                    // Redireciona para dashboard
-                    window.location.href = "/dashboard.html";
-                } else {
-                    alert("Falha ao processar login!");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Erro ao conectar com o backend!");
-            });
+            alert("Nenhum código encontrado!");
         }
     </script>
 </body>
