@@ -2,61 +2,24 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Staff</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="../style.css">
   <style>
-    /* Correções de cores e tema dark */
-    body.dark {
+    body {
       background-color: #330000;
       color: #fff;
       font-family: Arial, sans-serif;
     }
 
-    .sidebar {
-      background-color: #440000;
-      padding: 15px;
-      min-width: 200px;
-    }
-
-    .sidebar h2 {
+    h1,h2 {
       color: #ffdddd;
     }
 
-    .sidebar button {
-      display: block;
-      width: 100%;
-      background-color: #550000;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      margin: 5px 0;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .layout {
-      display: flex;
-    }
-
-    .content {
-      flex-grow: 1;
-      padding: 20px;
-    }
-
-    .aba {
-      display: none;
-    }
-
-    .aba.active {
-      display: block;
-    }
-
-    #lista-abertos, #lista-fechados {
+    #tickets-container, #chat-container {
       background-color: #440000;
-      padding: 10px;
+      padding: 15px;
       border-radius: 5px;
-      max-height: 400px;
-      overflow-y: auto;
+      margin-bottom: 20px;
     }
 
     .ticket {
@@ -66,135 +29,105 @@
       margin-bottom: 10px;
     }
 
-    .ticket button {
-      margin-top: 5px;
-    }
-
     .chat {
       background-color: #660000;
-      padding: 5px;
+      padding: 10px;
       border-radius: 5px;
-      max-height: 200px;
+      max-height: 300px;
       overflow-y: auto;
-      margin-top: 5px;
+      margin-top: 10px;
     }
 
-    .chat p {
-      margin: 2px 0;
-    }
-
-    input[type=text] {
-      width: 80%;
+    input[type=text], select, button {
       padding: 5px;
       border-radius: 3px;
       border: none;
       margin-top: 5px;
     }
+
+    button {
+      background-color: #550000;
+      color: #fff;
+      cursor: pointer;
+    }
   </style>
 </head>
-<body class="dark">
+<body>
 
-<div class="layout">
-  <aside class="sidebar">
-    <h2>👮 Staff</h2>
-    <button onclick="abrirAba('abertos')">📂 Abertos</button>
-    <button onclick="abrirAba('fechados')">🧾 Fechados</button>
-  </aside>
+<h1>Central de Atendimento</h1>
 
-  <main class="content">
-    <section id="abertos" class="aba active">
-      <h2>Tickets Abertos</h2>
-      <div id="lista-abertos"></div>
-    </section>
-
-    <section id="fechados" class="aba">
-      <h2>Tickets Fechados</h2>
-      <div id="lista-fechados"></div>
-    </section>
-  </main>
+<div id="tickets-container">
+  <h2>Criar Ticket</h2>
+  <select id="categoria">
+    <option value="Suporte">Suporte</option>
+    <option value="Financeiro">Financeiro</option>
+    <option value="Outros">Outros</option>
+  </select>
+  <button onclick="criarTicket()">Abrir Ticket</button>
 </div>
 
-<script type="module">
-  // ====== Funções de navegação entre abas ======
-  function abrirAba(aba) {
-    document.querySelectorAll('.aba').forEach(sec => sec.classList.remove('active'));
-    document.getElementById(aba).classList.add('active');
+<div id="chat-container">
+  <h2>Chat do Ticket</h2>
+  <div id="chat" class="chat"></div>
+  <input type="text" id="mensagem" placeholder="Digite sua mensagem">
+  <button onclick="enviarMensagem()">Enviar</button>
+</div>
+
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if(!usuario){
+    alert("Você precisa estar logado!");
+    window.location.href = "/index.html";
   }
 
-  // ====== Sistema de tickets ======
-  let tickets = [
-    // Exemplo de ticket
-    // {id:1, usuarioID:"123", categoria:"Suporte", aberto:true, mensagens:[{remetente:"User", texto:"Olá"}], staff:null}
-  ];
+  let tickets = [];
 
-  const staffID = "USER_DISCORD_ID"; // Substituir pelo ID do staff logado
-  const staffIDs = ["123456789012345678"]; // IDs autorizados
+  function criarTicket() {
+    const categoria = document.getElementById("categoria").value;
 
-  if (!staffIDs.includes(staffID)) {
-    alert("Acesso negado!");
-    window.location.href = "../index.html";
+    // Limita 1 ticket ativo por categoria
+    const ativo = tickets.find(t => t.usuarioID === usuario.id && t.categoria === categoria && t.aberto);
+    if(ativo) return alert("Você já tem um ticket aberto nesta categoria!");
+
+    const ticket = {
+      id: Date.now(),
+      usuarioID: usuario.id,
+      categoria,
+      aberto: true,
+      mensagens: []
+    };
+    tickets.push(ticket);
+    abrirChat(ticket);
   }
 
-  function atualizarLista() {
-    const listaA = document.getElementById("lista-abertos");
-    const listaF = document.getElementById("lista-fechados");
-    listaA.innerHTML = "";
-    listaF.innerHTML = "";
-
-    tickets.forEach(ticket => {
-      const divTicket = document.createElement("div");
-      divTicket.classList.add("ticket");
-      divTicket.innerHTML = `<strong>Ticket #${ticket.id}</strong> - ${ticket.categoria}<br>Usuário: ${ticket.usuarioID}`;
-
-      // Chat do ticket
-      const chatDiv = document.createElement("div");
-      chatDiv.classList.add("chat");
-      ticket.mensagens.forEach(msg => {
-        const p = document.createElement("p");
-        p.textContent = `${msg.remetente}: ${msg.texto}`;
-        chatDiv.appendChild(p);
-      });
-      divTicket.appendChild(chatDiv);
-
-      // Input para responder
-      if (ticket.aberto) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = "Digite sua mensagem";
-        input.onkeydown = (e) => {
-          if (e.key === "Enter") {
-            enviarMensagem(ticket, e.target.value);
-            e.target.value = "";
-          }
-        };
-        divTicket.appendChild(input);
-
-        const btnAssumir = document.createElement("button");
-        btnAssumir.textContent = ticket.staff ? "Assumido" : "Assumir Ticket";
-        btnAssumir.onclick = () => {
-          ticket.staff = staffID;
-          atualizarLista();
-        };
-        divTicket.appendChild(btnAssumir);
-      }
-
-      if (ticket.aberto) {
-        listaA.appendChild(divTicket);
-      } else {
-        listaF.appendChild(divTicket);
-      }
+  function abrirChat(ticket) {
+    const chatDiv = document.getElementById("chat");
+    chatDiv.innerHTML = "";
+    ticket.mensagens.forEach(msg=>{
+      const p = document.createElement("p");
+      p.textContent = `${msg.remetente}: ${msg.texto}`;
+      chatDiv.appendChild(p);
     });
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+    ticketAtual = ticket;
   }
 
-  function enviarMensagem(ticket, texto) {
-    if (!texto) return;
-    const remetente = staffID;
-    ticket.mensagens.push({ remetente, texto });
-    atualizarLista();
+  let ticketAtual = null;
+
+  function enviarMensagem() {
+    if(!ticketAtual) return alert("Nenhum ticket aberto!");
+    const texto = document.getElementById("mensagem").value.trim();
+    if(!texto) return;
+
+    ticketAtual.mensagens.push({ remetente: "Você", texto });
+    document.getElementById("mensagem").value = "";
+    abrirChat(ticketAtual);
   }
 
-  // Atualiza a lista a cada 2 segundos
-  setInterval(atualizarLista, 2000);
+  // Atualiza automaticamente o chat
+  setInterval(()=>{
+    if(ticketAtual) abrirChat(ticketAtual);
+  },2000);
 </script>
 
 </body>
