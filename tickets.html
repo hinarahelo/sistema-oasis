@@ -4,21 +4,44 @@
   <meta charset="UTF-8">
   <title>Tickets</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background-color: #660000;
+      color: #fff;
+      resize: none;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    #mensagens p {
+      margin: 4px 0;
+    }
+
+    button {
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body class="dark">
 
 <div class="layout">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>🎫 Atendimento</h2>
     <button onclick="abrirAba('solicitacoes')">🛒 Solicitações</button>
     <button onclick="abrirAba('historico')">🧾 Histórico</button>
   </aside>
 
+  <!-- CONTEÚDO PRINCIPAL -->
   <main class="content">
 
     <!-- SOLICITAÇÕES -->
-    <section id="solicitacoes" class="aba">
+    <section id="solicitacoes" class="aba active">
       <h2>🛒 Solicitações</h2>
       <div class="processos">
         <button onclick="abrirSolicitacao('Troca de Nome')">📜 Troca de Nome</button>
@@ -39,7 +62,7 @@
     <!-- CHAT -->
     <section id="chat" class="aba">
       <h2 id="chat-titulo"></h2>
-      <div id="mensagens" style="height:300px;overflow:auto;margin-bottom:10px;"></div>
+      <div id="mensagens" class="chat"></div>
       <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
       <button onclick="enviarMensagem()">Enviar</button>
     </section>
