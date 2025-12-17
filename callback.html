@@ -2,21 +2,20 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login Discord</title>
+  <title>Callback Discord</title>
 </head>
 <body>
-  <p>Processando login...</p>
+  <h2>Processando login...</h2>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
     if (!code) {
-      document.body.innerHTML = "Erro: código não recebido.";
+      document.body.innerHTML = "<h3>Erro ao autenticar.</h3>";
     } else {
-      // 🔁 ENVIA O CODE PARA O BACKEND
       window.location.href =
-        "https://oasis-backend.hinarahelo.repl.co/callback?code=" + code;
+        "https://13b4a7c8-ef9d-497c-9f6b-481e6dcfaa0b-00-2noz7t8kac8b2.riker.replit.dev/callback?code=" + code;
     }
   </script>
 </body>
