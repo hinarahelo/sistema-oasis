@@ -46,10 +46,14 @@ body {
 .aba { display: none; }
 .aba.active { display: block; }
 
-.grid button {
-  margin: 6px;
+.grid button,
+.lista-tickets button {
+  display: block;
+  width: 100%;
+  margin: 6px 0;
   padding: 12px;
   border-radius: 6px;
+  cursor: pointer;
 }
 
 .chat {
