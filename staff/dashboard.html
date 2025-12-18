@@ -2,13 +2,40 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Painel Staff • Oasis</title>
+  <title>Dashboard • Oasis</title>
   <link rel="stylesheet" href="../style.css">
+  <style>
+    .stats {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .stat {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      background: #330000;
+      text-align: center;
+      font-weight: bold;
+    }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .aberto { background:#7a0000; }
+    .atendimento { background:#b36b00; }
+    .fechado { background:#2e7d32; }
+    .filtro {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body class="dark">
 
 <script>
-  // Proteção por nível
   let usuario = null;
   try {
     usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -24,26 +51,34 @@
 <div class="layout">
   <aside class="sidebar">
     <h2>👮 Staff</h2>
-    <button onclick="abrirAba('abertos')">📂 Abertos</button>
-    <button onclick="abrirAba('fechados')">🧾 Fechados</button>
-
-    <!-- Apenas coordenação vê ações avançadas -->
-    <script>
-      if (usuario.nivel === "coordenacao") {
-        document.write(`<p style="margin-top:10px;">🛡 Coordenação</p>`);
-      }
-    </script>
+    <button onclick="abrirAba('dashboard')">📊 Dashboard</button>
+    <button onclick="abrirAba('tickets')">🎫 Tickets</button>
   </aside>
 
   <main class="content">
-    <section id="abertos" class="aba active">
-      <h2>Tickets Abertos</h2>
-      <div id="lista-abertos"></div>
+    <section id="dashboard" class="aba active">
+      <h2>📊 Visão Geral</h2>
+
+      <div class="stats">
+        <div class="stat">Abertos<br><span id="qtd-abertos">0</span></div>
+        <div class="stat">Em Atendimento<br><span id="qtd-atendimento">0</span></div>
+        <div class="stat">Fechados<br><span id="qtd-fechados">0</span></div>
+      </div>
     </section>
 
-    <section id="fechados" class="aba">
-      <h2>Tickets Fechados</h2>
-      <div id="lista-fechados"></div>
+    <section id="tickets" class="aba">
+      <h2>🎫 Tickets</h2>
+
+      <div class="filtro">
+        <select id="filtro-status" onchange="aplicarFiltro()">
+          <option value="todos">Todos</option>
+          <option value="aberto">Abertos</option>
+          <option value="atendimento">Em Atendimento</option>
+          <option value="fechado">Fechados</option>
+        </select>
+      </div>
+
+      <div id="lista-tickets"></div>
     </section>
   </main>
 </div>
