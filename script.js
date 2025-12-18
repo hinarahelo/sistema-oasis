@@ -1,12 +1,5 @@
-console.log("🔥 Atendimento Oasis iniciado");
-
-// 🔐 Usuário
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario) {
-  location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
-}
 
-// 🔥 Firebase
 firebase.initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
@@ -15,34 +8,40 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 let ticketAtual = null;
+let listener = null;
 
-// 🚪 Logout
+// ABAS
+function abrirAba(id) {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("ativa"));
+  document.getElementById(id).classList.add("ativa");
+}
+
+// LOGOUT
 function logout() {
   localStorage.removeItem("usuario");
   location.href = "index.html";
 }
 
-// 🎫 Abrir ou criar ticket por categoria
-async function abrirSolicitacao(categoria) {
-  document.getElementById("mensagens").innerHTML = "";
-  document.getElementById("chat-titulo").innerText = "💬 " + categoria;
+// ABRIR / CRIAR TICKET
+async function abrirTicket(categoria) {
+  if (listener) listener();
+
+  document.querySelectorAll(".chat").forEach(c => c.innerHTML = "");
 
   const snap = await db.collection("tickets")
     .where("cid", "==", usuario.cid)
     .get();
 
-  let encontrado = null;
+  let id = null;
 
   snap.forEach(doc => {
     const t = doc.data();
     if (t.categoria === categoria && t.status === "aberto") {
-      encontrado = doc.id;
+      id = doc.id;
     }
   });
 
-  if (encontrado) {
-    ticketAtual = encontrado;
-  } else {
+  if (!id) {
     const ref = await db.collection("tickets").add({
       nome: usuario.nome,
       cid: usuario.cid,
@@ -50,43 +49,46 @@ async function abrirSolicitacao(categoria) {
       status: "aberto",
       criadoEm: new Date()
     });
-    ticketAtual = ref.id;
+    id = ref.id;
   }
 
-  escutarMensagens();
+  ticketAtual = id;
+  escutarMensagens(categoria);
 }
 
-// 👂 Escutar mensagens do ticket atual
-function escutarMensagens() {
-  db.collection("tickets")
+// CHAT
+function escutarMensagens(categoria) {
+  listener = db.collection("tickets")
     .doc(ticketAtual)
     .collection("mensagens")
     .orderBy("criadoEm")
     .onSnapshot(snap => {
-      const box = document.getElementById("mensagens");
+      const box = document.querySelector(".aba.ativa .chat");
       box.innerHTML = "";
-
       snap.forEach(d => {
         const m = d.data();
-        box.innerHTML += `
-          <p>
-            <b>${m.autor} ${m.cid}:</b> ${m.texto}
-          </p>
-        `;
+        box.innerHTML += `<p><b>${m.autor} ${m.cid}:</b> ${m.texto}</p>`;
       });
-
       box.scrollTop = box.scrollHeight;
     });
 }
 
-// ✉️ Enviar mensagem
+// ENVIAR
 async function enviarMensagem() {
+  await enviarMensagemBase("mensagem");
+}
+
+async function enviarMensagemTickets() {
+  await enviarMensagemBase("mensagem-tickets");
+}
+
+async function enviarMensagemBase(idCampo) {
   if (!ticketAtual) {
-    alert("Selecione uma categoria primeiro.");
+    alert("Selecione uma categoria.");
     return;
   }
 
-  const input = document.getElementById("mensagem");
+  const input = document.getElementById(idCampo);
   const texto = input.value.trim();
   if (!texto) return;
 
