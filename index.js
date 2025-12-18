@@ -1,45 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <title>Central de Atendimento Oasis</title>
   <link rel="stylesheet" href="style.css">
 </head>
+<body class="papel">
 
-<body class="login-page">
+<header class="topo">
+  <img src="logo-oasis.png" class="logo">
+  <h1>Central de Atendimento Oasis</h1>
+  <p>Supremo Tribunal Oasis</p>
+</header>
 
-  <div class="login-container">
+<main class="login-box">
+  <h2>🔐 Acesso ao Sistema</h2>
+  <p>Faça login com seu Discord para abrir solicitações oficiais.</p>
 
-    <div class="login-card">
+  <!-- NÃO MUDA ROTA -->
+  <a href="auth.html" class="btn-principal">Entrar com Discord</a>
+</main>
 
-      <img src="logo-oasis.png" class="login-logo" alt="Tribunal Oasis">
-
-      <h1>Central de Atendimento Oasis</h1>
-
-      <p class="login-subtitle">
-        Tribunal de Justiça de Oasis<br>
-        Atendimento Civil, Criminal e Administrativo
-      </p>
-
-      <div class="login-info">
-        Para acessar o sistema, é necessário autenticar-se
-        utilizando sua conta do Discord.
-      </div>
-
-      <a
-        href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&redirect_uri=https%3A%2F%2Fhinarahelo.github.io%2Fsistema-oasis%2Fcallback.html&scope=identify"
-        class="login-button"
-      >
-        🔐 Entrar com Discord
-      </a>
-
-      <span class="login-footer">
-        Sistema Oficial • Tribunal de Justiça de Oasis
-      </span>
-
-    </div>
-
-  </div>
+<footer>
+  <p>Documento Oficial • Tribunal de Justiça Oasis</p>
+</footer>
 
 </body>
 </html>
