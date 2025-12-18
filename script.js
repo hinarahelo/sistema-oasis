@@ -1,13 +1,10 @@
 // 🔐 Sessão
-let usuario;
-try {
-  usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario) throw new Error();
-} catch {
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+if (!usuario) {
   location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
 }
 
-// 🔥 Firebase (compatível sem módulo)
+// 🔥 Firebase
 firebase.initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
@@ -15,28 +12,28 @@ firebase.initializeApp({
 });
 
 const db = firebase.firestore();
-
 let ticketAtual = null;
 
-/* 📂 Abas */
-window.abrirAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.style.display = "none");
-  document.getElementById(id).style.display = "block";
-};
+// 🚪 Logout
+function logout() {
+  localStorage.removeItem("usuario");
+  location.href = "index.html";
+}
 
-/* 🎫 ABRIR / CRIAR TICKET (SEM QUERY COMPLEXA) */
+// 🎫 Abrir ou criar ticket
 window.abrirSolicitacao = async categoria => {
-  // Busca TODOS os tickets do usuário
+  console.log("Abrindo ticket:", categoria);
+
   const snap = await db.collection("tickets")
     .where("cid", "==", usuario.cid)
     .get();
 
-  // tenta achar ticket aberto da categoria
   let encontrado = null;
-  snap.forEach(d => {
-    const t = d.data();
+
+  snap.forEach(doc => {
+    const t = doc.data();
     if (t.categoria === categoria && t.status === "aberto") {
-      encontrado = d.id;
+      encontrado = doc.id;
     }
   });
 
@@ -56,10 +53,9 @@ window.abrirSolicitacao = async categoria => {
   abrirChat(categoria);
 };
 
-/* 💬 CHAT DO TICKET */
+// 💬 Chat
 function abrirChat(categoria) {
   document.getElementById("chat-titulo").innerText = `💬 ${categoria}`;
-  abrirAba("chat");
 
   db.collection("tickets")
     .doc(ticketAtual)
@@ -71,22 +67,20 @@ function abrirChat(categoria) {
 
       snap.forEach(d => {
         const m = d.data();
-        box.innerHTML += `
-          <p><b>${m.autor}:</b> ${m.texto || ""}</p>
-          ${m.anexoLink ? `<a href="${m.anexoLink}" target="_blank">📎 Anexo</a>` : ""}
-        `;
+        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
+        if (m.anexoLink) {
+          box.innerHTML += `<a href="${m.anexoLink}" target="_blank">📎 Anexo</a>`;
+        }
       });
-
-      box.scrollTop = box.scrollHeight;
     });
 }
 
-/* ✉️ ENVIAR MENSAGEM */
+// ✉️ Enviar mensagem
 window.enviarMensagem = async () => {
   if (!ticketAtual) return;
 
   const texto = document.getElementById("mensagem").value.trim();
-  const anexo = document.getElementById("anexoLink")?.value.trim();
+  const anexo = document.getElementById("anexoLink").value.trim();
 
   if (!texto && !anexo) return;
 
@@ -101,6 +95,5 @@ window.enviarMensagem = async () => {
     });
 
   document.getElementById("mensagem").value = "";
-  if (document.getElementById("anexoLink"))
-    document.getElementById("anexoLink").value = "";
+  document.getElementById("anexoLink").value = "";
 };
