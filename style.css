@@ -1,30 +1,8 @@
-body.dark {
-  background: #111;
-  color: #fff;
+body {
+  margin: 0;
   font-family: Arial, sans-serif;
-}
-
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.card {
-  background: #400;
-  padding: 30px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-.btn {
-  display: block;
-  padding: 15px;
-  background: #900;
+  background: #0e0e0e;
   color: #fff;
-  text-decoration: none;
-  border-radius: 8px;
 }
 
 .layout {
@@ -33,37 +11,67 @@ body.dark {
 }
 
 .sidebar {
-  width: 220px;
-  background: #300;
-  padding: 15px;
+  width: 240px;
+  background: linear-gradient(#5a0000, #2b0000);
+  padding: 20px;
 }
 
 .sidebar button {
   width: 100%;
-  margin: 5px 0;
+  margin: 6px 0;
+  padding: 12px;
+  background: #8b0000;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background: #b30000;
+}
+
+.logo {
+  width: 120px;
+  display: block;
+  margin: 0 auto 20px;
 }
 
 .content {
   flex: 1;
-  padding: 20px;
+  padding: 30px;
+  overflow-y: auto;
 }
 
 .aba { display: none; }
 .aba.active { display: block; }
 
-.categorias button {
-  margin: 4px;
+.grid button {
+  margin: 6px;
+  padding: 12px;
+  border-radius: 6px;
 }
 
 .chat {
-  background: #000;
-  border: 1px solid #333;
   height: 300px;
+  background: #1a1a1a;
+  padding: 10px;
   overflow-y: auto;
+}
+
+.envio {
+  display: flex;
+  gap: 10px;
+}
+
+.envio input {
+  flex: 1;
   padding: 10px;
 }
 
-textarea {
-  width: 100%;
-  margin-top: 10px;
+.preco-box {
+  background: #1b1b1b;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
 }
