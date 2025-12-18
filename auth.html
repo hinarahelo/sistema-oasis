@@ -3,51 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <title>Autenticando...</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0e0e0e;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+  </style>
 </head>
+
 <body>
-<p>Autenticando, aguarde...</p>
+  <p>Autenticando, aguarde...</p>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { registrarLog } from "./logs.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { registrarLog } from "./logs.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
-    authDomain: "sistema-oasis-75979.firebaseapp.com",
-    projectId: "sistema-oasis-75979"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const payload = params.get("user");
-    if (!payload) throw new Error();
-
-    const user = JSON.parse(atob(payload));
-
-    const usuario = {
-      nome: user.nome,
-      cid: user.id,
-      nivel: user.nivel || "cidadao"
+    // 🔥 Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
+      authDomain: "sistema-oasis-75979.firebaseapp.com",
+      projectId: "sistema-oasis-75979"
     };
 
-    localStorage.setItem("usuario", JSON.stringify(usuario));
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    await registrarLog(db, {
-      tipo: "login",
-      usuario: usuario.nome,
-      cid: usuario.cid,
-      nivel: usuario.nivel
-    });
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const payload = params.get("user");
 
-    location.href = "tickets.html";
-  } catch {
-    localStorage.removeItem("usuario");
-    location.href = "index.html";
-  }
-</script>
+      if (!payload) throw new Error("Payload ausente");
+
+      // 🔓 Decodifica payload do Worker
+      const user = JSON.parse(atob(payload));
+
+      const usuario = {
+        nome: user.nome,
+        cid: user.id || user.cid || user.discordId,
+        nivel: user.nivel || "cidadao"
+      };
+
+      // 💾 Salva sessão
+      localStorage.setItem("usuario", JSON.stringify(usuario));
+
+      // 🧾 Log de login
+      await registrarLog(db, {
+        tipo: "login",
+        usuario: usuario.nome,
+        cid: usuario.cid,
+        nivel: usuario.nivel
+      });
+
+      // ✅ Redireciona corretamente
+      window.location.replace("tickets.html");
+
+    } catch (err) {
+      console.error("Erro no auth:", err);
+      localStorage.removeItem("usuario");
+      window.location.replace("index.html");
+    }
+  </script>
 </body>
 </html>
