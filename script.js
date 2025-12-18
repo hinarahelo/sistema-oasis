@@ -3,7 +3,6 @@ import {
   getFirestore, collection, addDoc, query, where, getDocs,
   serverTimestamp, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { uploadAnexo } from "./storage.js";
 import { registrarLog } from "./logs.js";
 
 /* 🔐 Sessão */
@@ -69,32 +68,35 @@ function abrirChat(categoria){
       const m = d.data();
       box.innerHTML += `
         <p><b>${m.autor}:</b> ${m.texto || ""}</p>
-        ${m.anexo ? `<a class="anexo" href="${m.anexo}" target="_blank">📎 Anexo</a>` : ""}
+        ${m.anexoLink ? `<a class="anexo" href="${m.anexoLink}" target="_blank">📎 Abrir anexo</a>` : ""}
       `;
     });
+    box.scrollTop = box.scrollHeight;
   });
 }
 
-/* 📎 Enviar mensagem + anexo */
+/* 📎 Enviar mensagem + link */
 window.enviarMensagem = async ()=>{
   const texto = document.getElementById("mensagem").value.trim();
-  const file = document.getElementById("arquivo").files[0];
-  if (!texto && !file) return;
+  const anexoLink = document.getElementById("anexoLink").value.trim();
 
-  let anexoUrl = null;
-  if (file) {
-    anexoUrl = await uploadAnexo(app, ticketAtual, file);
+  if (!texto && !anexoLink) return;
+
+  // valida URL básica
+  if (anexoLink && !/^https?:\/\//i.test(anexoLink)) {
+    alert("Link inválido. Use http:// ou https://");
+    return;
   }
 
   await addDoc(collection(db,"tickets",ticketAtual,"mensagens"),{
     autor:usuario.nome,
     texto,
-    anexo: anexoUrl,
+    anexoLink: anexoLink || null,
     criadoEm:serverTimestamp()
   });
 
   await registrarLog(db,{ tipo:"mensagem", usuario:usuario.nome });
 
   document.getElementById("mensagem").value="";
-  document.getElementById("arquivo").value="";
+  document.getElementById("anexoLink").value="";
 };
