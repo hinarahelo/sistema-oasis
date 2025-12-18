@@ -7,50 +7,56 @@ try {
   location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
 }
 
-// 🔥 Firebase (global)
-const firebaseConfig = {
+// 🔥 Firebase (compatível sem módulo)
+firebase.initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
-};
+});
 
-firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 📂 Abas
+let ticketAtual = null;
+
+/* 📂 Abas */
 window.abrirAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.style.display = "none");
   document.getElementById(id).style.display = "block";
 };
 
-// 🎫 Ticket atual
-let ticketAtual = null;
-
-// 🎫 Abrir solicitação
+/* 🎫 ABRIR / CRIAR TICKET (SEM QUERY COMPLEXA) */
 window.abrirSolicitacao = async categoria => {
+  // Busca TODOS os tickets do usuário
   const snap = await db.collection("tickets")
     .where("cid", "==", usuario.cid)
-    .where("categoria", "==", categoria)
-    .where("status", "!=", "fechado")
     .get();
 
-  if (!snap.empty) {
-    ticketAtual = snap.docs[0].id;
+  // tenta achar ticket aberto da categoria
+  let encontrado = null;
+  snap.forEach(d => {
+    const t = d.data();
+    if (t.categoria === categoria && t.status === "aberto") {
+      encontrado = d.id;
+    }
+  });
+
+  if (encontrado) {
+    ticketAtual = encontrado;
   } else {
-    const doc = await db.collection("tickets").add({
+    const ref = await db.collection("tickets").add({
       nome: usuario.nome,
       cid: usuario.cid,
       categoria,
       status: "aberto",
       criadoEm: new Date()
     });
-    ticketAtual = doc.id;
+    ticketAtual = ref.id;
   }
 
   abrirChat(categoria);
 };
 
-// 💬 Chat
+/* 💬 CHAT DO TICKET */
 function abrirChat(categoria) {
   document.getElementById("chat-titulo").innerText = `💬 ${categoria}`;
   abrirAba("chat");
@@ -62,18 +68,23 @@ function abrirChat(categoria) {
     .onSnapshot(snap => {
       const box = document.getElementById("mensagens");
       box.innerHTML = "";
+
       snap.forEach(d => {
         const m = d.data();
-        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
-        if (m.anexoLink) {
-          box.innerHTML += `<a href="${m.anexoLink}" target="_blank">📎 Anexo</a>`;
-        }
+        box.innerHTML += `
+          <p><b>${m.autor}:</b> ${m.texto || ""}</p>
+          ${m.anexoLink ? `<a href="${m.anexoLink}" target="_blank">📎 Anexo</a>` : ""}
+        `;
       });
+
+      box.scrollTop = box.scrollHeight;
     });
 }
 
-// ✉️ Enviar mensagem
+/* ✉️ ENVIAR MENSAGEM */
 window.enviarMensagem = async () => {
+  if (!ticketAtual) return;
+
   const texto = document.getElementById("mensagem").value.trim();
   const anexo = document.getElementById("anexoLink")?.value.trim();
 
