@@ -5,37 +5,29 @@
   <title>Atendimento Oasis</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
+<body>
 <div class="layout">
 
-  <!-- MENU LATERAL -->
   <aside class="sidebar">
-    <div class="logo">
-      <img src="logo-oasis.png" alt="Oasis">
-      <h2>Atendimento Oasis</h2>
-    </div>
-
-    <button onclick="mostrarAba('solicitacoes')">🎫 Faça sua Solicitação</button>
+    <img src="logo-oasis.png" class="logo">
+    <button onclick="mostrarAba('solicitacoes')">🎫 Solicitações</button>
     <button onclick="mostrarAba('tickets')">🎟 Tickets</button>
     <button onclick="mostrarAba('precos')">💰 Preços</button>
     <button onclick="sair()">🚪 Sair</button>
   </aside>
 
-  <!-- CONTEÚDO -->
   <main class="content">
 
-    <!-- ABA SOLICITAÇÕES -->
     <section id="solicitacoes" class="aba active">
-      <h1>🎫 Sistema de Tickets</h1>
+      <h1>🎫 Sistema de Atendimento</h1>
       <p class="info">
         • 1 ticket ativo por categoria<br>
-        • Atendimento em até 24 horas<br>
+        • Atendimento em até 24h<br>
         • Mantenha o respeito
       </p>
 
-      <h2>Solicitações</h2>
-      <div class="botoes">
+      <div class="grid">
         <button onclick="abrirCategoria('Troca de Nome')">📜 Troca de Nome</button>
         <button onclick="abrirCategoria('Adoção')">👶 Adoção</button>
         <button onclick="abrirCategoria('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
@@ -47,60 +39,38 @@
       </div>
     </section>
 
-    <!-- ABA CHAT -->
-    <section id="chat" class="aba">
-      <button class="voltar" onclick="mostrarAba('solicitacoes')">⬅ Voltar</button>
-      <h2 id="chatTitulo"></h2>
-
-      <div id="mensagens" class="chat"></div>
-
-      <div class="envio">
-        <input id="mensagem" placeholder="Digite sua mensagem...">
-        <button onclick="enviarMensagem()">Enviar</button>
-      </div>
-    </section>
-
-    <!-- ABA TICKETS -->
     <section id="tickets" class="aba">
       <h1>🎟 Tickets</h1>
-      <div class="botoes">
+      <div class="grid">
         <button onclick="abrirCategoria('Denúncia')">⚠ Denúncia</button>
-        <button onclick="abrirCategoria('Falar com o Juiz')">⚖ Falar com o Juiz</button>
+        <button onclick="abrirCategoria('Falar com o Juiz')">⚖ Juiz</button>
         <button onclick="abrirCategoria('Suporte')">🛠 Suporte</button>
         <button onclick="abrirCategoria('Processos')">📁 Processos</button>
       </div>
     </section>
 
-    <!-- ABA PREÇOS -->
-    <section id="precos" class="aba">
-      <h1>💰 Serviços Disponíveis</h1>
+    <section id="chat" class="aba">
+      <button class="voltar" onclick="mostrarAba('solicitacoes')">⬅ Voltar</button>
+      <h2 id="chatTitulo"></h2>
+      <div id="mensagens" class="chat"></div>
+      <div class="envio">
+        <input id="mensagem" placeholder="Digite sua mensagem">
+        <button onclick="enviarMensagem()">Enviar</button>
+      </div>
+    </section>
 
+    <section id="precos" class="aba">
+      <h1>💰 Serviços</h1>
       <div class="preco-box">
-        <h2>⚖ Atendimentos Jurídicos</h2>
+        <h2>⚖ Jurídico</h2>
         <p>Delegacia Sul — $20.000</p>
         <p>Delegacia PRF — $30.000</p>
       </div>
-
       <div class="preco-box">
-        <h2>🔫 Porte de Arma</h2>
-        <p>Emissão — $20.000</p>
-      </div>
-
-      <div class="preco-box">
-        <h2>💍 Certidões Civis</h2>
+        <h2>💍 Certidões</h2>
         <p>Casamento — $150.000</p>
         <p>Divórcio — $200.000</p>
         <p>Troca de Nome — $250.000</p>
-        <p>Adoção — $50.000</p>
-        <p>Nascimento — $50.000</p>
-        <p>Jovem Aprendiz — $30.000</p>
-      </div>
-
-      <div class="preco-box">
-        <h2>🧾 Ações Jurídicas</h2>
-        <p>Ação Judicial — $50.000</p>
-        <p>Limpeza de Ficha (1–3) — $50.000</p>
-        <small>+ $10.000 a partir da 4ª ocorrência</small>
       </div>
     </section>
 
