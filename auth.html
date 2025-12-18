@@ -25,7 +25,6 @@
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { registrarLog } from "./logs.js";
 
-    // 🔥 Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
       authDomain: "sistema-oasis-75979.firebaseapp.com",
@@ -38,22 +37,18 @@
     try {
       const params = new URLSearchParams(window.location.search);
       const payload = params.get("user");
+      if (!payload) throw new Error();
 
-      if (!payload) throw new Error("Payload ausente");
-
-      // 🔓 Decodifica payload do Worker
       const user = JSON.parse(atob(payload));
 
       const usuario = {
         nome: user.nome,
-        cid: user.id || user.cid || user.discordId,
+        cid: user.id,
         nivel: user.nivel || "cidadao"
       };
 
-      // 💾 Salva sessão
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // 🧾 Log de login
       await registrarLog(db, {
         tipo: "login",
         usuario: usuario.nome,
@@ -61,11 +56,8 @@
         nivel: usuario.nivel
       });
 
-      // ✅ Redireciona corretamente
       window.location.replace("tickets.html");
-
-    } catch (err) {
-      console.error("Erro no auth:", err);
+    } catch {
       localStorage.removeItem("usuario");
       window.location.replace("index.html");
     }
