@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Autenticando...</title>
+</head>
+<body>
+  <p>Autenticando, aguarde...</p>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const payload = params.get("user");
+
+    if (!payload) {
+      alert("Erro de autenticação");
+      window.location.href = "index.html";
+    } else {
+      try {
+        const user = JSON.parse(atob(payload));
+        localStorage.setItem("usuario", JSON.stringify({
+          nome: user.nome,
+          cid: user.discordId || user.cid,
+          nivel: user.nivel || "cliente"
+        }));
+        window.location.href = "tickets.html";
+      } catch(e) {
+        alert("Erro ao processar login");
+        window.location.href = "index.html";
+      }
+    }
+  </script>
+</body>
+</html>
