@@ -21,6 +21,7 @@
 </head>
 <body>
   <p>Autenticando, aguarde...</p>
+
   <script>
     const params = new URLSearchParams(window.location.search);
     const payload = params.get("user");
@@ -28,27 +29,31 @@
     if (!payload) {
       alert("Erro de autenticação");
       window.location.href = "index.html";
-    } else {
-      try {
-        // Decodifica payload Base64
-        const user = JSON.parse(atob(payload));
+      throw new Error("Payload ausente");
+    }
 
-        // Salva no localStorage de forma consistente
-        const usuario = {
-          nome: user.nome,
-          cid: user.id || user.discordId || user.cid,
-          nivel: user.nivel || "cliente"
-        };
+    try {
+      // Decodifica o payload enviado pelo Worker
+      const user = JSON.parse(atob(payload));
 
-        localStorage.setItem("usuario", JSON.stringify(usuario));
+      // Estrutura única e consistente usada em TODO o site
+      const usuario = {
+        nome: user.nome,
+        cid: user.id || user.discordId || user.cid,
+        nivel: user.nivel || "cidadao"
+      };
 
-        // Redireciona para tickets.html
-        window.location.href = "tickets.html";
-      } catch(e) {
-        console.error(e);
-        alert("Erro ao processar login");
-        window.location.href = "index.html";
-      }
+      // Salva sessão
+      localStorage.setItem("usuario", JSON.stringify(usuario));
+
+      // Redireciona para o sistema
+      window.location.href = "tickets.html";
+
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao processar login");
+      localStorage.removeItem("usuario");
+      window.location.href = "index.html";
     }
   </script>
 </body>
