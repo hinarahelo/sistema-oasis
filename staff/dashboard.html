@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <title>Dashboard • Oasis</title>
   <link rel="stylesheet" href="../style.css">
+  <style>
+    .sla-ok { color:#2e7d32; }
+    .sla-alerta { color:#f9a825; }
+    .sla-estourado { color:#c62828; }
+  </style>
 </head>
 <body class="dark">
 
@@ -18,18 +23,12 @@
   <aside class="sidebar">
     <h2>👮 Staff</h2>
     <button onclick="abrirAba('tickets')">🎫 Tickets</button>
-    <button onclick="abrirAba('logs')">🧾 Logs</button>
   </aside>
 
   <main class="content">
     <section id="tickets" class="aba active">
-      <h2>Tickets</h2>
+      <h2>🎫 Tickets com SLA</h2>
       <div id="lista-tickets"></div>
-    </section>
-
-    <section id="logs" class="aba">
-      <h2>Logs do Sistema</h2>
-      <ul id="lista-logs"></ul>
     </section>
   </main>
 </div>
