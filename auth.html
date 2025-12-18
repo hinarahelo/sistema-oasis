@@ -3,6 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <title>Autenticando...</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #1a1a1a;
+      color: #fff;
+      margin: 0;
+    }
+    p {
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
   <p>Autenticando, aguarde...</p>
@@ -15,14 +30,22 @@
       window.location.href = "index.html";
     } else {
       try {
+        // Decodifica payload Base64
         const user = JSON.parse(atob(payload));
-        localStorage.setItem("usuario", JSON.stringify({
+
+        // Salva no localStorage de forma consistente
+        const usuario = {
           nome: user.nome,
-          cid: user.discordId || user.cid,
+          cid: user.id || user.discordId || user.cid,
           nivel: user.nivel || "cliente"
-        }));
+        };
+
+        localStorage.setItem("usuario", JSON.stringify(usuario));
+
+        // Redireciona para tickets.html
         window.location.href = "tickets.html";
       } catch(e) {
+        console.error(e);
         alert("Erro ao processar login");
         window.location.href = "index.html";
       }
