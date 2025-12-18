@@ -1,4 +1,6 @@
-// 🔐 Sessão
+console.log("SCRIPT INICIADO");
+
+// 🔐 Usuário
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario) {
   location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
@@ -20,25 +22,25 @@ function logout() {
   location.href = "index.html";
 }
 
-// 🎫 Abrir ou criar ticket
-window.abrirSolicitacao = async categoria => {
-  console.log("Abrindo ticket:", categoria);
+// 🎫 Criar / Abrir Ticket
+async function abrirSolicitacao(categoria) {
+  console.log("Abrindo:", categoria);
 
   const snap = await db.collection("tickets")
     .where("cid", "==", usuario.cid)
     .get();
 
-  let encontrado = null;
+  let existente = null;
 
   snap.forEach(doc => {
     const t = doc.data();
     if (t.categoria === categoria && t.status === "aberto") {
-      encontrado = doc.id;
+      existente = doc.id;
     }
   });
 
-  if (encontrado) {
-    ticketAtual = encontrado;
+  if (existente) {
+    ticketAtual = existente;
   } else {
     const ref = await db.collection("tickets").add({
       nome: usuario.nome,
@@ -51,11 +53,11 @@ window.abrirSolicitacao = async categoria => {
   }
 
   abrirChat(categoria);
-};
+}
 
-// 💬 Chat
+// 💬 Chat em tempo real
 function abrirChat(categoria) {
-  document.getElementById("chat-titulo").innerText = `💬 ${categoria}`;
+  document.getElementById("chat-titulo").innerText = "💬 " + categoria;
 
   db.collection("tickets")
     .doc(ticketAtual)
@@ -67,22 +69,18 @@ function abrirChat(categoria) {
 
       snap.forEach(d => {
         const m = d.data();
-        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
-        if (m.anexoLink) {
-          box.innerHTML += `<a href="${m.anexoLink}" target="_blank">📎 Anexo</a>`;
-        }
+        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
       });
     });
 }
 
 // ✉️ Enviar mensagem
-window.enviarMensagem = async () => {
+async function enviarMensagem() {
   if (!ticketAtual) return;
 
-  const texto = document.getElementById("mensagem").value.trim();
-  const anexo = document.getElementById("anexoLink").value.trim();
-
-  if (!texto && !anexo) return;
+  const input = document.getElementById("mensagem");
+  const texto = input.value.trim();
+  if (!texto) return;
 
   await db.collection("tickets")
     .doc(ticketAtual)
@@ -90,10 +88,8 @@ window.enviarMensagem = async () => {
     .add({
       autor: usuario.nome,
       texto,
-      anexoLink: anexo || null,
       criadoEm: new Date()
     });
 
-  document.getElementById("mensagem").value = "";
-  document.getElementById("anexoLink").value = "";
-};
+  input.value = "";
+}
