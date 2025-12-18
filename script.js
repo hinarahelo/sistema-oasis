@@ -10,20 +10,31 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   🔐 SESSÃO
-================================ */
+/* =========================
+   🔐 SESSÃO / PROTEÇÃO
+========================= */
 
-const usuarioStr = localStorage.getItem("usuario");
-if (!usuarioStr) {
+let usuario = null;
+
+try {
+  const raw = localStorage.getItem("usuario");
+  if (!raw) throw new Error("Sessão inexistente");
+
+  usuario = JSON.parse(raw);
+
+  if (!usuario.nome || !usuario.cid || !usuario.nivel) {
+    throw new Error("Sessão inválida");
+  }
+
+} catch (e) {
+  console.warn("[SESSION INVALID]", e);
+  localStorage.removeItem("usuario");
   location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
 }
 
-const usuario = JSON.parse(usuarioStr);
-
-/* ===============================
+/* =========================
    🔥 FIREBASE
-================================ */
+========================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
@@ -34,22 +45,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ===============================
-   🧭 NAVEGAÇÃO
-================================ */
+/* =========================
+   📂 UI / ABAS
+========================= */
+
+let ticketAtual = null;
 
 window.abrirAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".aba").forEach(a => a.style.display = "none");
+  const el = document.getElementById(id);
+  if (el) el.style.display = "block";
 };
 
 abrirAba("solicitacoes");
 
-/* ===============================
+/* =========================
    🎫 TICKETS
-================================ */
-
-let ticketAtual = null;
+========================= */
 
 window.abrirSolicitacao = async categoria => {
   const q = query(
@@ -86,12 +98,10 @@ function abrirChat(categoria) {
   onSnapshot(ref, snap => {
     const box = document.getElementById("mensagens");
     box.innerHTML = "";
-
     snap.forEach(d => {
       const m = d.data();
       box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
     });
-
     box.scrollTop = box.scrollHeight;
   });
 }
@@ -99,7 +109,6 @@ function abrirChat(categoria) {
 window.enviarMensagem = async () => {
   const input = document.getElementById("mensagem");
   const texto = input.value.trim();
-
   if (!texto || !ticketAtual) return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
@@ -110,10 +119,6 @@ window.enviarMensagem = async () => {
 
   input.value = "";
 };
-
-/* ===============================
-   📜 HISTÓRICO
-================================ */
 
 async function carregarHistorico() {
   const q = query(collection(db, "tickets"), where("cid", "==", usuario.cid));
