@@ -2,52 +2,34 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Autenticando...</title>
+  <title>Autenticação • Tribunal de Justiça de Oasis</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<p>Autenticando, aguarde...</p>
+<body class="bg-paper">
+
+<header class="header official">
+  <img src="logo-oasis.png" class="logo" />
+  <div>
+    <h1>Tribunal de Justiça de Oasis</h1>
+    <span>Autenticação Institucional</span>
+  </div>
+</header>
+
+<main class="login-container">
+  <div class="login-card official">
+    <h2>🔐 Autenticação com Discord</h2>
+    <p>Utilizamos o Discord como meio oficial de identificação.</p>
+
+    <a id="loginDiscord" class="btn-primary">
+      Entrar com Discord
+    </a>
+  </div>
+</main>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { registrarLog } from "./logs.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
-    authDomain: "sistema-oasis-75979.firebaseapp.com",
-    projectId: "sistema-oasis-75979"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const payload = params.get("user");
-    if (!payload) throw new Error();
-
-    const user = JSON.parse(atob(payload));
-
-    const usuario = {
-      nome: prompt("Digite seu nome no jogo:"),
-      cid: prompt("Digite seu ID no jogo:"),
-      nivel: "cidadao"
-    };
-
-    localStorage.setItem("usuario", JSON.stringify(usuario));
-
-    await registrarLog(db, {
-      tipo: "login",
-      usuario: usuario.nome,
-      cid: usuario.cid,
-      nivel: usuario.nivel
-    });
-
-    location.href = "tickets.html";
-  } catch {
-    localStorage.clear();
-    location.href = "index.html";
-  }
+  import { discordAuthUrl } from "./config.js";
+  document.getElementById("loginDiscord").href = discordAuthUrl();
 </script>
+
 </body>
 </html>
