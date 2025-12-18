@@ -10,9 +10,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   🔥 FIREBASE
-================================ */
+/* 🔥 FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
@@ -22,49 +20,31 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ===============================
-   🔐 USUÁRIO
-================================ */
+/* 🔐 USUÁRIO */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario) {
-  location.href = "index.html";
-}
+if (!usuario) location.href = "index.html";
 
-/* ===============================
-   🧭 ESTADO GLOBAL
-================================ */
+/* 🧭 ESTADO */
 let ticketAtual = null;
-let categoriaAtual = null;
 let unsubscribeMensagens = null;
 
-/* ===============================
-   🗂️ ABAS
-================================ */
+/* 🗂️ ABAS */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  const aba = document.getElementById(id);
-  if (aba) aba.classList.add("active");
+  document.getElementById(id)?.classList.add("active");
 };
 
-/* ===============================
-   🚪 LOGOUT
-================================ */
+/* 🚪 SAIR */
 window.sair = () => {
   localStorage.clear();
   location.href = "index.html";
 };
 
-/* ===============================
-   📂 ABRIR CATEGORIA
-================================ */
+/* 📂 ABRIR CATEGORIA */
 window.abrirCategoria = async categoria => {
-  categoriaAtual = categoria;
   mostrarAba("chat");
+  document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
 
-  const titulo = document.getElementById("chatTitulo");
-  if (titulo) titulo.innerText = `💬 ${categoria}`;
-
-  // 🔍 Busca ticket aberto da categoria
   const q = query(
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
@@ -77,29 +57,24 @@ window.abrirCategoria = async categoria => {
   if (!snap.empty) {
     ticketAtual = snap.docs[0].id;
   } else {
-    const docRef = await addDoc(collection(db, "tickets"), {
+    const ref = await addDoc(collection(db, "tickets"), {
       nome: usuario.nome,
       cid: usuario.cid,
       categoria,
       status: "aberto",
       criadoEm: serverTimestamp()
     });
-    ticketAtual = docRef.id;
+    ticketAtual = ref.id;
   }
 
   iniciarChat();
 };
 
-/* ===============================
-   💬 CHAT
-================================ */
+/* 💬 CHAT */
 function iniciarChat() {
-  if (!ticketAtual) return;
-
   const box = document.getElementById("mensagens");
-  if (!box) return;
+  box.innerHTML = "";
 
-  // 🔁 Remove listener anterior
   if (unsubscribeMensagens) unsubscribeMensagens();
 
   unsubscribeMensagens = onSnapshot(
@@ -115,26 +90,19 @@ function iniciarChat() {
   );
 }
 
-/* ===============================
-   ✉️ ENVIAR MENSAGEM
-================================ */
+/* ✉️ ENVIAR */
 window.enviarMensagem = async () => {
   const input = document.getElementById("mensagem");
-  if (!input || !ticketAtual) return;
-
-  const texto = input.value.trim();
-  if (!texto) return;
+  if (!input.value.trim()) return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} ${usuario.cid}`,
-    texto,
+    texto: input.value,
     criadoEm: serverTimestamp()
   });
 
   input.value = "";
 };
 
-/* ===============================
-   🚀 ABA INICIAL
-================================ */
+/* 🚀 INICIAL */
 mostrarAba("solicitacoes");
