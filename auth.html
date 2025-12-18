@@ -3,38 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <title>Autenticando...</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #1a1a1a;
+      color: #fff;
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
-  <p>Autenticando, aguarde...</p>
 
-  <script>
+<p>Autenticando, aguarde...</p>
+
+<script>
+  try {
     const params = new URLSearchParams(window.location.search);
     const payload = params.get("user");
 
     if (!payload) {
-      alert("Erro de autenticação");
-      window.location.href = "index.html";
       throw new Error("Payload ausente");
     }
 
-    try {
-      const user = JSON.parse(atob(payload));
+    const decoded = atob(payload);
+    const user = JSON.parse(decoded);
 
-      const usuario = {
-        nome: user.nome,
-        cid: user.id,
-        nivel: user.nivel || "cidadao"
-      };
-
-      localStorage.setItem("usuario", JSON.stringify(usuario));
-
-      window.location.href = "tickets.html";
-    } catch (e) {
-      console.error(e);
-      localStorage.removeItem("usuario");
-      alert("Erro ao processar login");
-      window.location.href = "index.html";
+    // validação mínima defensiva
+    if (!user || !user.nome || !user.id) {
+      throw new Error("Payload inválido");
     }
-  </script>
+
+    const usuario = {
+      nome: user.nome,
+      cid: user.id,
+      nivel: user.nivel || "cidadao"
+    };
+
+    localStorage.setItem("usuario", JSON.stringify(usuario));
+
+    // limpeza de URL
+    window.history.replaceState({}, document.title, "/sistema-oasis/auth.html");
+
+    // segue fluxo normal
+    window.location.href = "tickets.html";
+
+  } catch (e) {
+    console.error("[AUTH ERROR]", e);
+    localStorage.removeItem("usuario");
+    alert("Falha no login. Tente novamente.");
+    window.location.href = "index.html";
+  }
+</script>
+
 </body>
 </html>
