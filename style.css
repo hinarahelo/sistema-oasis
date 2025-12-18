@@ -1,192 +1,45 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
-}
-
-:root {
-  --bg-main: #330000;
-  --bg-card: #440000;
-  --bg-sidebar: #550000;
-  --bg-soft: #660000;
-  --primary: #880000;
-  --primary-hover: #aa0000;
-  --text: #fff;
-  --muted: #ffcccc;
-  --radius: 18px;
-}
-
-/* BACKGROUND + LOGO WATERMARK */
 body.dark {
-  background: radial-gradient(circle at top, #330000, #000000);
-  color: var(--text);
-  min-height: 100vh;
-  position: relative;
+  background:#1a1a1a;
+  color:#fff;
+  margin:0;
+  font-family: Arial, sans-serif;
 }
 
-body.dark::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: url("logo-oasis.png") center no-repeat;
-  background-size: 420px;
-  opacity: 0.035;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* CENTER */
-body.center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* CARD */
-.card {
-  background: var(--bg-card);
-  width: 480px;
-  padding: 45px;
-  border-radius: var(--radius);
-  box-shadow: 0 40px 90px rgba(0,0,0,.8);
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-
-.card h2 {
-  margin-bottom: 28px;
-  font-size: 1.8rem;
-}
-
-/* INPUTS */
-input, textarea {
-  width: 100%;
-  background: var(--bg-soft);
-  border: none;
-  padding: 16px;
-  border-radius: 14px;
-  color: var(--text);
-  margin-bottom: 18px;
-  font-size: 15px;
-}
-
-/* BUTTON */
-button {
-  width: 100%;
-  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-  border: none;
-  padding: 16px;
-  border-radius: 14px;
-  color: #fff;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-button:hover {
-  filter: brightness(1.12);
-}
-
-/* LAYOUT */
-.layout {
-  display: flex;
-  min-height: 100vh;
-  position: relative;
-  z-index: 2;
-}
-
-/* SIDEBAR */
+.layout { display:flex; min-height:100vh; }
 .sidebar {
-  width: 290px;
-  background: var(--bg-sidebar);
-  padding: 32px;
-  box-shadow: 5px 0 40px rgba(0,0,0,.6);
+  width:220px;
+  background:#330000;
+  padding:15px;
+}
+.sidebar button, .sidebar a {
+  display:block;
+  width:100%;
+  margin-bottom:8px;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#7a0000;
+  color:#fff;
+  cursor:pointer;
+  text-align:left;
+}
+.sidebar button:hover, .sidebar a:hover {
+  background:#b30000;
 }
 
-.sidebar h2 {
-  margin-bottom: 25px;
-  font-size: 1.4rem;
+.content { flex:1; padding:15px; overflow-y:auto; }
+
+.card {
+  background:#2a0000;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
 }
 
-.sidebar button {
-  background: var(--bg-soft);
-  margin-bottom: 12px;
-  color: var(--text);
-}
-
-.sidebar button:hover {
-  background: var(--primary);
-}
-
-/* CONTENT */
-.content {
-  flex: 1;
-  padding: 50px;
-}
-
-/* ABA */
-.aba {
-  display: none;
-  background: var(--bg-card);
-  padding: 40px;
-  border-radius: var(--radius);
-  box-shadow: 0 30px 70px rgba(0,0,0,.6);
-}
-
-.aba.active {
-  display: block;
-}
-
-.aba h2 {
-  margin-bottom: 22px;
-}
-
-/* PROCESSOS */
-.processos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 18px;
-}
-
-/* HISTÓRICO */
-#lista-historico li {
-  background: var(--bg-soft);
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-#lista-historico li:hover {
-  background: var(--primary);
-  color: var(--text);
-}
-
-/* CHAT */
-.chat {
-  background-color: var(--bg-soft);
-  padding: 10px;
-  border-radius: 10px;
-  max-height: 300px;
-  overflow-y: auto;
-  margin-top: 10px;
-}
-
-.chat p {
-  margin: 3px 0;
-}
-
-/* RESPONSIVO */
-@media (max-width: 768px) {
-  .layout {
-    flex-direction: column;
-  }
-  .sidebar {
-    width: 100%;
-  }
-  .card {
-    width: 92%;
-  }
+textarea {
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  margin-top:5px;
 }
