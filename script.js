@@ -1,106 +1,87 @@
-const usuario = JSON.parse(localStorage.getItem("usuario"));
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-firebase.initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
-});
+};
 
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+if (!usuario) location.href = "index.html";
+
 let ticketAtual = null;
-let listener = null;
+let categoriaAtual = null;
 
-// ABAS
-function abrirAba(id) {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("ativa"));
-  document.getElementById(id).classList.add("ativa");
-}
+window.mostrarAba = id => {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+};
 
-// LOGOUT
-function logout() {
-  localStorage.removeItem("usuario");
+window.sair = () => {
+  localStorage.clear();
   location.href = "index.html";
-}
+};
 
-// ABRIR / CRIAR TICKET
-async function abrirTicket(categoria) {
-  if (listener) listener();
+window.abrirCategoria = async categoria => {
+  categoriaAtual = categoria;
+  mostrarAba("chat");
+  document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
 
-  document.querySelectorAll(".chat").forEach(c => c.innerHTML = "");
+  const q = query(
+    collection(db, "tickets"),
+    where("cid", "==", usuario.cid),
+    where("categoria", "==", categoria),
+    where("status", "==", "aberto")
+  );
 
-  const snap = await db.collection("tickets")
-    .where("cid", "==", usuario.cid)
-    .get();
+  const snap = await getDocs(q);
 
-  let id = null;
-
-  snap.forEach(doc => {
-    const t = doc.data();
-    if (t.categoria === categoria && t.status === "aberto") {
-      id = doc.id;
-    }
-  });
-
-  if (!id) {
-    const ref = await db.collection("tickets").add({
+  if (!snap.empty) {
+    ticketAtual = snap.docs[0].id;
+  } else {
+    const docRef = await addDoc(collection(db, "tickets"), {
       nome: usuario.nome,
       cid: usuario.cid,
       categoria,
       status: "aberto",
-      criadoEm: new Date()
+      criadoEm: serverTimestamp()
     });
-    id = ref.id;
+    ticketAtual = docRef.id;
   }
 
-  ticketAtual = id;
-  escutarMensagens(categoria);
-}
+  carregarMensagens();
+};
 
-// CHAT
-function escutarMensagens(categoria) {
-  listener = db.collection("tickets")
-    .doc(ticketAtual)
-    .collection("mensagens")
-    .orderBy("criadoEm")
-    .onSnapshot(snap => {
-      const box = document.querySelector(".aba.ativa .chat");
-      box.innerHTML = "";
-      snap.forEach(d => {
-        const m = d.data();
-        box.innerHTML += `<p><b>${m.autor} ${m.cid}:</b> ${m.texto}</p>`;
-      });
-      box.scrollTop = box.scrollHeight;
+function carregarMensagens() {
+  const box = document.getElementById("mensagens");
+  box.innerHTML = "";
+
+  onSnapshot(collection(db, "tickets", ticketAtual, "mensagens"), snap => {
+    box.innerHTML = "";
+    snap.forEach(d => {
+      const m = d.data();
+      box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
     });
+    box.scrollTop = box.scrollHeight;
+  });
 }
 
-// ENVIAR
-async function enviarMensagem() {
-  await enviarMensagemBase("mensagem");
-}
-
-async function enviarMensagemTickets() {
-  await enviarMensagemBase("mensagem-tickets");
-}
-
-async function enviarMensagemBase(idCampo) {
-  if (!ticketAtual) {
-    alert("Selecione uma categoria.");
-    return;
-  }
-
-  const input = document.getElementById(idCampo);
+window.enviarMensagem = async () => {
+  const input = document.getElementById("mensagem");
   const texto = input.value.trim();
-  if (!texto) return;
+  if (!texto || !ticketAtual) return;
 
-  await db.collection("tickets")
-    .doc(ticketAtual)
-    .collection("mensagens")
-    .add({
-      autor: usuario.nome,
-      cid: usuario.cid,
-      texto,
-      criadoEm: new Date()
-    });
+  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
+    autor: `${usuario.nome} ${usuario.cid}`,
+    texto,
+    criadoEm: serverTimestamp()
+  });
 
   input.value = "";
-}
+};
