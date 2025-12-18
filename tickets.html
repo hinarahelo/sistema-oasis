@@ -2,32 +2,42 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Tickets</title>
+  <title>Tickets • Oasis</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      background-color: #660000;
-      color: #fff;
-      resize: none;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-
-    #mensagens p { margin:4px 0; }
-    button { margin-top: 5px; }
+    .aba { display:none; }
+    .aba.active { display:block; }
   </style>
 </head>
 <body class="dark">
+
+<script>
+  // Proteção de acesso
+  let usuario = null;
+  try {
+    usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || !usuario.nivel) throw new Error();
+  } catch {
+    location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
+  }
+</script>
+
 <div class="layout">
   <aside class="sidebar">
     <h2>🎫 Atendimento</h2>
     <button onclick="abrirAba('solicitacoes')">🛒 Solicitações</button>
     <button onclick="abrirAba('historico')">🧾 Histórico</button>
+
+    <!-- Link staff só para níveis permitidos -->
+    <script>
+      if (usuario.nivel === "juridico" || usuario.nivel === "coordenacao") {
+        document.write(
+          `<a href="staff/dashboard.html" style="display:block;margin-top:10px;">👮 Painel Staff</a>`
+        );
+      }
+    </script>
   </aside>
+
   <main class="content">
     <section id="solicitacoes" class="aba active">
       <h2>🛒 Solicitações</h2>
@@ -40,18 +50,21 @@
         <button onclick="abrirSolicitacao('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
       </div>
     </section>
+
     <section id="historico" class="aba">
-      <h2>🧾 Meus Tickets</h2>
+      <h2>🧾 Tickets</h2>
       <ul id="lista-historico"></ul>
     </section>
+
     <section id="chat" class="aba">
       <h2 id="chat-titulo"></h2>
-      <div id="mensagens" class="chat"></div>
+      <div id="mensagens"></div>
       <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
       <button onclick="enviarMensagem()">Enviar</button>
     </section>
   </main>
 </div>
+
 <script type="module" src="script.js"></script>
 </body>
 </html>
