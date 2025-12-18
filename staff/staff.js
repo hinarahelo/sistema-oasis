@@ -1,78 +1,100 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
+/* =========================
+   🔐 SESSÃO
+========================= */
+
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+/* =========================
+   🔥 FIREBASE
+========================= */
+
+const app = initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
-};
-const app = initializeApp(firebaseConfig);
+});
+
 const db = getFirestore(app);
-
-// ====== VALIDAÇÃO CARGOS ======
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-const ROLES = {
-  "1142572540410212423":"cidadão",
-  "1142572540435386435":"jurídico",
-  "1142573532723810416":"coordenação"
-};
-
-if (!usuario || !Object.keys(ROLES).includes(usuario.cid) && usuario.nivel==="cliente") {
-  location.href = "../index.html";
-}
 
 let ticketAtual = null;
 
-// LISTAR TICKETS
-onSnapshot(collection(db,"tickets"),snap=>{
-  const lista = document.getElementById("lista-abertos");
-  const listaFechados = document.getElementById("lista-fechados");
-  lista.innerHTML="";
-  listaFechados.innerHTML="";
-  snap.forEach(d=>{
-    const t=d.data();
-    const div=document.createElement("div");
-    div.className="card";
-    div.innerHTML=`<b>${t.categoria}</b><br>${t.nome}`;
-    const btn=document.createElement("button");
-    btn.textContent="Abrir";
-    btn.onclick=()=>abrir(d.id);
-    div.appendChild(btn);
-    if(t.status!=="fechado") lista.appendChild(div);
-    else listaFechados.appendChild(div);
+/* =========================
+   📂 UI
+========================= */
+
+window.abrirAba = id => {
+  document.querySelectorAll(".aba").forEach(a => a.style.display = "none");
+  document.getElementById(id).style.display = "block";
+};
+
+/* =========================
+   🎫 LISTAGEM DE TICKETS
+========================= */
+
+onSnapshot(collection(db, "tickets"), snap => {
+  const abertos = document.getElementById("lista-abertos");
+  const fechados = document.getElementById("lista-fechados");
+
+  abertos.innerHTML = "";
+  fechados.innerHTML = "";
+
+  snap.forEach(d => {
+    const t = d.data();
+
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <b>${t.categoria}</b><br>
+      ${t.nome}<br>
+      <small>Status: ${t.status}</small>
+    `;
+
+    // Jurídico e Coordenação podem responder
+    if (usuario.nivel === "juridico" || usuario.nivel === "coordenacao") {
+      const btn = document.createElement("button");
+      btn.textContent = "Assumir";
+      btn.onclick = () => (ticketAtual = d.id);
+      div.appendChild(btn);
+    }
+
+    if (t.status === "fechado") fechados.appendChild(div);
+    else abertos.appendChild(div);
   });
 });
 
-// ABRIR CHAT
-window.abrir = id =>{
-  ticketAtual = id;
-  onSnapshot(collection(db,"tickets",id,"mensagens"),snap=>{
-    const box = document.getElementById("mensagens");
-    if(!box) return;
-    box.innerHTML="";
-    snap.forEach(d=>{
-      const m = d.data();
-      box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
-    });
-    box.scrollTop = box.scrollHeight;
-  });
-};
+/* =========================
+   💬 RESPONDER
+========================= */
 
-// RESPONDER
-window.responder = async ()=>{
-  const msg = document.getElementById("mensagem");
-  const texto = msg.value.trim();
-  if(!texto||!ticketAtual) return;
-  await addDoc(collection(db,"tickets",ticketAtual,"mensagens"),{
-    autor:usuario.nome,
+window.responder = async texto => {
+  if (!ticketAtual || !texto) return;
+
+  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
+    autor: usuario.nome,
     texto,
-    criadoEm:serverTimestamp()
+    criadoEm: serverTimestamp()
   });
-  msg.value="";
 };
 
-// MUDAR STATUS
-window.mudarStatus = async status=>{
-  if(!ticketAtual) return;
-  await updateDoc(doc(db,"tickets",ticketAtual),{status});
+/* =========================
+   🔒 MUDAR STATUS (SÓ COORDENAÇÃO)
+========================= */
+
+window.fecharTicket = async () => {
+  if (usuario.nivel !== "coordenacao" || !ticketAtual) return;
+
+  await updateDoc(doc(db, "tickets", ticketAtual), {
+    status: "fechado"
+  });
 };
