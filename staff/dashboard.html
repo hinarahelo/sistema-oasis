@@ -8,19 +8,8 @@
 <body class="dark">
 
 <script>
-  let usuario = null;
-  try {
-    usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario || (usuario.nivel !== "juridico" && usuario.nivel !== "coordenacao")) {
-      throw new Error();
-    }
-  } catch {
-    alert("Acesso restrito");
-    location.href = "../index.html";
-  }
-
-  function logout() {
-    localStorage.removeItem("usuario");
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || (usuario.nivel !== "juridico" && usuario.nivel !== "coordenacao")) {
     location.href = "../index.html";
   }
 </script>
@@ -28,24 +17,19 @@
 <div class="layout">
   <aside class="sidebar">
     <h2>👮 Staff</h2>
-    <button onclick="abrirAba('dashboard')">📊 Dashboard</button>
     <button onclick="abrirAba('tickets')">🎫 Tickets</button>
-    <button onclick="logout()" style="margin-top:15px;">🚪 Sair</button>
+    <button onclick="abrirAba('logs')">🧾 Logs</button>
   </aside>
 
   <main class="content">
-    <section id="dashboard" class="aba active">
-      <h2>📊 Visão Geral</h2>
-      <div class="stats">
-        <div class="stat">Abertos<br><span id="qtd-abertos">0</span></div>
-        <div class="stat">Em Atendimento<br><span id="qtd-atendimento">0</span></div>
-        <div class="stat">Fechados<br><span id="qtd-fechados">0</span></div>
-      </div>
+    <section id="tickets" class="aba active">
+      <h2>Tickets</h2>
+      <div id="lista-tickets"></div>
     </section>
 
-    <section id="tickets" class="aba">
-      <h2>🎫 Tickets</h2>
-      <div id="lista-tickets"></div>
+    <section id="logs" class="aba">
+      <h2>Logs do Sistema</h2>
+      <ul id="lista-logs"></ul>
     </section>
   </main>
 </div>
