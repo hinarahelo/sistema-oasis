@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, collection, addDoc, query, where, getDocs,
-  serverTimestamp, onSnapshot
+  serverTimestamp, onSnapshot, updateDoc, doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { registrarLog } from "./logs.js";
 
@@ -40,16 +40,23 @@ window.abrirSolicitacao = async categoria => {
   );
   const snap = await getDocs(q);
 
-  if (!snap.empty) ticketAtual = snap.docs[0].id;
-  else {
+  if (!snap.empty) {
+    ticketAtual = snap.docs[0].id;
+  } else {
     const ref = await addDoc(collection(db,"tickets"),{
       nome:usuario.nome,
       cid:usuario.cid,
       categoria,
       status:"aberto",
-      criadoEm:serverTimestamp()
+      criadoEm:serverTimestamp(),
+      sla: {
+        criadoEm: serverTimestamp(),
+        primeiraRespostaEm: null,
+        fechadoEm: null
+      }
     });
     ticketAtual = ref.id;
+
     await registrarLog(db,{ tipo:"criou_ticket", usuario:usuario.nome });
   }
 
@@ -68,32 +75,38 @@ function abrirChat(categoria){
       const m = d.data();
       box.innerHTML += `
         <p><b>${m.autor}:</b> ${m.texto || ""}</p>
-        ${m.anexoLink ? `<a class="anexo" href="${m.anexoLink}" target="_blank">📎 Abrir anexo</a>` : ""}
+        ${m.anexoLink ? `<a href="${m.anexoLink}" target="_blank">📎 Anexo</a>` : ""}
       `;
     });
     box.scrollTop = box.scrollHeight;
   });
 }
 
-/* 📎 Enviar mensagem + link */
+/* ✉️ Enviar mensagem */
 window.enviarMensagem = async ()=>{
   const texto = document.getElementById("mensagem").value.trim();
   const anexoLink = document.getElementById("anexoLink").value.trim();
-
   if (!texto && !anexoLink) return;
 
-  // valida URL básica
-  if (anexoLink && !/^https?:\/\//i.test(anexoLink)) {
-    alert("Link inválido. Use http:// ou https://");
-    return;
-  }
+  const msgRef = await addDoc(
+    collection(db,"tickets",ticketAtual,"mensagens"),
+    {
+      autor:usuario.nome,
+      texto,
+      anexoLink: anexoLink || null,
+      criadoEm:serverTimestamp(),
+      tipo: usuario.nivel === "cidadao" ? "cliente" : "staff"
+    }
+  );
 
-  await addDoc(collection(db,"tickets",ticketAtual,"mensagens"),{
-    autor:usuario.nome,
-    texto,
-    anexoLink: anexoLink || null,
-    criadoEm:serverTimestamp()
-  });
+  // primeira resposta do staff
+  if (usuario.nivel !== "cidadao") {
+    const ticketRef = doc(db,"tickets",ticketAtual);
+    await updateDoc(ticketRef,{
+      "sla.primeiraRespostaEm": serverTimestamp(),
+      status: "atendimento"
+    });
+  }
 
   await registrarLog(db,{ tipo:"mensagem", usuario:usuario.nome });
 
