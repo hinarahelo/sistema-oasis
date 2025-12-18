@@ -12,6 +12,11 @@
       margin:4px 0;
       font-size:14px;
     }
+    .hint {
+      font-size:12px;
+      opacity:.8;
+      margin-top:4px;
+    }
   </style>
 </head>
 <body class="dark">
@@ -44,6 +49,10 @@
       <h3>🛒 Solicitações</h3>
       <button onclick="abrirSolicitacao('Troca de Nome')">📜 Troca de Nome</button>
       <button onclick="abrirSolicitacao('Adoção')">👶 Adoção</button>
+      <button onclick="abrirSolicitacao('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+      <button onclick="abrirSolicitacao('Nascimento')">👼 Nascimento</button>
+      <button onclick="abrirSolicitacao('Porte de Arma')">🔫 Porte de Arma</button>
+      <button onclick="abrirSolicitacao('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
     </section>
 
     <section id="historico" class="aba">
@@ -56,7 +65,13 @@
 
       <div id="mensagens"></div>
 
-      <input type="file" id="arquivo" />
+      <input
+        type="url"
+        id="anexoLink"
+        placeholder="Cole aqui o link do anexo (Drive, Imgur, Discord...)"
+      />
+      <div class="hint">📎 Envie links públicos (visualização liberada)</div>
+
       <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
 
       <button onclick="enviarMensagem()">Enviar</button>
