@@ -2,15 +2,37 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Staff</title>
+  <title>Painel Staff • Oasis</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body class="dark">
+
+<script>
+  // Proteção por nível
+  let usuario = null;
+  try {
+    usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || (usuario.nivel !== "juridico" && usuario.nivel !== "coordenacao")) {
+      throw new Error();
+    }
+  } catch {
+    alert("Acesso restrito");
+    location.href = "../index.html";
+  }
+</script>
+
 <div class="layout">
   <aside class="sidebar">
     <h2>👮 Staff</h2>
     <button onclick="abrirAba('abertos')">📂 Abertos</button>
     <button onclick="abrirAba('fechados')">🧾 Fechados</button>
+
+    <!-- Apenas coordenação vê ações avançadas -->
+    <script>
+      if (usuario.nivel === "coordenacao") {
+        document.write(`<p style="margin-top:10px;">🛡 Coordenação</p>`);
+      }
+    </script>
   </aside>
 
   <main class="content">
@@ -18,12 +40,14 @@
       <h2>Tickets Abertos</h2>
       <div id="lista-abertos"></div>
     </section>
+
     <section id="fechados" class="aba">
       <h2>Tickets Fechados</h2>
       <div id="lista-fechados"></div>
     </section>
   </main>
 </div>
+
 <script type="module" src="staff.js"></script>
 </body>
 </html>
