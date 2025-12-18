@@ -3,39 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <title>Autenticando...</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #1a1a1a;
-      color: #fff;
-      margin: 0;
-    }
-  </style>
 </head>
 <body>
-
 <p>Autenticando, aguarde...</p>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { registrarLog } from "./logs.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
+    authDomain: "sistema-oasis-75979.firebaseapp.com",
+    projectId: "sistema-oasis-75979"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   try {
     const params = new URLSearchParams(window.location.search);
     const payload = params.get("user");
+    if (!payload) throw new Error();
 
-    if (!payload) {
-      throw new Error("Payload ausente");
-    }
-
-    const decoded = atob(payload);
-    const user = JSON.parse(decoded);
-
-    // validação mínima defensiva
-    if (!user || !user.nome || !user.id) {
-      throw new Error("Payload inválido");
-    }
+    const user = JSON.parse(atob(payload));
 
     const usuario = {
       nome: user.nome,
@@ -45,19 +36,18 @@
 
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
-    // limpeza de URL
-    window.history.replaceState({}, document.title, "/sistema-oasis/auth.html");
+    await registrarLog(db, {
+      tipo: "login",
+      usuario: usuario.nome,
+      cid: usuario.cid,
+      nivel: usuario.nivel
+    });
 
-    // segue fluxo normal
-    window.location.href = "tickets.html";
-
-  } catch (e) {
-    console.error("[AUTH ERROR]", e);
+    location.href = "tickets.html";
+  } catch {
     localStorage.removeItem("usuario");
-    alert("Falha no login. Tente novamente.");
-    window.location.href = "index.html";
+    location.href = "index.html";
   }
 </script>
-
 </body>
 </html>
