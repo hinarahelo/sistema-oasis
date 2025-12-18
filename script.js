@@ -3,6 +3,7 @@ import {
   getFirestore, collection, addDoc, query, where, getDocs,
   serverTimestamp, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { uploadAnexo } from "./storage.js";
 import { registrarLog } from "./logs.js";
 
 /* 🔐 Sessão */
@@ -24,51 +25,76 @@ const db = getFirestore(app);
 
 let ticketAtual = null;
 
+/* 📂 Abas */
+window.abrirAba = id => {
+  document.querySelectorAll(".aba").forEach(a => a.style.display="none");
+  document.getElementById(id).style.display="block";
+};
+
+/* 🎫 Abrir ticket */
 window.abrirSolicitacao = async categoria => {
   const q = query(
-    collection(db, "tickets"),
-    where("cid", "==", usuario.cid),
-    where("categoria", "==", categoria),
-    where("status", "!=", "fechado")
+    collection(db,"tickets"),
+    where("cid","==",usuario.cid),
+    where("categoria","==",categoria),
+    where("status","!=","fechado")
   );
   const snap = await getDocs(q);
 
-  if (!snap.empty) {
-    ticketAtual = snap.docs[0].id;
-  } else {
-    const docRef = await addDoc(collection(db, "tickets"), {
-      nome: usuario.nome,
-      cid: usuario.cid,
+  if (!snap.empty) ticketAtual = snap.docs[0].id;
+  else {
+    const ref = await addDoc(collection(db,"tickets"),{
+      nome:usuario.nome,
+      cid:usuario.cid,
       categoria,
-      status: "aberto",
-      criadoEm: serverTimestamp()
+      status:"aberto",
+      criadoEm:serverTimestamp()
     });
-    ticketAtual = docRef.id;
-
-    await registrarLog(db, {
-      tipo: "criou_ticket",
-      categoria,
-      usuario: usuario.nome,
-      cid: usuario.cid
-    });
+    ticketAtual = ref.id;
+    await registrarLog(db,{ tipo:"criou_ticket", usuario:usuario.nome });
   }
+
+  abrirChat(categoria);
 };
 
-window.enviarMensagem = async () => {
+/* 💬 Chat */
+function abrirChat(categoria){
+  document.getElementById("chat-titulo").innerText = `💬 ${categoria}`;
+  abrirAba("chat");
+
+  onSnapshot(collection(db,"tickets",ticketAtual,"mensagens"), snap=>{
+    const box = document.getElementById("mensagens");
+    box.innerHTML="";
+    snap.forEach(d=>{
+      const m = d.data();
+      box.innerHTML += `
+        <p><b>${m.autor}:</b> ${m.texto || ""}</p>
+        ${m.anexo ? `<a class="anexo" href="${m.anexo}" target="_blank">📎 Anexo</a>` : ""}
+      `;
+    });
+  });
+}
+
+/* 📎 Enviar mensagem + anexo */
+window.enviarMensagem = async ()=>{
   const texto = document.getElementById("mensagem").value.trim();
-  if (!texto || !ticketAtual) return;
+  const file = document.getElementById("arquivo").files[0];
+  if (!texto && !file) return;
 
-  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: usuario.nome,
+  let anexoUrl = null;
+  if (file) {
+    anexoUrl = await uploadAnexo(app, ticketAtual, file);
+  }
+
+  await addDoc(collection(db,"tickets",ticketAtual,"mensagens"),{
+    autor:usuario.nome,
     texto,
-    criadoEm: serverTimestamp()
+    anexo: anexoUrl,
+    criadoEm:serverTimestamp()
   });
 
-  await registrarLog(db, {
-    tipo: "mensagem",
-    ticket: ticketAtual,
-    usuario: usuario.nome
-  });
+  await registrarLog(db,{ tipo:"mensagem", usuario:usuario.nome });
 
-  document.getElementById("mensagem").value = "";
+  document.getElementById("mensagem").value="";
+  document.getElementById("arquivo").value="";
 };
