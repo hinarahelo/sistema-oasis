@@ -2,18 +2,19 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Callback Discord</title>
+  <title>Autenticação</title>
 </head>
 <body>
-  <h2>Processando login...</h2>
+  <h2>Processando autenticação...</h2>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
     if (!code) {
-      document.body.innerHTML = "<h3>Erro ao autenticar.</h3>";
+      document.body.innerHTML = "<h3>Falha na autenticação.</h3>";
     } else {
+      // Encaminha para seu backend (mantido)
       window.location.href =
         "https://13b4a7c8-ef9d-497c-9f6b-481e6dcfaa0b-00-2noz7t8kac8b2.riker.replit.dev/callback?code=" + code;
     }
