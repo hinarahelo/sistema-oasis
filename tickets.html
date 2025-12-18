@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Atendimento Oasis</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Atendimento Oasis</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body class="dark">
 
 <div class="layout">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>🏛️ Atendimento Oasis</h2>
-
-    <button onclick="mostrarAba('solicitacoes')">🎫 Faça sua Solicitação</button>
-    <button onclick="mostrarAba('tickets')">🎫 Tickets</button>
-    <button onclick="mostrarAba('precos')">💰 Preços</button>
-    <button onclick="sair()">🚪 Sair</button>
+    <button onclick="abrirAba('solicitacoes')">🎫 Faça sua Solicitação</button>
+    <button onclick="abrirAba('precos')">💰 Preços</button>
+    <button onclick="logout()">🚪 Sair</button>
   </aside>
 
-  <!-- CONTEÚDO -->
   <main class="content">
 
     <!-- ABA SOLICITAÇÕES -->
     <section id="solicitacoes" class="aba active">
       <h2>🎫 Sistema de Tickets</h2>
-      <p>Bem-vindo ao nosso sistema de atendimento.</p>
 
-      <ul>
-        <li>• Apenas usuários autorizados podem criar tickets</li>
-        <li>• Limite de 1 ticket ativo por categoria</li>
-        <li>• Atendimento em até 24 horas</li>
-        <li>• Mantenha a conversa respeitosa</li>
-      </ul>
+      <p>
+        • 1 ticket ativo por categoria<br>
+        • Atendimento em até 24h<br>
+        • Mantenha o respeito
+      </p>
 
-      <h3>📂 Solicitações</h3>
-      <div class="grid">
+      <div class="categorias">
         <button onclick="abrirCategoria('Troca de Nome')">📜 Troca de Nome</button>
         <button onclick="abrirCategoria('Adoção')">👶 Adoção</button>
         <button onclick="abrirCategoria('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
@@ -44,57 +38,7 @@
         <button onclick="abrirCategoria('Nascimento')">👼 Nascimento</button>
         <button onclick="abrirCategoria('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
         <button onclick="abrirCategoria('Porte de Arma')">🔫 Porte de Arma</button>
-        <button onclick="abrirCategoria('Abertura de CNPJ')">🏢 Abertura de CNPJ</button>
       </div>
-    </section>
-
-    <!-- ABA TICKETS -->
-    <section id="tickets" class="aba">
-      <h2>🎫 Tickets</h2>
-
-      <div class="grid">
-        <button onclick="abrirCategoria('Denúncia')">⚠️ Denúncia</button>
-        <button onclick="abrirCategoria('Falar com o Juiz')">⚖️ Falar com o Juiz</button>
-        <button onclick="abrirCategoria('Suporte')">🛠️ Suporte</button>
-        <button onclick="abrirCategoria('Processos')">📂 Processos</button>
-      </div>
-    </section>
-
-    <!-- ABA PREÇOS -->
-    <section id="precos" class="aba">
-      <pre>
-⚖️ Serviços Disponíveis ao Público – Supremo Tribunal Oasis ⚖️
-
-🏛️ Atendimentos Jurídicos
-• Delegacia Sul: $20.000
-• Delegacia PRF: $30.000
-
-Redução de Pena:
-• Advogado: -20%
-• Confissão: -10%
-• Bom comportamento: -10%
-• Total possível: até 40%
-
-🔫 Porte de Arma
-• Emissão: $20.000
-
-💍 Certidões Civis
-• Casamento: $150.000
-• Divórcio: $200.000
-• Troca de Nome: $250.000
-• Adoção: $50.000
-• Nascimento: $50.000
-• Jovem Aprendiz: $30.000
-
-🏢 Alvará
-• Abertura: $150.000
-• Renovação: $60.000
-
-🧾 Ações Jurídicas
-• Ação Judicial: $50.000
-• Limpeza de Ficha: $50.000 (1 a 3)
-• A partir da 4ª: +$10.000
-      </pre>
     </section>
 
     <!-- CHAT -->
@@ -104,6 +48,31 @@ Redução de Pena:
 
       <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
       <button onclick="enviarMensagem()">Enviar</button>
+    </section>
+
+    <!-- ABA PREÇOS -->
+    <section id="precos" class="aba">
+      <pre>
+⚖️ Serviços – Supremo Tribunal Oasis ⚖️
+
+Delegacia Sul: $20.000
+Delegacia PRF: $30.000
+
+Redução de Pena:
+• Advogado: -20%
+• Confissão: -10%
+• Bom comportamento: -10%
+
+🔫 Porte de Arma: $20.000
+
+💍 Certidões:
+Casamento: $150.000
+Divórcio: $200.000
+Troca de Nome: $250.000
+Adoção: $50.000
+Nascimento: $50.000
+Jovem Aprendiz: $30.000
+      </pre>
     </section>
 
   </main>
