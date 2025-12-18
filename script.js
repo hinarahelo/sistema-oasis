@@ -32,6 +32,8 @@ let unsubscribeMensagens = null;
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
+
+  if (id === "andamento") carregarTicketsEmAndamento();
 };
 
 /* 🚪 SAIR */
@@ -103,6 +105,41 @@ window.enviarMensagem = async () => {
 
   input.value = "";
 };
+
+/* 🕒 EM ANDAMENTO */
+function carregarTicketsEmAndamento() {
+  const lista = document.getElementById("lista-andamento");
+  if (!lista) return;
+
+  onSnapshot(
+    query(
+      collection(db, "tickets"),
+      where("cid", "==", usuario.cid),
+      where("status", "==", "aberto")
+    ),
+    snap => {
+      lista.innerHTML = "";
+
+      if (snap.empty) {
+        lista.innerHTML = "<p>Nenhum ticket em andamento.</p>";
+        return;
+      }
+
+      snap.forEach(doc => {
+        const t = doc.data();
+        const btn = document.createElement("button");
+        btn.textContent = `📂 ${t.categoria}`;
+        btn.onclick = () => {
+          ticketAtual = doc.id;
+          mostrarAba("chat");
+          document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
+          iniciarChat();
+        };
+        lista.appendChild(btn);
+      });
+    }
+  );
+}
 
 /* 🚀 INICIAL */
 mostrarAba("solicitacoes");
