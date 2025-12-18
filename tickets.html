@@ -4,81 +4,45 @@
   <meta charset="UTF-8">
   <title>Tickets • Oasis</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .aba { display:none; }
-    .aba.active { display:block; }
-    .anexo {
-      display:block;
-      margin:4px 0;
-      font-size:14px;
-    }
-    .hint {
-      font-size:12px;
-      opacity:.8;
-      margin-top:4px;
-    }
-  </style>
 </head>
 <body class="dark">
 
 <script>
-  let usuario;
-  try {
-    usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario) throw new Error();
-  } catch {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario) {
     location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
-  }
-
-  function logout(){
-    localStorage.removeItem("usuario");
-    location.href = "index.html";
   }
 </script>
 
 <div class="layout">
   <aside class="sidebar">
     <h2>🎫 Atendimento</h2>
-    <button onclick="abrirAba('solicitacoes')">🛒 Solicitações</button>
-    <button onclick="abrirAba('historico')">🧾 Histórico</button>
+    <button onclick="abrirSolicitacao('Troca de Nome')">📜 Troca de Nome</button>
+    <button onclick="abrirSolicitacao('Adoção')">👶 Adoção</button>
+    <button onclick="abrirSolicitacao('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+    <button onclick="abrirSolicitacao('Nascimento')">👼 Nascimento</button>
+    <button onclick="abrirSolicitacao('Porte de Arma')">🔫 Porte de Arma</button>
+    <button onclick="abrirSolicitacao('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
     <button onclick="logout()">🚪 Sair</button>
   </aside>
 
   <main class="content">
-    <section id="solicitacoes" class="aba active">
-      <h3>🛒 Solicitações</h3>
-      <button onclick="abrirSolicitacao('Troca de Nome')">📜 Troca de Nome</button>
-      <button onclick="abrirSolicitacao('Adoção')">👶 Adoção</button>
-      <button onclick="abrirSolicitacao('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
-      <button onclick="abrirSolicitacao('Nascimento')">👼 Nascimento</button>
-      <button onclick="abrirSolicitacao('Porte de Arma')">🔫 Porte de Arma</button>
-      <button onclick="abrirSolicitacao('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
-    </section>
-
-    <section id="historico" class="aba">
-      <h3>🧾 Meus Tickets</h3>
-      <ul id="lista-historico"></ul>
-    </section>
-
-    <section id="chat" class="aba">
-      <h3 id="chat-titulo"></h3>
-
+    <section id="chat">
+      <h2 id="chat-titulo">Selecione um atendimento</h2>
       <div id="mensagens"></div>
-
-      <input
-        type="url"
-        id="anexoLink"
-        placeholder="Cole aqui o link do anexo (Drive, Imgur, Discord...)"
-      />
-      <div class="hint">📎 Envie links públicos (visualização liberada)</div>
-
+      <input id="anexoLink" placeholder="Link do anexo (opcional)">
       <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
-
       <button onclick="enviarMensagem()">Enviar</button>
     </section>
   </main>
 </div>
 
-<script type="module" src="script.js"></script>
+<!-- 🔥 FIREBASE CDN (OBRIGATÓRIO) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<!-- SEU SCRIPT -->
+<script src="script.js"></script>
+
 </body>
 </html>
