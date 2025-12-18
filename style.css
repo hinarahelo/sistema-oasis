@@ -1,225 +1,81 @@
 /* ===============================
-   RESET
+   LOGIN PAGE
 ================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
-}
-
-/* ===============================
-   FUNDO GERAL
-================================ */
-body {
+.login-page {
   min-height: 100vh;
   background:
     linear-gradient(135deg, #3b0000, #140000),
     url("https://www.transparenttextures.com/patterns/paper-fibers.png");
   background-blend-mode: overlay;
-  color: #f5f5f5;
-}
-
-/* ===============================
-   LAYOUT
-================================ */
-.layout {
   display: flex;
-  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ===============================
-   SIDEBAR
-================================ */
-.sidebar {
-  width: 240px;
-  background:
-    linear-gradient(180deg, #4a0000, #1c0000),
-    url("https://www.transparenttextures.com/patterns/paper-fibers.png");
-  background-blend-mode: overlay;
-  padding: 25px 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  border-right: 1px solid rgba(255, 215, 0, 0.25);
-}
-
-.sidebar .logo {
+.login-container {
   width: 100%;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
+  display: flex;
+  justify-content: center;
 }
 
-.sidebar button {
-  background: linear-gradient(135deg, #7a0000, #3a0000);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  border-radius: 10px;
-  color: #f8f8f8;
-  padding: 12px;
-  font-size: 14px;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.25s;
-}
-
-.sidebar button:hover {
-  background: linear-gradient(135deg, #9b0000, #520000);
-  transform: translateX(4px);
-}
-
-/* ===============================
-   CONTEÚDO
-================================ */
-.content {
-  flex: 1;
-  padding: 35px;
+.login-card {
   background:
-    linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.9)),
+    linear-gradient(180deg, rgba(40,0,0,0.95), rgba(15,0,0,0.95)),
     url("https://www.transparenttextures.com/patterns/paper-fibers.png");
   background-blend-mode: overlay;
+  border: 1px solid rgba(255,215,0,0.35);
+  border-radius: 18px;
+  padding: 40px;
+  width: 420px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
 }
 
-/* ===============================
-   ABAS
-================================ */
-.aba {
-  display: none;
+.login-logo {
+  width: 120px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(255,215,0,0.6));
 }
 
-.aba.active {
-  display: block;
-}
-
-/* ===============================
-   TÍTULOS
-================================ */
-h1, h2 {
+.login-card h1 {
   color: #f5d27b;
-  text-shadow: 0 0 6px rgba(0,0,0,0.7);
-  margin-bottom: 15px;
+  font-size: 24px;
+  margin-bottom: 10px;
 }
 
-h1 {
-  font-size: 26px;
+.login-subtitle {
+  font-size: 14px;
+  color: #ddd;
+  margin-bottom: 20px;
 }
 
-h2 {
-  font-size: 20px;
-}
-
-/* ===============================
-   TEXTOS
-================================ */
-.info {
-  background: rgba(0,0,0,0.45);
-  padding: 18px;
-  border-radius: 12px;
-  margin-bottom: 25px;
+.login-info {
+  background: rgba(0,0,0,0.5);
   border-left: 4px solid #d4af37;
-  line-height: 1.6;
-  color: #e6e6e6;
-}
-
-/* ===============================
-   GRID DE BOTÕES
-================================ */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 14px;
-}
-
-.grid button {
-  background: linear-gradient(135deg, #5a0000, #2a0000);
-  border: 1px solid rgba(255,215,0,0.3);
-  border-radius: 12px;
-  padding: 14px;
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.25s;
-}
-
-.grid button:hover {
-  background: linear-gradient(135deg, #8b0000, #3a0000);
-  transform: translateY(-3px);
-}
-
-/* ===============================
-   CHAT
-================================ */
-.chat {
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,215,0,0.3);
-  border-radius: 12px;
-  padding: 15px;
-  height: 380px;
-  overflow-y: auto;
-  margin-bottom: 15px;
-}
-
-.chat p {
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-.envio {
-  display: flex;
-  gap: 10px;
-}
-
-.envio input {
-  flex: 1;
   padding: 12px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-}
-
-.envio button {
-  background: linear-gradient(135deg, #a00000, #5a0000);
-  border: none;
-  border-radius: 10px;
-  padding: 12px 20px;
-  color: #fff;
-  cursor: pointer;
-}
-
-.voltar {
-  background: none;
-  border: none;
-  color: #f5d27b;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-/* ===============================
-   PREÇOS
-================================ */
-.preco-box {
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(255,215,0,0.25);
-  border-radius: 14px;
-  padding: 20px;
+  font-size: 13px;
   margin-bottom: 25px;
 }
 
-.preco-box h2 {
-  margin-bottom: 10px;
+.login-button {
+  display: block;
+  text-decoration: none;
+  background: linear-gradient(135deg, #a00000, #5a0000);
+  color: #fff;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: bold;
+  transition: all 0.3s;
 }
 
-.preco-box p,
-.preco-box li {
-  font-size: 14px;
-  margin-bottom: 6px;
+.login-button:hover {
+  background: linear-gradient(135deg, #c00000, #6a0000);
+  transform: scale(1.03);
 }
 
-.preco-box ul {
-  margin-left: 20px;
-}
-
-.preco-box .obs {
-  margin-top: 10px;
-  font-size: 13px;
-  color: #d4d4d4;
+.login-footer {
+  display: block;
+  margin-top: 20px;
+  font-size: 12px;
+  color: #aaa;
 }
