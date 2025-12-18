@@ -16,32 +16,38 @@
 </script>
 
 <div class="layout">
+
   <aside class="sidebar">
     <h2>🎫 Atendimento Oasis</h2>
 
-    <button onclick="abrirSolicitacao('Troca de Nome')">Troca de Nome</button>
-    <button onclick="abrirSolicitacao('Adoção')">Adoção</button>
-    <button onclick="abrirSolicitacao('Nascimento')">Nascimento</button>
+    <button onclick="abrirSolicitacao('Troca de Nome')">📜 Troca de Nome</button>
+    <button onclick="abrirSolicitacao('Adoção')">👶 Adoção</button>
+    <button onclick="abrirSolicitacao('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+    <button onclick="abrirSolicitacao('Divórcio')">💔 Divórcio</button>
+    <button onclick="abrirSolicitacao('Casamento')">💍 Casamento</button>
+    <button onclick="abrirSolicitacao('Nascimento')">👼 Nascimento</button>
+    <button onclick="abrirSolicitacao('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
+    <button onclick="abrirSolicitacao('Porte de Arma')">🔫 Porte de Arma</button>
+    <button onclick="abrirSolicitacao('Abertura de CNPJ')">🏢 Abertura de CNPJ</button>
 
     <button onclick="logout()">🚪 Sair</button>
   </aside>
 
   <main class="content">
-    <h3 id="chat-titulo">Selecione um atendimento</h3>
+    <h3 id="chat-titulo">Selecione uma categoria</h3>
 
     <div id="mensagens" class="chat"></div>
 
     <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
     <button onclick="enviarMensagem()">Enviar</button>
   </main>
+
 </div>
 
-<!-- 🔥 Firebase COMPAT (OBRIGATÓRIO) -->
+<!-- Firebase COMPAT -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<!-- Script principal -->
 <script src="script.js"></script>
-
 </body>
 </html>
