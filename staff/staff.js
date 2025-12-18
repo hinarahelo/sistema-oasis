@@ -2,11 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore,
   collection,
-  onSnapshot,
-  addDoc,
-  updateDoc,
-  doc,
-  serverTimestamp
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* =========================
@@ -27,8 +23,6 @@ const app = initializeApp({
 
 const db = getFirestore(app);
 
-let ticketAtual = null;
-
 /* =========================
    📂 UI
 ========================= */
@@ -38,63 +32,52 @@ window.abrirAba = id => {
   document.getElementById(id).style.display = "block";
 };
 
+let filtroAtual = "todos";
+window.aplicarFiltro = () => {
+  filtroAtual = document.getElementById("filtro-status").value;
+  renderTickets();
+};
+
+let cacheTickets = [];
+
 /* =========================
-   🎫 LISTAGEM DE TICKETS
+   🎫 REALTIME
 ========================= */
 
 onSnapshot(collection(db, "tickets"), snap => {
-  const abertos = document.getElementById("lista-abertos");
-  const fechados = document.getElementById("lista-fechados");
-
-  abertos.innerHTML = "";
-  fechados.innerHTML = "";
+  cacheTickets = [];
+  let abertos = 0, atendimento = 0, fechados = 0;
 
   snap.forEach(d => {
-    const t = d.data();
+    const t = { id: d.id, ...d.data() };
+    cacheTickets.push(t);
 
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <b>${t.categoria}</b><br>
-      ${t.nome}<br>
-      <small>Status: ${t.status}</small>
-    `;
-
-    // Jurídico e Coordenação podem responder
-    if (usuario.nivel === "juridico" || usuario.nivel === "coordenacao") {
-      const btn = document.createElement("button");
-      btn.textContent = "Assumir";
-      btn.onclick = () => (ticketAtual = d.id);
-      div.appendChild(btn);
-    }
-
-    if (t.status === "fechado") fechados.appendChild(div);
-    else abertos.appendChild(div);
+    if (t.status === "fechado") fechados++;
+    else if (t.status === "atendimento") atendimento++;
+    else abertos++;
   });
+
+  document.getElementById("qtd-abertos").innerText = abertos;
+  document.getElementById("qtd-atendimento").innerText = atendimento;
+  document.getElementById("qtd-fechados").innerText = fechados;
+
+  renderTickets();
 });
 
-/* =========================
-   💬 RESPONDER
-========================= */
+function renderTickets() {
+  const box = document.getElementById("lista-tickets");
+  box.innerHTML = "";
 
-window.responder = async texto => {
-  if (!ticketAtual || !texto) return;
-
-  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: usuario.nome,
-    texto,
-    criadoEm: serverTimestamp()
-  });
-};
-
-/* =========================
-   🔒 MUDAR STATUS (SÓ COORDENAÇÃO)
-========================= */
-
-window.fecharTicket = async () => {
-  if (usuario.nivel !== "coordenacao" || !ticketAtual) return;
-
-  await updateDoc(doc(db, "tickets", ticketAtual), {
-    status: "fechado"
-  });
-};
+  cacheTickets
+    .filter(t => filtroAtual === "todos" || t.status === filtroAtual)
+    .forEach(t => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <b>${t.categoria}</b><br>
+        ${t.nome}<br>
+        <span class="tag ${t.status || "aberto"}">${t.status || "aberto"}</span>
+      `;
+      box.appendChild(div);
+    });
+}
