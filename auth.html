@@ -3,64 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <title>Autenticando...</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0e0e0e;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-  </style>
 </head>
-
 <body>
-  <p>Autenticando, aguarde...</p>
+<p>Autenticando, aguarde...</p>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { registrarLog } from "./logs.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { registrarLog } from "./logs.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
-      authDomain: "sistema-oasis-75979.firebaseapp.com",
-      projectId: "sistema-oasis-75979"
+  const firebaseConfig = {
+    apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
+    authDomain: "sistema-oasis-75979.firebaseapp.com",
+    projectId: "sistema-oasis-75979"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const payload = params.get("user");
+    if (!payload) throw new Error();
+
+    const user = JSON.parse(atob(payload));
+
+    const usuario = {
+      nome: prompt("Digite seu nome no jogo:"),
+      cid: prompt("Digite seu ID no jogo:"),
+      nivel: "cidadao"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    localStorage.setItem("usuario", JSON.stringify(usuario));
 
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const payload = params.get("user");
-      if (!payload) throw new Error();
+    await registrarLog(db, {
+      tipo: "login",
+      usuario: usuario.nome,
+      cid: usuario.cid,
+      nivel: usuario.nivel
+    });
 
-      const user = JSON.parse(atob(payload));
-
-      const usuario = {
-        nome: user.nome,
-        cid: user.id,
-        nivel: user.nivel || "cidadao"
-      };
-
-      localStorage.setItem("usuario", JSON.stringify(usuario));
-
-      await registrarLog(db, {
-        tipo: "login",
-        usuario: usuario.nome,
-        cid: usuario.cid,
-        nivel: usuario.nivel
-      });
-
-      window.location.replace("tickets.html");
-    } catch {
-      localStorage.removeItem("usuario");
-      window.location.replace("index.html");
-    }
-  </script>
+    location.href = "tickets.html";
+  } catch {
+    localStorage.clear();
+    location.href = "index.html";
+  }
+</script>
 </body>
 </html>
