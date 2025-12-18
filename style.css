@@ -1,45 +1,69 @@
 body.dark {
-  background:#1a1a1a;
-  color:#fff;
-  margin:0;
+  background: #111;
+  color: #fff;
   font-family: Arial, sans-serif;
 }
 
-.layout { display:flex; min-height:100vh; }
-.sidebar {
-  width:220px;
-  background:#330000;
-  padding:15px;
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
-.sidebar button, .sidebar a {
-  display:block;
-  width:100%;
-  margin-bottom:8px;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:#7a0000;
-  color:#fff;
-  cursor:pointer;
-  text-align:left;
-}
-.sidebar button:hover, .sidebar a:hover {
-  background:#b30000;
-}
-
-.content { flex:1; padding:15px; overflow-y:auto; }
 
 .card {
-  background:#2a0000;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:10px;
+  background: #400;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.btn {
+  display: block;
+  padding: 15px;
+  background: #900;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: #300;
+  padding: 15px;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 5px 0;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.aba { display: none; }
+.aba.active { display: block; }
+
+.categorias button {
+  margin: 4px;
+}
+
+.chat {
+  background: #000;
+  border: 1px solid #333;
+  height: 300px;
+  overflow-y: auto;
+  padding: 10px;
 }
 
 textarea {
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  margin-top:5px;
+  width: 100%;
+  margin-top: 10px;
 }
