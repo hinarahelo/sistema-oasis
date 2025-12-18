@@ -1,81 +1,140 @@
-/* ===============================
-   LOGIN PAGE
-================================ */
-.login-page {
-  min-height: 100vh;
-  background:
-    linear-gradient(135deg, #3b0000, #140000),
-    url("https://www.transparenttextures.com/patterns/paper-fibers.png");
-  background-blend-mode: overlay;
+body {
+  margin: 0;
+  font-family: "Georgia", serif;
+  background: #f5f1e8;
+  color: #2b2b2b;
+}
+
+.bg-paper {
+  background: linear-gradient(#f5f1e8, #ede7dc);
+}
+
+.header {
+  text-align: center;
+  padding: 30px;
+  background: #5b0f14;
+  color: #f5e6c8;
+}
+
+.header.small {
   display: flex;
   align-items: center;
+  gap: 20px;
+  text-align: left;
+}
+
+.logo {
+  width: 120px;
+}
+
+.logo.small {
+  width: 80px;
+}
+
+.nav-bar {
+  display: flex;
   justify-content: center;
+  gap: 10px;
+  background: #7a1c22;
+  padding: 10px;
+}
+
+.nav-bar button {
+  background: #f5e6c8;
+  border: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.content {
+  padding: 30px;
+}
+
+.aba {
+  display: none;
+}
+
+.aba.active {
+  display: block;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.category-grid button {
+  padding: 12px;
+  font-size: 15px;
+  background: #fff;
+  border: 1px solid #bfa76f;
+  cursor: pointer;
+}
+
+.info-box {
+  background: #fff7e1;
+  border-left: 5px solid #bfa76f;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.chat-box {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #bfa76f;
+  padding: 10px;
+  background: white;
+}
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+}
+
+.chat-input button {
+  padding: 8px 12px;
+}
+
+.price-card {
+  background: white;
+  border: 1px solid #bfa76f;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 .login-container {
-  width: 100%;
   display: flex;
   justify-content: center;
+  margin-top: 60px;
 }
 
 .login-card {
-  background:
-    linear-gradient(180deg, rgba(40,0,0,0.95), rgba(15,0,0,0.95)),
-    url("https://www.transparenttextures.com/patterns/paper-fibers.png");
-  background-blend-mode: overlay;
-  border: 1px solid rgba(255,215,0,0.35);
-  border-radius: 18px;
-  padding: 40px;
-  width: 420px;
+  background: white;
+  padding: 30px;
+  border: 1px solid #bfa76f;
+  width: 400px;
   text-align: center;
-  box-shadow: 0 0 40px rgba(0,0,0,0.8);
 }
 
-.login-logo {
-  width: 120px;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 10px rgba(255,215,0,0.6));
-}
-
-.login-card h1 {
-  color: #f5d27b;
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.login-subtitle {
-  font-size: 14px;
-  color: #ddd;
-  margin-bottom: 20px;
-}
-
-.login-info {
-  background: rgba(0,0,0,0.5);
-  border-left: 4px solid #d4af37;
-  padding: 12px;
-  font-size: 13px;
-  margin-bottom: 25px;
-}
-
-.login-button {
-  display: block;
+.btn-primary {
+  display: inline-block;
+  background: #7a1c22;
+  color: white;
+  padding: 12px 20px;
   text-decoration: none;
-  background: linear-gradient(135deg, #a00000, #5a0000);
-  color: #fff;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: bold;
-  transition: all 0.3s;
-}
-
-.login-button:hover {
-  background: linear-gradient(135deg, #c00000, #6a0000);
-  transform: scale(1.03);
-}
-
-.login-footer {
-  display: block;
   margin-top: 20px;
-  font-size: 12px;
-  color: #aaa;
+}
+
+.footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 13px;
 }
