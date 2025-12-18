@@ -7,6 +7,13 @@
   <style>
     .aba { display:none; }
     .aba.active { display:block; }
+    .topbar {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:10px;
+    }
+    .loader {
+      display:none; text-align:center; margin-top:20px;
+    }
   </style>
 </head>
 <body class="dark">
@@ -20,6 +27,11 @@
   } catch {
     location.href = "https://sistema-oasis-auth.hinarahelo.workers.dev/login";
   }
+
+  function logout() {
+    localStorage.removeItem("usuario");
+    location.href = "index.html";
+  }
 </script>
 
 <div class="layout">
@@ -28,19 +40,24 @@
     <button onclick="abrirAba('solicitacoes')">🛒 Solicitações</button>
     <button onclick="abrirAba('historico')">🧾 Histórico</button>
 
-    <!-- Link staff só para níveis permitidos -->
     <script>
       if (usuario.nivel === "juridico" || usuario.nivel === "coordenacao") {
-        document.write(
-          `<a href="staff/dashboard.html" style="display:block;margin-top:10px;">👮 Painel Staff</a>`
-        );
+        document.write(`<a href="staff/dashboard.html">👮 Painel Staff</a>`);
       }
     </script>
+
+    <button onclick="logout()" style="margin-top:15px;">🚪 Sair</button>
   </aside>
 
   <main class="content">
+    <div class="topbar">
+      <h2>Bem-vindo, <span id="user-nome"></span></h2>
+    </div>
+
+    <div class="loader" id="loader">Carregando...</div>
+
     <section id="solicitacoes" class="aba active">
-      <h2>🛒 Solicitações</h2>
+      <h3>🛒 Solicitações</h3>
       <div class="processos">
         <button onclick="abrirSolicitacao('Troca de Nome')">📜 Troca de Nome</button>
         <button onclick="abrirSolicitacao('Adoção')">👶 Adoção</button>
@@ -52,12 +69,12 @@
     </section>
 
     <section id="historico" class="aba">
-      <h2>🧾 Tickets</h2>
+      <h3>🧾 Meus Tickets</h3>
       <ul id="lista-historico"></ul>
     </section>
 
     <section id="chat" class="aba">
-      <h2 id="chat-titulo"></h2>
+      <h3 id="chat-titulo"></h3>
       <div id="mensagens"></div>
       <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
       <button onclick="enviarMensagem()">Enviar</button>
@@ -65,6 +82,9 @@
   </main>
 </div>
 
+<script>
+  document.getElementById("user-nome").innerText = usuario.nome;
+</script>
 <script type="module" src="script.js"></script>
 </body>
 </html>
