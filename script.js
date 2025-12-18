@@ -1,4 +1,4 @@
-console.log("SCRIPT INICIADO");
+console.log("🔥 Atendimento Oasis iniciado");
 
 // 🔐 Usuário
 const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -22,25 +22,26 @@ function logout() {
   location.href = "index.html";
 }
 
-// 🎫 Criar / Abrir Ticket
+// 🎫 Abrir ou criar ticket por categoria
 async function abrirSolicitacao(categoria) {
-  console.log("Abrindo:", categoria);
+  document.getElementById("mensagens").innerHTML = "";
+  document.getElementById("chat-titulo").innerText = "💬 " + categoria;
 
   const snap = await db.collection("tickets")
     .where("cid", "==", usuario.cid)
     .get();
 
-  let existente = null;
+  let encontrado = null;
 
   snap.forEach(doc => {
     const t = doc.data();
     if (t.categoria === categoria && t.status === "aberto") {
-      existente = doc.id;
+      encontrado = doc.id;
     }
   });
 
-  if (existente) {
-    ticketAtual = existente;
+  if (encontrado) {
+    ticketAtual = encontrado;
   } else {
     const ref = await db.collection("tickets").add({
       nome: usuario.nome,
@@ -52,13 +53,11 @@ async function abrirSolicitacao(categoria) {
     ticketAtual = ref.id;
   }
 
-  abrirChat(categoria);
+  escutarMensagens();
 }
 
-// 💬 Chat em tempo real
-function abrirChat(categoria) {
-  document.getElementById("chat-titulo").innerText = "💬 " + categoria;
-
+// 👂 Escutar mensagens do ticket atual
+function escutarMensagens() {
   db.collection("tickets")
     .doc(ticketAtual)
     .collection("mensagens")
@@ -69,14 +68,23 @@ function abrirChat(categoria) {
 
       snap.forEach(d => {
         const m = d.data();
-        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
+        box.innerHTML += `
+          <p>
+            <b>${m.autor} ${m.cid}:</b> ${m.texto}
+          </p>
+        `;
       });
+
+      box.scrollTop = box.scrollHeight;
     });
 }
 
 // ✉️ Enviar mensagem
 async function enviarMensagem() {
-  if (!ticketAtual) return;
+  if (!ticketAtual) {
+    alert("Selecione uma categoria primeiro.");
+    return;
+  }
 
   const input = document.getElementById("mensagem");
   const texto = input.value.trim();
@@ -87,6 +95,7 @@ async function enviarMensagem() {
     .collection("mensagens")
     .add({
       autor: usuario.nome,
+      cid: usuario.cid,
       texto,
       criadoEm: new Date()
     });
