@@ -5,35 +5,40 @@
   <title>Central de Atendimento Oasis</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark center">
 
-  <div class="card">
-    <h2>🌹 Central de Atendimento</h2>
-    <p style="color:#ffb3b3; margin-bottom:25px;">
-      Faça login com seu Discord para abrir solicitações
-    </p>
+<body class="login-page">
 
-    <!-- LOGIN DISCORD -->
-    <a
-      href="https://sistema-oasis-auth.hinarahelo.workers.dev/login"
-      style="
-        display:block;
-        text-align:center;
-        text-decoration:none;
-        padding:16px;
-        border-radius:14px;
-        background:linear-gradient(135deg,#7a0000,#b30000);
-        color:white;
-        font-weight:bold;
-        font-size:16px;
-      "
-    >
-      🔐 Entrar com Discord
-    </a>
+  <div class="login-container">
 
-    <p style="margin-top:25px;font-size:13px;color:#aaa;">
-      Sistema Oasis • Login seguro via Discord
-    </p>
+    <div class="login-card">
+
+      <img src="logo-oasis.png" class="login-logo" alt="Tribunal Oasis">
+
+      <h1>Central de Atendimento Oasis</h1>
+
+      <p class="login-subtitle">
+        Tribunal de Justiça de Oasis<br>
+        Atendimento Civil, Criminal e Administrativo
+      </p>
+
+      <div class="login-info">
+        Para acessar o sistema, é necessário autenticar-se
+        utilizando sua conta do Discord.
+      </div>
+
+      <a
+        href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&redirect_uri=https%3A%2F%2Fhinarahelo.github.io%2Fsistema-oasis%2Fcallback.html&scope=identify"
+        class="login-button"
+      >
+        🔐 Entrar com Discord
+      </a>
+
+      <span class="login-footer">
+        Sistema Oficial • Tribunal de Justiça de Oasis
+      </span>
+
+    </div>
+
   </div>
 
 </body>
