@@ -26,7 +26,7 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 /* ======================================================
-   🔐 USUÁRIO — JURÍDICO
+   🔐 USUÁRIO
 ====================================================== */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario || usuario.nivel !== "juridico") {
@@ -37,151 +37,122 @@ if (!usuario || usuario.nivel !== "juridico") {
    ESTADO
 ====================================================== */
 let ticketAtual = null;
+let ticketsCache = [];
 let unsubscribeMensagens = null;
-let unsubscribeStatus = null;
 let arquivoSelecionado = null;
 
 /* ======================================================
-   LOGS
+   📂 CARREGAR TICKETS + FILTRO
 ====================================================== */
-async function registrarLog(acao) {
-  await addDoc(collection(db, "logs"), {
-    ticket: ticketAtual,
-    usuario: usuario.nome,
-    nivel: "juridico",
-    acao,
-    data: serverTimestamp()
+function carregarTickets() {
+  const lista = document.getElementById("listaTickets");
+  const filtro = document.getElementById("filtroCategoria");
+
+  const q = query(collection(db, "tickets"), where("status", "==", "aberto"));
+
+  onSnapshot(q, snap => {
+    ticketsCache = [];
+    lista.innerHTML = "";
+    filtro.innerHTML = `<option value="">Todas as categorias</option>`;
+
+    snap.forEach(d => {
+      const t = { id: d.id, ...d.data() };
+      ticketsCache.push(t);
+
+      if (![...filtro.options].some(o => o.value === t.categoria)) {
+        filtro.innerHTML += `<option value="${t.categoria}">${t.categoria}</option>`;
+      }
+    });
+
+    renderTickets();
   });
 }
 
-/* ======================================================
-   📂 TICKETS ABERTOS (TODOS)
-====================================================== */
-function carregarTicketsAbertos() {
+window.filtrarCategoria = () => {
+  const cat = document.getElementById("filtroCategoria").value;
+  renderTickets(cat);
+};
+
+function prioridadeBadge(p = "media") {
+  if (p === "alta") return `<span class="badge badge-alta">ALTA</span>`;
+  if (p === "baixa") return `<span class="badge badge-baixa">BAIXA</span>`;
+  return `<span class="badge badge-media">MÉDIA</span>`;
+}
+
+function renderTickets(filtro = "") {
   const lista = document.getElementById("listaTickets");
   lista.innerHTML = "";
 
-  const q = query(
-    collection(db, "tickets"),
-    where("status", "==", "aberto")
-  );
-
-  onSnapshot(q, snap => {
-    lista.innerHTML = "";
-
-    if (snap.empty) {
-      lista.innerHTML = "<p>Nenhum ticket aberto.</p>";
-      return;
-    }
-
-    snap.forEach(d => {
-      const t = d.data();
-      const item = document.createElement("div");
-      item.className = "card-ticket official";
-      item.innerHTML = `
-        <h4>${t.categoria}</h4>
+  ticketsCache
+    .filter(t => !filtro || t.categoria === filtro)
+    .forEach(t => {
+      const card = document.createElement("div");
+      card.className = "card-ticket official";
+      card.innerHTML = `
+        <h4>${t.categoria} ${prioridadeBadge(t.prioridade)}</h4>
         <small>${t.nome}</small>
       `;
 
-      item.onclick = () => {
-        ticketAtual = d.id;
+      card.onclick = () => {
+        ticketAtual = t.id;
         document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
+        document.getElementById("painel").classList.remove("active");
+        document.getElementById("chat").classList.add("active");
         iniciarChat();
       };
 
-      lista.appendChild(item);
+      lista.appendChild(card);
     });
-  });
 }
 
-carregarTicketsAbertos();
+carregarTickets();
 
 /* ======================================================
    💬 CHAT
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
-  const input = document.getElementById("mensagem");
-  const btn = document.getElementById("btnEnviar");
-
   box.innerHTML = "";
 
   if (unsubscribeMensagens) unsubscribeMensagens();
-  if (unsubscribeStatus) unsubscribeStatus();
-
-  unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), snap => {
-    const t = snap.data();
-    input.disabled = btn.disabled = t.status === "encerrado";
-    input.placeholder = t.status === "encerrado"
-      ? "🔒 Ticket encerrado"
-      : "Digite sua mensagem...";
-  });
 
   unsubscribeMensagens = onSnapshot(
-    query(
-      collection(db, "tickets", ticketAtual, "mensagens"),
-      orderBy("criadoEm", "asc")
-    ),
+    query(collection(db, "tickets", ticketAtual, "mensagens"), orderBy("criadoEm")),
     snap => {
       box.innerHTML = "";
 
       snap.forEach(d => {
         const m = d.data();
 
-        let tipo = "juridico";
-        let classe = "nome-juridico";
-        if (m.autor?.includes("cidadao")) {
-          tipo = "cidadao";
-          classe = "nome-cidadao";
-        }
-        if (m.autor?.includes("coordenacao")) {
-          tipo = "coordenacao";
-          classe = "nome-coordenacao";
-        }
+        let tipo = "juridico", classe = "nome-juridico";
+        if (m.autor?.includes("cidadao")) (tipo = "cidadao"), (classe = "nome-cidadao");
+        if (m.autor?.includes("coordenacao")) (tipo = "coordenacao"), (classe = "nome-coordenacao");
 
-        const dataHora = m.criadoEm
+        const dh = m.criadoEm
           ? m.criadoEm.toDate().toLocaleString("pt-BR", {
               timeZone: "America/Sao_Paulo",
+              hour: "2-digit",
+              minute: "2-digit",
               day: "2-digit",
               month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit"
+              year: "numeric"
             })
           : "";
 
-        let preview = "";
+        let anexo = "";
         if (m.anexo) {
-          const url = m.anexo.url;
-
-          if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-            preview = `
-              <div class="preview-img">
-                <a href="${url}" target="_blank" download>
-                  <img src="${url}">
-                </a>
-              </div>`;
-          } else if (url.match(/\.pdf$/i)) {
-            preview = `
-              <div class="preview-pdf">
-                📄 <a href="${url}" target="_blank" download>Baixar PDF</a>
-              </div>`;
-          } else {
-            preview = `
-              <div class="anexo">
-                📎 <a href="${url}" target="_blank" download>⬇️ ${m.anexo.nome}</a>
-              </div>`;
-          }
+          anexo = `
+            <div class="anexo">
+              📎 <a href="${m.anexo.url}" target="_blank" download>${m.anexo.nome}</a>
+            </div>`;
         }
 
         box.innerHTML += `
           <div class="mensagem ${tipo}">
-            <div class="conteudo">
-              <span class="autor ${classe}">${m.autor}</span>
-              <div class="texto">${m.texto || ""}</div>
-              ${preview}
-            </div>
-            <div class="hora">${dataHora}</div>
+            <span class="autor ${classe}">${m.autor}</span>
+            ${m.texto || ""}
+            ${anexo}
+            <div class="hora">${dh}</div>
           </div>
         `;
       });
@@ -192,88 +163,33 @@ function iniciarChat() {
 }
 
 /* ======================================================
-   📎 ARQUIVO
-====================================================== */
-const fileInput = document.getElementById("arquivo");
-fileInput?.addEventListener("change", () => {
-  arquivoSelecionado = fileInput.files[0];
-  document.getElementById("arquivoPreview")?.remove();
-
-  if (arquivoSelecionado) {
-    fileInput.insertAdjacentHTML(
-      "afterend",
-      `<div id="arquivoPreview">
-        📎 ${arquivoSelecionado.name}
-        <button onclick="removerArquivo()">❌</button>
-      </div>`
-    );
-  }
-});
-
-window.removerArquivo = () => {
-  arquivoSelecionado = null;
-  fileInput.value = "";
-  document.getElementById("arquivoPreview")?.remove();
-};
-
-/* ======================================================
-   ☁️ CLOUDINARY
-====================================================== */
-async function uploadCloudinary(file) {
-  const fd = new FormData();
-  fd.append("file", file);
-  fd.append("upload_preset", "oasis_upload");
-
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/dnd90frwv/auto/upload",
-    { method: "POST", body: fd }
-  );
-
-  const data = await res.json();
-  return { nome: file.name, url: data.secure_url };
-}
-
-/* ======================================================
-   📤 ENVIAR MENSAGEM
+   📤 ENVIAR
 ====================================================== */
 window.enviarMensagem = async () => {
   const texto = document.getElementById("mensagem").value.trim();
-  if (!texto && !arquivoSelecionado) {
-    alert("Mensagem ou anexo obrigatório.");
-    return;
-  }
-
-  let anexo = null;
-  if (arquivoSelecionado) {
-    anexo = await uploadCloudinary(arquivoSelecionado);
-    removerArquivo();
-  }
+  if (!texto) return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} (juridico)`,
     texto,
-    anexo,
     criadoEm: serverTimestamp()
   });
 
-  await registrarLog("Resposta jurídica enviada");
   document.getElementById("mensagem").value = "";
 };
 
 /* ======================================================
-   🔒 ENCERRAR TICKET
+   🔒 ENCERRAR
 ====================================================== */
 window.encerrarTicket = async () => {
-  if (!confirm("Deseja encerrar este ticket?")) return;
+  if (!confirm("Encerrar este ticket?")) return;
 
-  await updateDoc(doc(db, "tickets", ticketAtual), {
-    status: "encerrado"
-  });
-
-  await registrarLog("Ticket encerrado pelo jurídico");
+  await updateDoc(doc(db, "tickets", ticketAtual), { status: "encerrado" });
 
   await notificarDiscord(
-    `🔒 TICKET ENCERRADO\nTicket: ${ticketAtual}\nPor: ${usuario.nome}`,
+    `🔒 Ticket encerrado\nID: ${ticketAtual}`,
     "WEBHOOK_COORDENACAO_AQUI"
   );
+
+  voltarPainel();
 };
