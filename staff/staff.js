@@ -1,177 +1,300 @@
-import {
-  collection,
-  onSnapshot,
-  updateDoc,
-  doc,
-  serverTimestamp,
-  addDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import { db } from "../firebase.js";
-
-/* =====================================================
-   🔐 CONTROLE DE ACESSO
-===================================================== */
-
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
-  location.href = "../index.html";
+/* ======================================================
+   RESET / BASE
+====================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* =====================================================
-   📜 LOGS / AUDITORIA
-===================================================== */
-
-async function registrarLog(ticketId, acao, detalhes = "") {
-  await addDoc(collection(db, "logs"), {
-    ticket: ticketId,
-    acao,
-    detalhes,
-    usuario: usuario.nome,
-    nivel: usuario.nivel,
-    data: serverTimestamp()
-  });
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  background: radial-gradient(circle, #7a1c1c, #3b0d0d);
+  color: #2b2b2b;
+  min-height: 100vh;
 }
 
-/* =====================================================
-   ⏱ SLA
-===================================================== */
-
-function calcularSLA(ticket) {
-  if (!ticket.criadoEm) return "🟢 OK";
-
-  const horas =
-    (Date.now() - ticket.criadoEm.toDate().getTime()) / 36e5;
-
-  if (horas <= 3) return "🟢 OK";
-  if (horas <= 18) return "🟡 Atenção";
-  return "🔴 Estourado";
+/* ======================================================
+   LAYOUT GERAL
+====================================================== */
+.bg-paper {
+  background: #f8f4ee;
 }
 
-/* =====================================================
-   🎫 LISTAGEM DE TICKETS
-===================================================== */
+.content {
+  max-width: 1200px;
+  margin: auto;
+  padding: 24px;
+}
 
-onSnapshot(collection(db, "tickets"), snap => {
-  const box = document.getElementById("lista-tickets");
-  if (!box) return;
+.official {
+  letter-spacing: 0.2px;
+}
 
-  box.innerHTML = "";
+/* ======================================================
+   HEADER
+====================================================== */
+.header {
+  background: linear-gradient(to right, #5b0f0f, #7a1c1c);
+  color: #f8f4ee;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 4px solid #d4af37;
+}
 
-  snap.forEach(d => {
-    const ticket = d.data();
-    const ticketId = d.id;
+.header.small {
+  padding: 18px 24px;
+}
 
-    const statusAtual =
-      (ticket.status || "").toLowerCase().trim();
+.header-text h1,
+.header-text h2 {
+  font-size: 22px;
+  font-weight: bold;
+}
 
-    const card = document.createElement("div");
-    card.className = "card";
+.header-text span {
+  font-size: 13px;
+  opacity: 0.9;
+}
 
-    card.innerHTML = `
-      <b>${ticket.categoria}</b><br>
-      👤 Cidadão: <b>${ticket.nome}</b><br>
-      🆔 CID: ${ticket.cid}<br>
-      ⚖️ Jurídico: ${ticket.atendente || "—"}<br>
-      📌 Status: <b>${ticket.status}</b><br>
-      ⏱ SLA: <b>${calcularSLA(ticket)}</b><br><br>
-    `;
+.logo {
+  width: 110px;
+}
 
-    /* ✏️ ALTERAR NOME DO CIDADÃO */
-    const btnCidadao = document.createElement("button");
-    btnCidadao.textContent = "✏️ Alterar nome do cidadão";
-    btnCidadao.onclick = async () => {
-      const novoNome = prompt(
-        "Novo nome do cidadão:",
-        ticket.nome
-      );
-      if (!novoNome) return;
+.logo.small {
+  width: 70px;
+}
 
-      await updateDoc(doc(db, "tickets", ticketId), {
-        nome: novoNome
-      });
+/* ======================================================
+   NAVBAR
+====================================================== */
+.nav-bar {
+  background: #3b0d0d;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #d4af37;
+}
 
-      await registrarLog(
-        ticketId,
-        "Alteração de nome do cidadão",
-        `De "${ticket.nome}" para "${novoNome}"`
-      );
-    };
-    card.appendChild(btnCidadao);
+.nav-bar button {
+  background: #6b0f0f;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
 
-    /* ✏️ ALTERAR NOME DO JURÍDICO (coordenação) */
-    if (usuario.nivel === "coordenacao" && ticket.atendente) {
-      const btnJuridico = document.createElement("button");
-      btnJuridico.textContent = "✏️ Alterar nome do jurídico";
-      btnJuridico.onclick = async () => {
-        const novoNome = prompt(
-          "Novo nome do jurídico:",
-          ticket.atendente
-        );
-        if (!novoNome) return;
+.nav-bar button:hover {
+  background: #8c1d1d;
+}
 
-        await updateDoc(doc(db, "tickets", ticketId), {
-          atendente: novoNome
-        });
+/* ======================================================
+   ABAS
+====================================================== */
+.aba {
+  display: none;
+}
 
-        await registrarLog(
-          ticketId,
-          "Alteração de nome do jurídico",
-          `De "${ticket.atendente}" para "${novoNome}"`
-        );
-      };
-      card.appendChild(btnJuridico);
-    }
+.aba.active {
+  display: block;
+}
 
-    /* 👑 ALTERAR NOME DA COORDENAÇÃO */
-    if (usuario.nivel === "coordenacao") {
-      const btnCoord = document.createElement("button");
-      btnCoord.textContent = "👑 Alterar nome da coordenação";
-      btnCoord.onclick = async () => {
-        const novoNome = prompt(
-          "Novo nome da coordenação:",
-          usuario.nome
-        );
-        if (!novoNome) return;
+/* ======================================================
+   INFO BOX
+====================================================== */
+.info-box {
+  background: #fff;
+  border-left: 6px solid #d4af37;
+  padding: 18px;
+  border-radius: 14px;
+  margin-bottom: 22px;
+  font-size: 14px;
+  line-height: 1.6;
+}
 
-        usuario.nome = novoNome;
-        localStorage.setItem(
-          "usuario",
-          JSON.stringify(usuario)
-        );
+/* ======================================================
+   GRID DE CATEGORIAS
+====================================================== */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
 
-        await registrarLog(
-          ticketId,
-          "Alteração de nome da coordenação",
-          `Coordenação alterou o próprio nome para "${novoNome}"`
-        );
+.category-grid button {
+  background: #f8f4ee;
+  border: 2px solid #d4af37;
+  padding: 18px;
+  border-radius: 16px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
-        alert("Nome da coordenação atualizado.");
-      };
-      card.appendChild(btnCoord);
-    }
+.category-grid button:hover {
+  background: #fff;
+  transform: translateY(-2px);
+}
 
-    /* ⚖️ ENCERRAR TICKET — JURÍDICO E COORDENAÇÃO */
-    if (statusAtual !== "encerrado") {
-      const btnEncerrar = document.createElement("button");
-      btnEncerrar.textContent = "⚖️ Encerrar Ticket";
-      btnEncerrar.onclick = async () => {
-        await updateDoc(doc(db, "tickets", ticketId), {
-          status: "encerrado",
-          encerradoPor: usuario.nome,
-          encerradoEm: serverTimestamp()
-        });
+/* ======================================================
+   CARDS
+====================================================== */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-        await registrarLog(
-          ticketId,
-          "Ticket encerrado",
-          `Encerrado por ${usuario.nome}`
-        );
-      };
-      card.appendChild(btnEncerrar);
-    }
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  border-left: 6px solid #6b0f0f;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  cursor: pointer;
+}
 
-    box.appendChild(card);
-  });
-});
+.card:hover {
+  background: #fdfbf7;
+}
+
+/* ======================================================
+   CHAT
+====================================================== */
+.chat-box {
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  height: 360px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.chat-box p {
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.chat-input input[type="text"],
+.chat-input input[type="file"],
+.chat-input input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #ccc;
+}
+
+.chat-input button {
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: none;
+  background: #6b0f0f;
+  color: #fff;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background: #8c1d1d;
+}
+
+.btn-secondary {
+  background: #aaa !important;
+  color: #000 !important;
+}
+
+/* ======================================================
+   CHAT — CORES POR NÍVEL
+====================================================== */
+.nome-cidadao {
+  color: #1e5eff;
+  font-weight: bold;
+}
+
+.nome-juridico {
+  color: #c9a227;
+  font-weight: bold;
+}
+
+.nome-coordenacao {
+  color: #b00000;
+  font-weight: bold;
+}
+
+.hora {
+  font-size: 11px;
+  color: #666;
+  margin-left: 6px;
+}
+
+.anexo a {
+  color: #6b0f0f;
+  font-size: 13px;
+}
+
+/* ======================================================
+   DIGITANDO
+====================================================== */
+#digitando {
+  font-size: 13px;
+  color: #2f7d32;
+  margin: 6px 0 10px;
+}
+
+/* ======================================================
+   PREÇOS / SERVIÇOS
+====================================================== */
+.price-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 22px;
+  border-top: 6px solid #d4af37;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.price-card h3 {
+  margin-bottom: 10px;
+  color: #5b0f0f;
+}
+
+.price-card ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.price-card li {
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+/* ======================================================
+   RESPONSIVO
+====================================================== */
+@media (max-width: 700px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .nav-bar {
+    justify-content: center;
+  }
+
+  .chat-input {
+    flex-direction: column;
+  }
+}
