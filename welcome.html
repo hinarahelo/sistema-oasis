@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Supremo Tribunal de Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Georgia", serif;
+      background: radial-gradient(circle, #7a1c1c, #3b0d0d);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #f8f4ee;
+      border-radius: 18px;
+      max-width: 520px;
+      width: 100%;
+      padding: 40px 30px;
+      border: 2px solid #d4af37;
+      box-shadow: 0 25px 60px rgba(0,0,0,.4);
+    }
+
+    .logo {
+      width: 150px;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      color: #5b0f0f;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    p {
+      text-align: center;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tabs button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: #6b0f0f;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tabs button.active {
+      background: #8c1d1d;
+    }
+
+    .aba {
+      display: none;
+    }
+
+    .aba.active {
+      display: block;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: #6b0f0f;
+      color: #fff;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-left: 4px solid #6b0f0f;
+      font-size: 13px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 11px;
+      color: #555;
+      letter-spacing: .4px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <img src="logo-oasis.png" class="logo">
+
+  <h1>SUPREMO TRIBUNAL DE OASIS ⚖️</h1>
+  <p id="textoBoasVindas"></p>
+
+  <div class="tabs">
+    <button class="active" onclick="mostrarAba('principal')">
+      🏛️ Acesso
+    </button>
+    <button onclick="mostrarAba('abertas')">
+      📂 Solicitações Abertas
+    </button>
+  </div>
+
+  <!-- ABA PRINCIPAL -->
+  <div id="principal" class="aba active">
+    <button class="btn" id="btnAcessar"></button>
+  </div>
+
+  <!-- ABA SOLICITAÇÕES -->
+  <div id="abertas" class="aba">
+    <div id="listaAbertas"></div>
+  </div>
+
+  <div class="footer">
+    Sistema institucional • acesso monitorado
+  </div>
+</div>
+
+<script type="module">
+  import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  import { app } from "./firebase.js";
+
+  const db = getFirestore(app);
+
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario) location.href = "index.html";
+
+  const texto = document.getElementById("textoBoasVindas");
+  const btn = document.getElementById("btnAcessar");
+  const lista = document.getElementById("listaAbertas");
+
+  if (usuario.nivel === "cidadao") {
+    texto.innerText =
+      `Bem-vindo(a), ${usuario.nome}.
+       Utilize o portal oficial do Supremo Tribunal de Oasis para acompanhar e abrir solicitações.`;
+    btn.innerText = "➕ Abrir nova solicitação";
+    btn.onclick = () => location.href = "tickets.html";
+  }
+
+  if (usuario.nivel === "juridico") {
+    texto.innerText =
+      `Bem-vindo(a), ${usuario.nome}.
+       Você está acessando o painel jurídico institucional.`;
+    btn.innerText = "⚖️ Ir para painel jurídico";
+    btn.onclick = () => location.href = "staff/dashboard.html";
+  }
+
+  if (usuario.nivel === "coordenacao") {
+    texto.innerText =
+      `Bem-vindo(a), ${usuario.nome}.
+       Painel administrativo do Supremo Tribunal de Oasis.`;
+    btn.innerText = "👑 Painel da coordenação";
+    btn.onclick = () => location.href = "staff/coordenacao.html";
+  }
+
+  /* SOLICITAÇÕES ABERTAS */
+  let q;
+
+  if (usuario.nivel === "cidadao") {
+    q = query(
+      collection(db, "tickets"),
+      where("cid", "==", usuario.cid),
+      where("status", "!=", "encerrado")
+    );
+  } else {
+    q = query(
+      collection(db, "tickets"),
+      where("status", "!=", "encerrado")
+    );
+  }
+
+  onSnapshot(q, snap => {
+    lista.innerHTML = "";
+    if (snap.empty) {
+      lista.innerHTML = "<p>Nenhuma solicitação em andamento.</p>";
+      return;
+    }
+
+    snap.forEach(d => {
+      const t = d.data();
+      lista.innerHTML += `
+        <div class="card">
+          <b>${t.categoria}</b><br>
+          ${t.nome || ""}<br>
+          Status: ${t.status}
+        </div>
+      `;
+    });
+  });
+
+  window.mostrarAba = id => {
+    document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    document.querySelectorAll(".tabs button")
+      .forEach(b => b.classList.remove("active"));
+
+    event.target.classList.add("active");
+  };
+</script>
+
+</body>
+</html>
