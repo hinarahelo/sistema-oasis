@@ -1,88 +1,102 @@
-/* ================= RESET ================= */
+/* ======================================================
+   RESET / BASE
+====================================================== */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: "Georgia", serif;
-}
-
-/* ================= FUNDO ================= */
-.bg-paper {
+  font-family: Georgia, "Times New Roman", serif;
   background: radial-gradient(circle, #7a1c1c, #3b0d0d);
+  color: #2b2b2b;
   min-height: 100vh;
 }
 
-/* ================= HEADER ================= */
+/* ======================================================
+   LAYOUT GERAL
+====================================================== */
+.bg-paper {
+  background: #f8f4ee;
+}
+
+.content {
+  max-width: 1200px;
+  margin: auto;
+  padding: 24px;
+}
+
+.official {
+  letter-spacing: 0.2px;
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
 .header {
+  background: linear-gradient(to right, #5b0f0f, #7a1c1c);
+  color: #f8f4ee;
+  padding: 28px;
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 24px 30px;
-  background: #f8f4ee;
-  border-bottom: 3px solid #d4af37;
+  gap: 18px;
+  border-bottom: 4px solid #d4af37;
 }
 
 .header.small {
-  padding: 18px 30px;
+  padding: 18px 24px;
 }
 
-.header h1,
-.header h2 {
-  margin: 0;
-  color: #5b0f0f;
+.header-text h1,
+.header-text h2 {
+  font-size: 22px;
+  font-weight: bold;
 }
 
-.header span {
+.header-text span {
   font-size: 13px;
-  color: #444;
+  opacity: 0.9;
 }
 
-/* ================= LOGOS ================= */
 .logo {
-  width: 70px;
+  width: 110px;
 }
 
 .logo.small {
   width: 70px;
 }
 
-.logo-grande {
-  width: 140px;
-  margin-bottom: 15px;
-}
-
-/* ================= NAVBAR ================= */
+/* ======================================================
+   NAVBAR
+====================================================== */
 .nav-bar {
+  background: #3b0d0d;
+  padding: 10px;
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  padding: 14px;
-  background: #5b0f0f;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #d4af37;
 }
 
 .nav-bar button {
-  background: #7a1c1c;
-  border: none;
+  background: #6b0f0f;
   color: #fff;
+  border: none;
   padding: 10px 18px;
   border-radius: 14px;
-  font-size: 14px;
   cursor: pointer;
-  transition: 0.2s;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
 .nav-bar button:hover {
-  background: #9a2a2a;
+  background: #8c1d1d;
 }
 
-/* ================= CONTEÚDO ================= */
-.content {
-  padding: 30px;
-}
-
-/* ================= ABAS ================= */
+/* ======================================================
+   ABAS
+====================================================== */
 .aba {
   display: none;
 }
@@ -91,185 +105,185 @@ body {
   display: block;
 }
 
-/* ================= INFO BOX ================= */
+/* ======================================================
+   INFO BOX
+====================================================== */
 .info-box {
-  background: #ffffff;
-  padding: 20px;
-  border-left: 5px solid #d4af37;
-  border-radius: 12px;
-  margin-bottom: 25px;
+  background: #fff;
+  border-left: 6px solid #d4af37;
+  padding: 18px;
+  border-radius: 14px;
+  margin-bottom: 22px;
   font-size: 14px;
+  line-height: 1.6;
 }
 
-/* ================= SOLICITAÇÕES (CIDADÃO) ================= */
-.solicitacoes-clean {
-  background: #f8f4ee;
-  padding: 30px;
-  border-radius: 20px;
-  border: 1px solid #d4af37;
-}
-
-.solicitacoes-header {
-  text-align: center;
-  margin-bottom: 35px;
-}
-
-.solicitacoes-header h2 {
-  color: #5b0f0f;
-  margin: 10px 0;
-}
-
-.solicitacoes-header p {
-  font-size: 14px;
-  color: #333;
-}
-
-/* ================= BLOCOS DE SERVIÇOS ================= */
-.bloco-servicos {
-  margin-bottom: 35px;
-}
-
-.bloco-servicos h3 {
-  margin-bottom: 15px;
-  color: #5b0f0f;
-  border-bottom: 2px solid #d4af37;
-  padding-bottom: 6px;
-}
-
-/* ================= GRID DE BOTÕES ================= */
-.grid-servicos {
+/* ======================================================
+   GRID DE CATEGORIAS
+====================================================== */
+.category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
 }
 
-.grid-servicos button {
-  background: #6b0f0f;
-  color: #fff;
-  border: none;
-  padding: 14px;
+.category-grid button {
+  background: #f8f4ee;
+  border: 2px solid #d4af37;
+  padding: 18px;
   border-radius: 16px;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   transition: 0.2s;
 }
 
-.grid-servicos button:hover {
-  background: #8c1d1d;
+.category-grid button:hover {
+  background: #fff;
+  transform: translateY(-2px);
 }
 
-/* ================= LISTAS / CARDS ================= */
+/* ======================================================
+   CARDS
+====================================================== */
 .card-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 14px;
 }
 
-.price-card {
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 18px;
-  border: 1px solid #d4af37;
-}
-
-.price-card b {
-  color: #5b0f0f;
-}
-
-.price-card h3 {
-  margin-top: 0;
-  color: #5b0f0f;
-}
-
-.price-card h4 {
-  margin-top: 15px;
-  color: #6b0f0f;
-}
-
-.price-card ul {
-  padding-left: 20px;
-  font-size: 14px;
-}
-
-.price-card li {
-  margin-bottom: 6px;
-}
-
-/* ================= BOTÕES DE AÇÃO ================= */
-.price-card button {
-  margin-top: 12px;
-  background: #7a1c1c;
-  color: #fff;
-  border: none;
-  padding: 9px 16px;
-  border-radius: 12px;
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  border-left: 6px solid #6b0f0f;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   cursor: pointer;
 }
 
-.price-card button:hover {
-  background: #9a2a2a;
+.card:hover {
+  background: #fdfbf7;
 }
 
-/* ================= ANDAMENTO ================= */
-.section-desc {
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-/* ================= CHAT ================= */
+/* ======================================================
+   CHAT
+====================================================== */
 .chat-box {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 15px;
-  height: 320px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  height: 360px;
   overflow-y: auto;
-  border: 1px solid #d4af37;
-  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
 }
 
 .chat-box p {
+  margin-bottom: 10px;
   font-size: 14px;
-  margin: 6px 0;
+  line-height: 1.5;
 }
 
 .chat-input {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 .chat-input input[type="text"],
-.chat-input input[type="file"] {
+.chat-input input[type="file"],
+.chat-input input {
   flex: 1;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 14px;
   border: 1px solid #ccc;
 }
 
 .chat-input button {
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: none;
   background: #6b0f0f;
   color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 16px;
   cursor: pointer;
 }
 
+.chat-input button:hover {
+  background: #8c1d1d;
+}
+
 .btn-secondary {
-  background: #999 !important;
+  background: #aaa !important;
+  color: #000 !important;
 }
 
-/* ================= PAINEL STAFF / COORD ================= */
-#listaTickets,
-#listaProcessos,
-#listaCoord,
-#lista-tickets,
-#lista-logs {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+/* ======================================================
+   CHAT — CORES POR NÍVEL
+====================================================== */
+.nome-cidadao {
+  color: #1e5eff;
+  font-weight: bold;
 }
 
-/* ================= RESPONSIVO ================= */
+.nome-juridico {
+  color: #c9a227;
+  font-weight: bold;
+}
+
+.nome-coordenacao {
+  color: #b00000;
+  font-weight: bold;
+}
+
+.hora {
+  font-size: 11px;
+  color: #666;
+  margin-left: 6px;
+}
+
+.anexo a {
+  color: #6b0f0f;
+  font-size: 13px;
+}
+
+/* ======================================================
+   DIGITANDO
+====================================================== */
+#digitando {
+  font-size: 13px;
+  color: #2f7d32;
+  margin: 6px 0 10px;
+}
+
+/* ======================================================
+   PREÇOS / SERVIÇOS
+====================================================== */
+.price-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 22px;
+  border-top: 6px solid #d4af37;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.price-card h3 {
+  margin-bottom: 10px;
+  color: #5b0f0f;
+}
+
+.price-card ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.price-card li {
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+/* ======================================================
+   RESPONSIVO
+====================================================== */
 @media (max-width: 700px) {
   .header {
     flex-direction: column;
@@ -277,7 +291,7 @@ body {
   }
 
   .nav-bar {
-    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .chat-input {
