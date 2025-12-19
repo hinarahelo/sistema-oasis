@@ -15,7 +15,6 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { enviarArquivo } from "./upload.js";
 import { notificarDiscord } from "./discord.js";
 
 /* ======================================================
@@ -38,12 +37,13 @@ if (!usuario || usuario.nivel !== "cidadao") {
 }
 
 /* ======================================================
-   ESTADO GLOBAL
+   ESTADO
 ====================================================== */
 let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
 let typingTimeout = null;
+
 let arquivoSelecionado = null;
 
 /* ======================================================
@@ -61,9 +61,6 @@ window.mostrarAba = id => {
   }
 };
 
-/* ======================================================
-   HASH INICIAL
-====================================================== */
 const hash = location.hash.replace("#", "");
 mostrarAba(hash || "solicitacoes");
 
@@ -89,7 +86,7 @@ async function registrarLog(acao) {
 }
 
 /* ======================================================
-   🕒 EM ANDAMENTO — POR CATEGORIA
+   🕒 EM ANDAMENTO
 ====================================================== */
 function carregarTicketsEmAndamento() {
   const grid = document.getElementById("categoriasTickets");
@@ -207,6 +204,7 @@ function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
   const btnEnviar = document.querySelector(".chat-input button");
+  const digitandoBox = document.getElementById("digitando");
 
   box.innerHTML = "";
 
@@ -217,10 +215,9 @@ function iniciarChat() {
     const t = snap.data();
     input.disabled = t.status === "encerrado";
     btnEnviar.disabled = t.status === "encerrado";
-    input.placeholder =
-      t.status === "encerrado"
-        ? "🔒 Ticket encerrado"
-        : "Digite sua mensagem...";
+    input.placeholder = t.status === "encerrado"
+      ? "🔒 Ticket encerrado"
+      : "Digite sua mensagem...";
   });
 
   unsubscribeMensagens = onSnapshot(
@@ -267,26 +264,55 @@ function iniciarChat() {
 }
 
 /* ======================================================
-   📎 ARQUIVO — SELEÇÃO / REMOÇÃO
+   📎 ARQUIVO — SELEÇÃO / REMOVER
 ====================================================== */
-const inputArquivo = document.getElementById("arquivo");
+const fileInput = document.getElementById("arquivo");
 
-inputArquivo.addEventListener("change", e => {
-  arquivoSelecionado = e.target.files[0];
-  if (!arquivoSelecionado) return;
-
-  document.getElementById("arquivoNome").innerText = arquivoSelecionado.name;
-  document.getElementById("arquivoPreview").style.display = "block";
+fileInput.addEventListener("change", () => {
+  arquivoSelecionado = fileInput.files[0];
+  if (arquivoSelecionado) {
+    fileInput.insertAdjacentHTML(
+      "afterend",
+      `<div id="arquivoPreview">
+        📎 ${arquivoSelecionado.name}
+        <button onclick="removerArquivo()">❌</button>
+      </div>`
+    );
+  }
 });
 
 window.removerArquivo = () => {
   arquivoSelecionado = null;
-  inputArquivo.value = "";
-  document.getElementById("arquivoPreview").style.display = "none";
+  fileInput.value = "";
+  document.getElementById("arquivoPreview")?.remove();
 };
 
 /* ======================================================
-   📤 ENVIAR MENSAGEM / ARQUIVO
+   ☁️ CLOUDINARY UPLOAD
+====================================================== */
+async function uploadCloudinary(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "oasis_upload");
+
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/dnd90frwv/auto/upload",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
+
+  const data = await res.json();
+
+  return {
+    nome: file.name,
+    url: data.secure_url
+  };
+}
+
+/* ======================================================
+   📤 ENVIAR
 ====================================================== */
 window.enviarMensagem = async () => {
   const texto = document.getElementById("mensagem").value.trim();
@@ -296,10 +322,15 @@ window.enviarMensagem = async () => {
     return;
   }
 
-  let anexo = null;
+  const ticketSnap = await getDoc(doc(db, "tickets", ticketAtual));
+  if (ticketSnap.data().status === "encerrado") {
+    alert("Este ticket está encerrado.");
+    return;
+  }
 
+  let anexo = null;
   if (arquivoSelecionado) {
-    anexo = await enviarArquivo(ticketAtual, arquivoSelecionado);
+    anexo = await uploadCloudinary(arquivoSelecionado);
     removerArquivo();
   }
 
@@ -311,5 +342,6 @@ window.enviarMensagem = async () => {
   });
 
   await registrarLog("Mensagem enviada");
+
   document.getElementById("mensagem").value = "";
 };
