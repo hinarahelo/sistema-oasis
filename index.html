@@ -1,44 +1,37 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Central de Atendimento • Tribunal de Justiça de Oasis</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Tribunal de Justiça de Oasis</title>
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
+
+<body class="dark">
 
 <header class="topo">
-  <img src="logo-oasis.png" alt="Tribunal de Justiça de Oasis" class="logo">
+  <img src="logo-oasis.png" alt="Oasis">
   <h1>Tribunal de Justiça de Oasis</h1>
   <p>Central Oficial de Atendimento</p>
 </header>
 
-<main class="login-container">
+<main class="login-box">
   <h2>🔐 Acesso ao Sistema</h2>
-  <p>Escolha o tipo de acesso para autenticação via Discord.</p>
+  <p>Escolha o tipo de acesso para autenticação via Discord</p>
 
-  <!-- CIDADÃO -->
-  <a class="btn cidadao"
+  <a class="btn discord"
      href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=cidadao">
      👤 Entrar como Cidadão
   </a>
 
-  <!-- STAFF -->
   <a class="btn staff"
      href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=staff">
-     🛡️ Entrar como Staff
+     👮 Entrar como Staff
   </a>
 
-  <p class="aviso">
-    O acesso é restrito a usuários autorizados.<br>
-    Todas as ações são registradas.
-  </p>
+  <footer>
+    <small>Tribunal de Justiça de Oasis © 2025</small>
+  </footer>
 </main>
-
-<footer>
-  Tribunal de Justiça de Oasis © 2025<br>
-  Sistema Oficial • Uso Institucional
-</footer>
 
 </body>
 </html>
