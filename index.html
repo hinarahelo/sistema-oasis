@@ -1,33 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Tribunal de Justiça de Oasis</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Tribunal de Justiça de Oasis</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="dark">
 
 <header class="topo">
-  <img src="logo-oasis.png">
+  <img src="logo-oasis.png" alt="Tribunal de Justiça de Oasis">
   <h1>Tribunal de Justiça de Oasis</h1>
-  <span>Central Oficial de Atendimento</span>
+  <span>Sistema Oficial de Atendimento</span>
 </header>
 
 <main class="login">
-  <h2>🔐 Autenticação</h2>
+  <h2>🔐 Autenticação Oficial</h2>
 
+  <!-- CIDADÃO -->
   <a class="btn cidadao"
-     href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=cidadao">
-     👤 Entrar como Cidadão
+     href="https://discord.com/oauth2/authorize
+?client_id=1450905109083979785
+&response_type=code
+&scope=identify+guilds.members.read
+&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback
+&state=cidadao">
+    👤 Entrar como Cidadão
   </a>
 
+  <!-- STAFF -->
   <a class="btn staff"
-     href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=staff">
-     👮 Entrar como Staff
+     href="https://discord.com/oauth2/authorize
+?client_id=1450905109083979785
+&response_type=code
+&scope=identify+guilds.members.read
+&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback
+&state=staff">
+    👮 Entrar como Staff
   </a>
 
-  <footer>Uso Institucional • © 2025</footer>
+  <footer>
+    Uso Institucional • Tribunal de Justiça de Oasis © 2025
+  </footer>
 </main>
 
 </body>
