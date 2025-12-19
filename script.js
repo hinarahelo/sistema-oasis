@@ -7,7 +7,9 @@ import {
   where,
   getDocs,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  updateDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { enviarArquivo } from "./storage.js";
@@ -25,12 +27,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* ===============================
-   🔐 USUÁRIO (OAuth)
+   🔐 USUÁRIO
 ================================ */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario) {
-  location.href = "index.html";
-}
+if (!usuario) location.href = "index.html";
 
 /* ===============================
    🧭 ESTADO GLOBAL
@@ -43,8 +43,7 @@ let unsubscribeMensagens = null;
 ================================ */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  const aba = document.getElementById(id);
-  if (aba) aba.classList.add("active");
+  document.getElementById(id)?.classList.add("active");
 };
 
 /* ===============================
@@ -60,16 +59,13 @@ window.sair = () => {
 ================================ */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
+  document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
 
-  const titulo = document.getElementById("chatTitulo");
-  if (titulo) titulo.innerText = `💬 ${categoria}`;
-
-  // 🔍 verifica ticket aberto da categoria
   const q = query(
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
     where("categoria", "==", categoria),
-    where("status", "==", "aberto")
+    where("status", "!=", "fechado")
   );
 
   const snap = await getDocs(q);
@@ -77,94 +73,98 @@ window.abrirCategoria = async categoria => {
   if (!snap.empty) {
     ticketAtual = snap.docs[0].id;
   } else {
-    const docRef = await addDoc(collection(db, "tickets"), {
+    const ref = await addDoc(collection(db, "tickets"), {
       nome: usuario.nome,
       cid: usuario.cid,
       categoria,
       status: "aberto",
       criadoEm: serverTimestamp()
     });
-    ticketAtual = docRef.id;
+    ticketAtual = ref.id;
   }
 
   iniciarChat();
 };
 
 /* ===============================
-   💬 CHAT (REALTIME)
+   💬 CHAT REALTIME
 ================================ */
 function iniciarChat() {
   if (!ticketAtual) return;
 
   const box = document.getElementById("mensagens");
-  if (!box) return;
-
   box.innerHTML = "";
 
-  // remove listener anterior
   if (unsubscribeMensagens) unsubscribeMensagens();
 
   unsubscribeMensagens = onSnapshot(
     collection(db, "tickets", ticketAtual, "mensagens"),
     snap => {
       box.innerHTML = "";
-
       snap.forEach(d => {
         const m = d.data();
 
         let html = `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
 
         if (m.anexo) {
-          html += `
-            <p>
-              📎 <a href="${m.anexo.url}" target="_blank">
-                ${m.anexo.nome}
-              </a>
-            </p>
-          `;
+          html += `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>`;
         }
 
         box.innerHTML += html;
       });
-
       box.scrollTop = box.scrollHeight;
     }
   );
 }
 
 /* ===============================
-   ✉️ ENVIAR MENSAGEM + ANEXO
+   ✉️ ENVIAR MENSAGEM
 ================================ */
 window.enviarMensagem = async () => {
   const input = document.getElementById("mensagem");
-  const fileInput = document.getElementById("arquivo");
-
+  const file = document.getElementById("arquivo")?.files[0];
   if (!ticketAtual) return;
 
-  const texto = input.value.trim();
-  const file = fileInput.files[0];
-
-  if (!texto && !file) return;
-
   let anexo = null;
+  if (file) anexo = await enviarArquivo(app, ticketAtual, file, usuario);
 
-  if (file) {
-    anexo = await enviarArquivo(app, ticketAtual, file, usuario);
-  }
+  if (!input.value && !anexo) return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} ${usuario.cid}`,
-    texto: texto || "",
+    texto: input.value || "",
     anexo,
     criadoEm: serverTimestamp()
   });
 
+  // muda status automaticamente
+  await updateDoc(doc(db, "tickets", ticketAtual), {
+    status: "em_atendimento"
+  });
+
   input.value = "";
-  fileInput.value = "";
+  if (document.getElementById("arquivo")) document.getElementById("arquivo").value = "";
 };
 
 /* ===============================
-   🕒 LISTAR TICKETS EM ANDAMENTO
+   🕒 SLA
+================================ */
+function calcularSLA(criadoEm) {
+  if (!criadoEm) return "🟢 OK";
+
+  const agora = Date.now();
+  const inicio = criadoEm.toDate().getTime();
+  const horas = (agora - inicio) / (1000 * 60 * 60);
+
+  if (horas <= 3) return "🟢 OK";
+  if (horas <= 18) return "🟡 Atenção";
+  if (horas > 48) return "🔴 Estourado";
+
+  return "🟡 Atenção";
+}
+
+/* ===============================
+   🕒 TICKETS EM ANDAMENTO
 ================================ */
 async function carregarTicketsEmAndamento() {
   const lista = document.getElementById("listaTickets");
@@ -173,11 +173,10 @@ async function carregarTicketsEmAndamento() {
   const q = query(
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
-    where("status", "==", "aberto")
+    where("status", "!=", "fechado")
   );
 
   const snap = await getDocs(q);
-
   lista.innerHTML = "";
 
   snap.forEach(d => {
@@ -187,16 +186,14 @@ async function carregarTicketsEmAndamento() {
     div.className = "card";
     div.innerHTML = `
       <b>${t.categoria}</b><br>
-      Status: ${t.status}
+      Status: ${t.status}<br>
+      SLA: ${calcularSLA(t.criadoEm)}
     `;
 
     div.onclick = () => {
       ticketAtual = d.id;
       mostrarAba("chat");
-
-      const titulo = document.getElementById("chatTitulo");
-      if (titulo) titulo.innerText = `💬 ${t.categoria}`;
-
+      document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
       iniciarChat();
     };
 
@@ -205,7 +202,7 @@ async function carregarTicketsEmAndamento() {
 }
 
 /* ===============================
-   🚀 INICIALIZAÇÃO
+   🚀 INIT
 ================================ */
 carregarTicketsEmAndamento();
 mostrarAba("solicitacoes");
