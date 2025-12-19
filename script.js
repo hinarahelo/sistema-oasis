@@ -15,10 +15,10 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { enviarArquivo } from "./storage.js";
+import { enviarArquivo } from "./upload.js";
 import { notificarDiscord } from "./discord.js";
 
-/* 🔥 FIREBASE */
+/* 🔥 Firebase */
 const app = initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
@@ -26,7 +26,7 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-/* 🔐 USUÁRIO */
+/* 🔐 Usuário */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario || usuario.nivel !== "cidadao") {
   location.href = "index.html";
@@ -34,89 +34,15 @@ if (!usuario || usuario.nivel !== "cidadao") {
 
 /* ESTADO */
 let ticketAtual = null;
-let unsubscribeMensagens = null;
-let unsubscribeStatus = null;
-let typingTimeout = null;
-
-/* ABAS */
-window.mostrarAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
-  if (id === "andamento") carregarTicketsEmAndamento();
-};
-
-const hash = location.hash.replace("#", "");
-mostrarAba(hash || "solicitacoes");
-
-window.sair = () => {
-  localStorage.clear();
-  location.href = "index.html";
-};
-
-/* LOG */
-async function registrarLog(acao) {
-  await addDoc(collection(db, "logs"), {
-    ticket: ticketAtual,
-    cid: usuario.cid,
-    usuario: usuario.nome,
-    acao,
-    data: serverTimestamp()
-  });
-}
-
-/* CHAT */
-function iniciarChat() {
-  const box = document.getElementById("mensagens");
-  const input = document.getElementById("mensagem");
-  const btnEnviar = document.querySelector(".chat-input button");
-
-  box.innerHTML = "";
-
-  if (unsubscribeMensagens) unsubscribeMensagens();
-  if (unsubscribeStatus) unsubscribeStatus();
-
-  unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), snap => {
-    const t = snap.data();
-    input.disabled = t.status === "encerrado";
-    btnEnviar.disabled = t.status === "encerrado";
-  });
-
-  unsubscribeMensagens = onSnapshot(
-    query(
-      collection(db, "tickets", ticketAtual, "mensagens"),
-      orderBy("criadoEm", "asc")
-    ),
-    snap => {
-      box.innerHTML = "";
-      snap.forEach(d => {
-        const m = d.data();
-        box.innerHTML += `
-          <p>
-            <b>${m.autor}</b><br>
-            ${m.texto || ""}
-          </p>
-        `;
-        if (m.anexo) {
-          box.innerHTML += `
-            <p class="anexo">
-              📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a>
-            </p>
-          `;
-        }
-      });
-      box.scrollTop = box.scrollHeight;
-    }
-  );
-}
 
 /* ENVIAR */
 window.enviarMensagem = async () => {
   try {
     const texto = document.getElementById("mensagem").value.trim();
     const fileInput = document.getElementById("arquivo");
-    const file = fileInput?.files[0];
+    const file = fileInput.files[0];
 
-    console.log("📎 Arquivo detectado:", file);
+    console.log("📎 arquivo:", file);
 
     if (!texto && !file) {
       alert("Mensagem ou anexo obrigatório.");
@@ -125,7 +51,7 @@ window.enviarMensagem = async () => {
 
     let anexo = null;
     if (file) {
-      anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+      anexo = await enviarArquivo(ticketAtual, file);
       fileInput.value = "";
     }
 
@@ -137,9 +63,8 @@ window.enviarMensagem = async () => {
     });
 
     document.getElementById("mensagem").value = "";
-    await registrarLog("Mensagem enviada");
-  } catch (err) {
-    console.error("❌ ERRO AO ENVIAR:", err);
+  } catch (e) {
+    console.error("❌ ERRO UPLOAD:", e);
     alert("Erro ao enviar arquivo. Veja o console.");
   }
 };
