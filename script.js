@@ -10,7 +10,8 @@ import {
   serverTimestamp,
   updateDoc,
   doc,
-  getDoc
+  getDoc,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { enviarArquivo } from "./storage.js";
@@ -51,7 +52,7 @@ if (hash) {
   mostrarAba("solicitacoes");
 }
 
-/* LOGOUT */
+/* 🚪 LOGOUT */
 window.sair = () => {
   localStorage.clear();
   location.href = "index.html";
@@ -132,22 +133,39 @@ function iniciarChat() {
     }
   });
 
-  /* 💬 MENSAGENS */
+  /* 💬 MENSAGENS (ORDENADAS + HORÁRIO) */
   unsubscribeMensagens = onSnapshot(
-    collection(db, "tickets", ticketAtual, "mensagens"),
+    query(
+      collection(db, "tickets", ticketAtual, "mensagens"),
+      orderBy("criadoEm", "asc")
+    ),
     snap => {
       box.innerHTML = "";
+
       snap.forEach(d => {
         const m = d.data();
-        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
+
+        const hora = m.criadoEm
+          ? m.criadoEm.toDate().toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : "--:--";
+
+        box.innerHTML += `
+          <p>
+            <b>${m.autor}</b>
+            <span style="font-size:11px;color:#666;">(${hora})</span><br>
+            ${m.texto || ""}
+          </p>
+        `;
 
         if (m.anexo) {
           box.innerHTML += `
-            <p>📎 
-              <a href="${m.anexo.url}" target="_blank">
-                ${m.anexo.nome}
-              </a>
-            </p>`;
+            <p style="font-size:13px;">
+              📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a>
+            </p>
+          `;
         }
       });
 
