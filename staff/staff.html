@@ -8,37 +8,46 @@
 
 <body class="bg-paper">
 
-<script>
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "staff") {
-    location.href = "../index.html";
-  }
-</script>
-
 <header class="header small official">
   <img src="../logo-oasis.png" class="logo small">
   <div>
     <h1>Tribunal de Justiça de Oasis</h1>
-    <span>Painel Administrativo • Staff</span>
+    <span>Painel Operacional da Staff</span>
   </div>
 </header>
 
-<nav class="nav-bar">
-  <button onclick="mostrarAba('abertos')">📂 Abertos</button>
-  <button onclick="mostrarAba('fechados')">🧾 Fechados</button>
-  <button onclick="location.href='dashboard.html'">📊 SLA</button>
-  <button onclick="sair()">🚪 Sair</button>
+<nav class="nav-bar official">
+  <button onclick="abrirAba('abertos')">📂 Abertos</button>
+  <button onclick="abrirAba('fechados')">🧾 Fechados</button>
+  <button onclick="location.href='dashboard.html'">⚖️ Coordenação</button>
+  <button onclick="localStorage.clear();location.href='../index.html'">🚪 Sair</button>
 </nav>
 
-<main class="content">
+<main class="content official">
 
+<!-- TICKETS ABERTOS -->
 <section id="abertos" class="aba active">
-  <h2>📂 Tickets Abertos</h2>
+  <h2>📂 Tickets Abertos / Em Atendimento</h2>
   <div id="lista-abertos" class="card-list"></div>
 </section>
 
+<!-- CHAT -->
+<section id="chat" class="aba">
+  <h2 id="chatTitulo">💬 Atendimento</h2>
+
+  <div id="mensagens" class="chat-box official"></div>
+
+  <div class="chat-input official">
+    <input id="mensagem" placeholder="Digite a resposta oficial..." />
+    <button onclick="enviarMensagem()">Enviar</button>
+    <button onclick="fecharTicket()" class="btn-secondary">Encerrar Ticket</button>
+    <button onclick="abrirAba('abertos')" class="btn-secondary">⬅ Voltar</button>
+  </div>
+</section>
+
+<!-- TICKETS FECHADOS -->
 <section id="fechados" class="aba">
-  <h2>🧾 Tickets Fechados</h2>
+  <h2>🧾 Tickets Encerrados</h2>
   <div id="lista-fechados" class="card-list"></div>
 </section>
 
