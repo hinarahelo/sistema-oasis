@@ -11,8 +11,7 @@ import {
   updateDoc,
   doc,
   getDoc,
-  orderBy,
-  setDoc
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { notificarDiscord } from "./discord.js";
@@ -42,7 +41,6 @@ if (!usuario || usuario.nivel !== "cidadao") {
 let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
-let typingTimeout = null;
 let arquivoSelecionado = null;
 
 /* ======================================================
@@ -55,9 +53,7 @@ window.mostrarAba = id => {
 
   document.getElementById(id)?.classList.add("active");
 
-  if (id === "andamento") {
-    carregarTicketsEmAndamento();
-  }
+  if (id === "andamento") carregarTicketsEmAndamento();
 };
 
 const hash = location.hash.replace("#", "");
@@ -111,7 +107,7 @@ function carregarTicketsEmAndamento() {
       categorias[t.categoria].push({ id: d.id, ...t });
     });
 
-    if (Object.keys(categorias).length === 0) {
+    if (!Object.keys(categorias).length) {
       grid.innerHTML = "<p>Nenhum ticket em andamento.</p>";
       return;
     }
@@ -261,7 +257,11 @@ function iniciarChat() {
               ${m.texto || ""}
               ${
                 m.anexo
-                  ? `<div class="anexo">📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></div>`
+                  ? `<div class="anexo">
+                       📎 <a href="${m.anexo.url}" download target="_blank">
+                         ⬇️ ${m.anexo.nome}
+                       </a>
+                     </div>`
                   : ""
               }
             </div>
