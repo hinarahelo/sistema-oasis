@@ -5,55 +5,53 @@
   <title>Autenticando — Supremo Tribunal de Oasis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body>
-  <p>🔐 Finalizando autenticação, aguarde...</p>
 
-  <script>
-    try {
-      /*
-        Worker redireciona assim:
-        auth.html#user=JSON_ENCODED
-      */
+<p>🔐 Finalizando autenticação, aguarde...</p>
 
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      const payload = params.get("user");
+<script>
+(function () {
+  try {
+    // Remove o #
+    const hash = window.location.hash.replace("#", "");
 
-      if (!payload) throw "Payload ausente";
-
-      const usuario = JSON.parse(decodeURIComponent(payload));
-
-      if (!usuario.nome || !usuario.cid || !usuario.nivel) {
-        throw "Usuário inválido";
-      }
-
-      /* Estrutura única do sistema */
-      const usuarioFinal = {
-        nome: usuario.nome,
-        cid: usuario.cid,
-        nivel: usuario.nivel
-      };
-
-      localStorage.setItem(
-        "usuario",
-        JSON.stringify(usuarioFinal)
-      );
-
-      /* 🔀 Redirecionamento por nível */
-      if (usuarioFinal.nivel === "coordenacao") {
-        location.href = "staff/coordenacao.html";
-      } else if (usuarioFinal.nivel === "juridico") {
-        location.href = "staff/dashboard.html";
-      } else {
-        location.href = "tickets.html";
-      }
-
-    } catch (e) {
-      console.error("Erro na autenticação:", e);
-      localStorage.clear();
-      location.href = "index.html";
+    if (!hash.startsWith("user=")) {
+      throw "Payload ausente";
     }
-  </script>
+
+    // Recupera JSON
+    const payload = decodeURIComponent(hash.replace("user=", ""));
+    const usuario = JSON.parse(payload);
+
+    if (!usuario || !usuario.nivel || !usuario.cid) {
+      throw "Usuário inválido";
+    }
+
+    // Normaliza estrutura
+    const usuarioFinal = {
+      nome: usuario.nome,
+      cid: usuario.cid,
+      nivel: usuario.nivel
+    };
+
+    localStorage.setItem("usuario", JSON.stringify(usuarioFinal));
+
+    // Redirecionamento FINAL
+    if (usuarioFinal.nivel === "coordenacao") {
+      window.location.href = "staff/coordenacao.html";
+    } else if (usuarioFinal.nivel === "juridico") {
+      window.location.href = "staff/dashboard.html";
+    } else {
+      window.location.href = "tickets.html";
+    }
+
+  } catch (e) {
+    console.error("Erro no auth:", e);
+    localStorage.clear();
+    window.location.href = "index.html";
+  }
+})();
+</script>
+
 </body>
 </html>
