@@ -16,7 +16,9 @@ if (!usuario || usuario.nivel !== "coordenacao") {
 
 /* 🔀 ABAS */
 window.mostrar = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.querySelectorAll(".aba").forEach(a =>
+    a.classList.remove("active")
+  );
   document.getElementById(id).classList.add("active");
 };
 
@@ -26,7 +28,7 @@ window.sair = () => {
   location.href = "../index.html";
 };
 
-/* 🎫 TODOS OS TICKETS */
+/* 🎫 TICKETS */
 onSnapshot(collection(db, "tickets"), snap => {
   const box = document.getElementById("lista-tickets");
   if (!box) return;
@@ -35,19 +37,17 @@ onSnapshot(collection(db, "tickets"), snap => {
   snap.forEach(d => {
     const t = d.data();
     const id = d.id;
-
-    const statusAtual = (t.status || "").toLowerCase().trim();
-
     const div = document.createElement("div");
     div.className = "card";
+
     div.innerHTML = `
-      <b>${t.categoria}</b><br>
+      📂 <b>${t.categoria}</b><br>
       👤 ${t.nome}<br>
       ⚖️ ${t.atendente || "—"}<br>
       📌 ${t.status}<br><br>
     `;
 
-    if (statusAtual !== "encerrado") {
+    if (t.status !== "encerrado") {
       const btn = document.createElement("button");
       btn.textContent = "⚖️ Encerrar Ticket";
       btn.onclick = async () => {
