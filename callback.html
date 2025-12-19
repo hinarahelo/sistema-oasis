@@ -6,14 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: Georgia, serif;
+      font-family: Georgia, "Times New Roman", serif;
       background: #f4f1ec;
+      color: #5a0f0f;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       text-align: center;
-      color: #5a0f0f;
     }
   </style>
 </head>
@@ -27,16 +27,15 @@
     const params = new URLSearchParams(window.location.search);
     const hash = window.location.hash;
 
-    // 🔁 CASO 1 — voltou do Discord com ?code=
+    // CASO 1 — voltou do Discord com ?code=
     if (params.get("code")) {
       const code = params.get("code");
-
       window.location.href =
         "https://sistema-oasis-auth.hinarahelo.workers.dev/callback?code=" + code;
       return;
     }
 
-    // 🔁 CASO 2 — voltou do Worker com #user=
+    // CASO 2 — voltou do Worker com #user=
     if (hash.includes("user=")) {
       const encoded = hash.split("user=")[1];
       const user = JSON.parse(decodeURIComponent(encoded));
@@ -54,7 +53,6 @@
     throw new Error("Fluxo inválido");
 
   } catch (e) {
-    console.error(e);
     document.body.innerHTML = `
       <h2>❌ Erro de autenticação</h2>
       <p>Não foi possível validar seu login.</p>
