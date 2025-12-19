@@ -5,28 +5,46 @@
   <title>Supremo Tribunal de Oasis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: Georgia, serif; background:#5b0f14; color:#fff; display:flex; align-items:center; justify-content:center; height:100vh;">
 
-<div style="background:#f6f1e9; color:#1a1a1a; padding:40px; border-radius:18px; width:360px; text-align:center;">
-  <h1>SUPREMO TRIBUNAL DE OASIS ⚖️</h1>
-  <p>Portal Oficial de Serviços Judiciários</p>
+<body style="
+  margin:0;
+  font-family: Georgia, serif;
+  background: radial-gradient(circle, #7a1c1c, #3b0d0d);
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+">
 
-  <button onclick="login('cidadao')" style="width:100%; padding:14px; margin:10px 0; border-radius:14px; border:none; background:#5b0f14; color:#fff;">
+<div style="
+  background:#f8f4ee;
+  border-radius:18px;
+  padding:40px 30px;
+  width:360px;
+  text-align:center;
+  border:2px solid #d4af37;
+">
+
+  <h1 style="color:#5b0f0f;">SUPREMO TRIBUNAL DE OASIS ⚖️</h1>
+  <p>Portal Oficial de Acesso Institucional</p>
+
+  <button onclick="login('cidadao')" style="width:100%;padding:14px;margin:10px 0;border-radius:14px;border:none;background:#6b0f0f;color:#fff;">
     👤 Acesso do Cidadão
   </button>
 
-  <button onclick="login('juridico')" style="width:100%; padding:14px; margin:10px 0; border-radius:14px; border:none; background:#5b0f14; color:#fff;">
+  <button onclick="login('juridico')" style="width:100%;padding:14px;margin:10px 0;border-radius:14px;border:none;background:#6b0f0f;color:#fff;">
     ⚖️ Acesso Jurídico
   </button>
 
-  <button onclick="login('coordenacao')" style="width:100%; padding:14px; margin:10px 0; border-radius:14px; border:none; background:#5b0f14; color:#fff;">
+  <button onclick="login('coordenacao')" style="width:100%;padding:14px;margin:10px 0;border-radius:14px;border:none;background:#6b0f0f;color:#fff;">
     👑 Coordenação
   </button>
+
 </div>
 
 <script>
 function login(nivel) {
-  const url =
+  const authUrl =
     "https://discord.com/oauth2/authorize" +
     "?client_id=1450920482479145195" +
     "&response_type=code" +
@@ -34,7 +52,7 @@ function login(nivel) {
     "&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback" +
     "&state=" + nivel;
 
-  window.location.href = url;
+  window.location.href = authUrl;
 }
 </script>
 
