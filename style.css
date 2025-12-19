@@ -48,8 +48,7 @@ body {
   padding: 18px 24px;
 }
 
-.header-text h1,
-.header-text h2 {
+.header-text h1 {
   font-size: 22px;
   font-weight: bold;
 }
@@ -92,7 +91,7 @@ body {
   border-radius: 14px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.2s ease;
+  transition: 0.2s;
 }
 
 .nav-bar button:hover {
@@ -160,7 +159,7 @@ body {
   padding: 22px;
   text-align: center;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: 0.2s;
 }
 
 .categoria-card:hover {
@@ -168,36 +167,8 @@ body {
   box-shadow: 0 12px 28px rgba(0,0,0,0.15);
 }
 
-.categoria-card h4 {
-  margin-bottom: 6px;
-  color: #5b0f0f;
-}
-
 .lista-categoria.hidden {
   display: none;
-}
-
-/* ======================================================
-   CARDS DE TICKET
-====================================================== */
-.card-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 20px;
-}
-
-.card-ticket {
-  background: #fff;
-  border-radius: 16px;
-  padding: 18px;
-  border-left: 6px solid #6b0f0f;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  cursor: pointer;
-}
-
-.card-ticket:hover {
-  background: #fdf6e9;
 }
 
 /* ======================================================
@@ -206,62 +177,109 @@ body {
 .chat-box {
   background: #fff;
   border-radius: 18px;
-  padding: 18px;
-  height: 380px;
+  padding: 16px;
+  height: 360px;
   overflow-y: auto;
   border: 1px solid #ddd;
   margin-bottom: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* ===== MENSAGEM ===== */
+/* ======================================================
+   MENSAGENS
+====================================================== */
 .mensagem {
-  max-width: 75%;
-  margin-bottom: 14px;
-  padding: 12px 16px;
-  border-radius: 16px;
-  font-size: 14px;
-  line-height: 1.5;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  max-width: 65%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* CIDADÃO */
 .mensagem.cidadao {
-  background: #e8f0ff;
-  margin-left: auto;
-  border-bottom-right-radius: 6px;
+  align-self: flex-end;
 }
 
-/* JURÍDICO */
-.mensagem.juridico {
-  background: #fff6d8;
-  margin-right: auto;
-  border-bottom-left-radius: 6px;
-}
-
-/* COORDENAÇÃO */
+.mensagem.juridico,
 .mensagem.coordenacao {
-  background: #ffe5e5;
-  margin-right: auto;
-  border-bottom-left-radius: 6px;
+  align-self: flex-start;
 }
 
-/* CONTEÚDO */
+.mensagem .autor {
+  font-size: 12px;
+}
+
 .mensagem .conteudo {
-  white-space: pre-wrap;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
 }
 
-/* AUTOR */
-.autor {
-  display: block;
-  margin-bottom: 4px;
+/* CORES DOS BALÕES */
+.mensagem.cidadao .conteudo {
+  background: #e8f0ff;
+}
+
+.mensagem.juridico .conteudo {
+  background: #fff6dc;
+}
+
+.mensagem.coordenacao .conteudo {
+  background: #ffe5e5;
 }
 
 /* DATA / HORA */
 .mensagem .hora {
-  text-align: right;
   font-size: 11px;
   color: #666;
+  text-align: right;
+}
+
+/* ======================================================
+   CORES POR CARGO (NÃO REMOVER)
+====================================================== */
+.nome-cidadao {
+  color: #1e5eff;
+  font-weight: bold;
+}
+
+.nome-juridico {
+  color: #c9a227;
+  font-weight: bold;
+}
+
+.nome-coordenacao {
+  color: #b00000;
+  font-weight: bold;
+}
+
+/* ======================================================
+   ANEXOS / PREVIEW
+====================================================== */
+.anexo {
   margin-top: 6px;
+}
+
+.anexo a {
+  color: #6b0f0f;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.preview-img img {
+  max-width: 180px;
+  border-radius: 10px;
+  border: 2px solid #d4af37;
+  margin-top: 6px;
+}
+
+.preview-pdf {
+  margin-top: 6px;
+  font-size: 13px;
 }
 
 /* ======================================================
@@ -290,49 +308,9 @@ body {
   cursor: pointer;
 }
 
-.chat-input button:hover {
-  background: #8c1d1d;
-}
-
 .btn-secondary {
   background: #aaa !important;
   color: #000 !important;
-}
-
-/* ======================================================
-   CORES POR NÍVEL
-====================================================== */
-.nome-cidadao {
-  color: #1e5eff;
-  font-weight: bold;
-}
-
-.nome-juridico {
-  color: #c9a227;
-  font-weight: bold;
-}
-
-.nome-coordenacao {
-  color: #b00000;
-  font-weight: bold;
-}
-
-/* ======================================================
-   ANEXO
-====================================================== */
-.anexo a {
-  color: #6b0f0f;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-/* ======================================================
-   DIGITANDO
-====================================================== */
-#digitando {
-  font-size: 13px;
-  color: #2f7d32;
-  margin: 6px 0 10px;
 }
 
 /* ======================================================
