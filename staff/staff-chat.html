@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Atendimento • Staff</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body class="bg-paper">
+
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || usuario.nivel !== "staff") {
+    location.href = "../index.html";
+  }
+</script>
+
+<header class="header small official">
+  <img src="../logo-oasis.png" class="logo small">
+  <div>
+    <h1>Atendimento ao Cidadão</h1>
+    <span id="chatCategoria"></span>
+  </div>
+</header>
+
+<nav class="nav-bar">
+  <button onclick="location.href='staff.html'">⬅ Voltar</button>
+  <button onclick="fecharTicket()">🔒 Encerrar Ticket</button>
+  <button onclick="sair()">🚪 Sair</button>
+</nav>
+
+<main class="content">
+  <div id="mensagens" class="chat-box"></div>
+
+  <div class="chat-input">
+    <input id="mensagem" placeholder="Digite sua resposta oficial..." />
+    <button onclick="enviarMensagem()">Enviar</button>
+  </div>
+</main>
+
+<script type="module" src="staff.js"></script>
+</body>
+</html>
