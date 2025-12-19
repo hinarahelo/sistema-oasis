@@ -75,7 +75,7 @@
 <body>
 
 <div class="container">
-  <img src="logo-oasis.png" class="logo">
+  <img src="logo-oasis.png" class="logo" alt="Supremo Tribunal de Oasis">
 
   <h1>SUPREMO TRIBUNAL DE OASIS ⚖️</h1>
   <p id="texto"></p>
@@ -90,8 +90,9 @@
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
+  // 🔐 Proteção sem loop
   if (!usuario || !usuario.nivel) {
-    location.href = "index.html";
+    location.replace("index.html");
   }
 
   const texto = document.getElementById("texto");
