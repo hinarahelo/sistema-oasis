@@ -1,83 +1,115 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Painel Staff — Sistema Oasis</title>
-  <link rel="stylesheet" href="../style.css" />
+  <meta charset="UTF-8">
+  <title>Painel Jurídico — Supremo Tribunal de Oasis</title>
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body class="bg-paper">
 
-<!-- 🔐 PROTEÇÃO REAL -->
+<!-- 🔐 PROTEÇÃO -->
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-  // Não logado
-  if (!usuario) {
-    location.href = "../index.html";
-  }
-
-  // Apenas staff ou coordenação
-  if (usuario.nivel !== "staff" && usuario.nivel !== "coordenacao") {
+  if (!usuario || usuario.nivel !== "juridico") {
     location.href = "../index.html";
   }
 </script>
 
 <header class="header small official">
-  <h2>👮 Painel Staff — Sistema Oasis</h2>
-  <span>Atendimento institucional</span>
+  <img src="../logo-oasis.png" class="logo small">
+  <div class="header-text">
+    <h2>👮 Painel Jurídico</h2>
+    <span>Supremo Tribunal de Oasis</span>
+  </div>
 </header>
 
 <nav class="nav-bar official">
-  <button onclick="mostrarAba('tickets')">🎫 Tickets</button>
-
-  <!-- ⚖️ só coordenação vê -->
-  <button
-    id="btnCoord"
-    onclick="mostrarAba('coord')"
-    style="display:none"
-  >
-    ⚖️ Coordenação
-  </button>
-
+  <button onclick="mostrarAba('processos')">📂 Processos Abertos</button>
+  <button onclick="mostrarAba('historico')">📜 Histórico por Cidadão</button>
   <button onclick="sair()">🚪 Sair</button>
 </nav>
 
 <main class="content official">
 
-  <!-- ===== TICKETS STAFF ===== -->
-  <section id="tickets" class="aba active">
-    <h3>🎫 Tickets em Atendimento</h3>
-    <div id="listaTickets"></div>
-  </section>
+<!-- ================= PROCESSOS ================= -->
+<section id="processos" class="aba active">
+  <h3>📂 Processos em Andamento</h3>
+  <p class="section-desc">
+    Todos os tickets abertos organizados por categoria.
+  </p>
 
-  <!-- ===== COORDENAÇÃO ===== -->
-  <section id="coord" class="aba">
-    <h3>⚖️ Painel de Coordenação</h3>
-    <p>Ferramentas avançadas de controle.</p>
+  <div id="listaProcessos" class="card-list"></div>
+</section>
 
-    <div id="listaCoord"></div>
-  </section>
+<!-- ================= HISTÓRICO ================= -->
+<section id="historico" class="aba">
+  <h3>📜 Histórico Oficial</h3>
+  <div id="historicoBox" class="card-list"></div>
+</section>
 
 </main>
 
-<script type="module" src="staff.js"></script>
+<script type="module">
+import {
+  collection,
+  onSnapshot,
+  updateDoc,
+  doc,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "../firebase.js";
 
-<script>
-  // Mostrar aba coordenação apenas para coord
-  if (usuario.nivel === "coordenacao") {
-    document.getElementById("btnCoord").style.display = "inline-block";
-  }
+/* 🔁 ABAS */
+window.mostrarAba = id => {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+};
 
-  function mostrarAba(id) {
-    document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-  }
+/* 🚪 SAIR */
+window.sair = () => {
+  localStorage.clear();
+  location.href = "../index.html";
+};
 
-  function sair() {
-    localStorage.clear();
-    location.href = "../index.html";
+/* 📂 PROCESSOS ABERTOS */
+onSnapshot(
+  query(collection(db, "tickets"), where("status", "==", "aberto")),
+  snap => {
+    const box = document.getElementById("listaProcessos");
+    box.innerHTML = "";
+
+    snap.forEach(d => {
+      const t = d.data();
+      box.innerHTML += `
+        <div class="price-card">
+          <b>${t.categoria}</b><br>
+          Cidadão: ${t.nome}<br>
+          CID: ${t.cid}<br><br>
+
+          <button onclick="abrirChat('${d.id}')">💬 Abrir Atendimento</button>
+          <button onclick="encerrar('${d.id}')">🔒 Encerrar Ticket</button>
+        </div>
+      `;
+    });
   }
+);
+
+/* 🔒 ENCERRAR */
+window.encerrar = async id => {
+  await updateDoc(doc(db, "tickets", id), {
+    status: "encerrado"
+  });
+  alert("Ticket encerrado com sucesso.");
+};
+
+/* 💬 CHAT */
+window.abrirChat = id => {
+  localStorage.setItem("ticketStaff", id);
+  location.href = "chat.html";
+};
+
 </script>
 
 </body>
