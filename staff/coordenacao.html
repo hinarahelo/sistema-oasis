@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Supremo Tribunal de Oasis — Coordenação</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body class="bg-paper">
+
+<header class="header official">
+  <h1>🏛️ Supremo Tribunal de Oasis</h1>
+  <span>Painel da Coordenação</span>
+</header>
+
+<nav class="nav-bar official">
+  <button onclick="mostrar('tickets')">📂 Todos os Tickets</button>
+  <button onclick="mostrar('logs')">📜 Auditoria</button>
+  <button onclick="sair()">🚪 Encerrar Sessão</button>
+</nav>
+
+<main class="content official">
+  <section id="tickets" class="aba active">
+    <h2>🎫 Controle Geral de Tickets</h2>
+    <div id="lista-tickets"></div>
+  </section>
+
+  <section id="logs" class="aba">
+    <h2>📜 Logs do Sistema</h2>
+    <div id="lista-logs"></div>
+  </section>
+</main>
+
+<script type="module" src="coordenacao.js"></script>
+</body>
+</html>
