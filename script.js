@@ -11,7 +11,8 @@ import {
   updateDoc,
   doc,
   getDoc,
-  orderBy
+  orderBy,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { enviarArquivo } from "./storage.js";
@@ -35,6 +36,7 @@ if (!usuario || usuario.nivel !== "cidadao") {
 let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
+let typingTimeout = null;
 
 /* ================= ABAS ================= */
 window.mostrarAba = id => {
@@ -44,13 +46,9 @@ window.mostrarAba = id => {
   document.getElementById(id)?.classList.add("active");
 };
 
-/* 🔁 ABRIR ABA VIA HASH */
+/* 🔁 HASH */
 const hash = location.hash.replace("#", "");
-if (hash) {
-  mostrarAba(hash);
-} else {
-  mostrarAba("solicitacoes");
-}
+mostrarAba(hash || "solicitacoes");
 
 /* 🚪 LOGOUT */
 window.sair = () => {
@@ -112,28 +110,24 @@ function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
   const btnEnviar = document.querySelector(".chat-input button");
+  const digitandoBox = document.getElementById("digitando");
 
   box.innerHTML = "";
 
   if (unsubscribeMensagens) unsubscribeMensagens();
   if (unsubscribeStatus) unsubscribeStatus();
 
-  /* 🔒 STATUS DO TICKET */
+  /* 🔒 STATUS */
   unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), snap => {
     const t = snap.data();
-
-    if (t.status === "encerrado") {
-      input.disabled = true;
-      btnEnviar.disabled = true;
-      input.placeholder = "🔒 Ticket encerrado";
-    } else {
-      input.disabled = false;
-      btnEnviar.disabled = false;
-      input.placeholder = "Digite sua mensagem...";
-    }
+    input.disabled = t.status === "encerrado";
+    btnEnviar.disabled = t.status === "encerrado";
+    input.placeholder = t.status === "encerrado"
+      ? "🔒 Ticket encerrado"
+      : "Digite sua mensagem...";
   });
 
-  /* 💬 MENSAGENS (ORDENADAS + HORÁRIO) */
+  /* 💬 MENSAGENS */
   unsubscribeMensagens = onSnapshot(
     query(
       collection(db, "tickets", ticketAtual, "mensagens"),
@@ -144,7 +138,6 @@ function iniciarChat() {
 
       snap.forEach(d => {
         const m = d.data();
-
         const hora = m.criadoEm
           ? m.criadoEm.toDate().toLocaleTimeString("pt-BR", {
               hour: "2-digit",
@@ -152,17 +145,21 @@ function iniciarChat() {
             })
           : "--:--";
 
+        let classe = "nome-cidadao";
+        if (m.autor?.includes("juridico")) classe = "nome-juridico";
+        if (m.autor?.includes("coordenacao")) classe = "nome-coordenacao";
+
         box.innerHTML += `
           <p>
-            <b>${m.autor}</b>
-            <span style="font-size:11px;color:#666;">(${hora})</span><br>
+            <b class="${classe}">${m.autor}</b>
+            <span class="hora">(${hora})</span><br>
             ${m.texto || ""}
           </p>
         `;
 
         if (m.anexo) {
           box.innerHTML += `
-            <p style="font-size:13px;">
+            <p class="anexo">
               📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a>
             </p>
           `;
@@ -172,9 +169,42 @@ function iniciarChat() {
       box.scrollTop = box.scrollHeight;
     }
   );
+
+  /* 🟢 DIGITANDO */
+  input.oninput = () => {
+    setDoc(
+      doc(db, "tickets", ticketAtual, "digitando", usuario.cid),
+      {
+        nome: usuario.nome,
+        nivel: usuario.nivel,
+        em: serverTimestamp()
+      }
+    );
+
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      updateDoc(
+        doc(db, "tickets", ticketAtual, "digitando", usuario.cid),
+        { em: null }
+      );
+    }, 2000);
+  };
+
+  onSnapshot(
+    collection(db, "tickets", ticketAtual, "digitando"),
+    snap => {
+      digitandoBox.innerHTML = "";
+      snap.forEach(d => {
+        const t = d.data();
+        if (t.nome && t.nome !== usuario.nome) {
+          digitandoBox.innerHTML = `🟢 ${t.nome} está digitando...`;
+        }
+      });
+    }
+  );
 }
 
-/* ================= ENVIAR MENSAGEM ================= */
+/* ================= ENVIAR ================= */
 window.enviarMensagem = async () => {
   const texto = mensagem.value.trim();
   const file = arquivo?.files[0];
@@ -184,33 +214,23 @@ window.enviarMensagem = async () => {
     return;
   }
 
-  /* 🔒 VERIFICA STATUS */
   const ticketSnap = await getDoc(doc(db, "tickets", ticketAtual));
-  const ticket = ticketSnap.data();
-
-  if (ticket.status === "encerrado") {
+  if (ticketSnap.data().status === "encerrado") {
     alert("Este ticket está encerrado.");
     return;
   }
 
   let anexo = null;
-  if (file) {
-    anexo = await enviarArquivo(app, ticketAtual, file, usuario);
-  }
+  if (file) anexo = await enviarArquivo(app, ticketAtual, file, usuario);
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: `${usuario.nome} ${usuario.cid}`,
+    autor: `${usuario.nome} (${usuario.nivel})`,
     texto,
     anexo,
     criadoEm: serverTimestamp()
   });
 
   await registrarLog("Mensagem enviada");
-
-  await notificarDiscord(
-    `💬 NOVA RESPOSTA\nTicket: ${ticketAtual}\nPor: ${usuario.nome}`,
-    "WEBHOOK_STAFF_AQUI"
-  );
 
   mensagem.value = "";
 };
