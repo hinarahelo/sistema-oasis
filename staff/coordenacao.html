@@ -2,34 +2,105 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Supremo Tribunal de Oasis — Coordenação</title>
+  <title>Painel da Coordenação — Supremo Tribunal de Oasis</title>
   <link rel="stylesheet" href="../style.css">
 </head>
+
 <body class="bg-paper">
 
+<!-- 🔐 PROTEÇÃO -->
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || usuario.nivel !== "coordenacao") {
+    location.href = "../index.html";
+  }
+</script>
+
 <header class="header official">
-  <h1>🏛️ Supremo Tribunal de Oasis</h1>
-  <span>Painel da Coordenação</span>
+  <img src="../logo-oasis.png" class="logo">
+  <div class="header-text">
+    <h1>👑 Painel da Coordenação</h1>
+    <span>Supremo Tribunal de Oasis</span>
+  </div>
 </header>
 
 <nav class="nav-bar official">
-  <button onclick="mostrar('tickets')">📂 Todos os Tickets</button>
-  <button onclick="mostrar('logs')">📜 Auditoria</button>
+  <button onclick="mostrarAba('tickets')">📂 Todos os Tickets</button>
+  <button onclick="mostrarAba('logs')">📜 Auditoria</button>
   <button onclick="sair()">🚪 Encerrar Sessão</button>
 </nav>
 
 <main class="content official">
-  <section id="tickets" class="aba active">
-    <h2>🎫 Controle Geral de Tickets</h2>
-    <div id="lista-tickets"></div>
-  </section>
 
-  <section id="logs" class="aba">
-    <h2>📜 Logs do Sistema</h2>
-    <div id="lista-logs"></div>
-  </section>
+<!-- ================= TICKETS ================= -->
+<section id="tickets" class="aba active">
+  <h2>📂 Controle Geral de Tickets</h2>
+  <div id="listaTickets" class="card-list"></div>
+</section>
+
+<!-- ================= LOGS ================= -->
+<section id="logs" class="aba">
+  <h2>📜 Logs Oficiais do Sistema</h2>
+  <div id="listaLogs" class="card-list"></div>
+</section>
+
 </main>
 
-<script type="module" src="coordenacao.js"></script>
+<script type="module">
+import {
+  collection,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "../firebase.js";
+
+/* 🔁 ABAS */
+window.mostrarAba = id => {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+};
+
+/* 🚪 SAIR */
+window.sair = () => {
+  localStorage.clear();
+  location.href = "../index.html";
+};
+
+/* 📂 TODOS OS TICKETS */
+onSnapshot(collection(db, "tickets"), snap => {
+  const box = document.getElementById("listaTickets");
+  box.innerHTML = "";
+
+  snap.forEach(d => {
+    const t = d.data();
+    box.innerHTML += `
+      <div class="price-card">
+        <b>${t.categoria}</b><br>
+        Cidadão: ${t.nome}<br>
+        CID: ${t.cid}<br>
+        Status: ${t.status}
+      </div>
+    `;
+  });
+});
+
+/* 📜 LOGS */
+onSnapshot(collection(db, "logs"), snap => {
+  const box = document.getElementById("listaLogs");
+  box.innerHTML = "";
+
+  snap.forEach(d => {
+    const l = d.data();
+    box.innerHTML += `
+      <div class="price-card">
+        <b>${l.acao}</b><br>
+        Usuário: ${l.usuario}<br>
+        CID: ${l.cid}<br>
+        Data: ${l.data?.toDate().toLocaleString() || ""}
+      </div>
+    `;
+  });
+});
+</script>
+
 </body>
 </html>
