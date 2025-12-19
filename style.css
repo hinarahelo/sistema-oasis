@@ -8,105 +8,148 @@
   font-family: "Georgia", "Times New Roman", serif;
 }
 
-body {
-  background: #0f0f14;
-  color: #e6e6e6;
+body.dark {
+  background: #0f1115;
+  color: #eaeaea;
   min-height: 100vh;
-}
-
-/* ===============================
-   FUNDO PAPEL / INSTITUCIONAL
-================================ */
-.bg-paper {
-  background:
-    linear-gradient(rgba(15,15,20,0.95), rgba(15,15,20,0.95)),
-    url("paper-texture.png");
-  background-size: cover;
 }
 
 /* ===============================
    HEADER
 ================================ */
-.header {
+.topo {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px 32px;
-  border-bottom: 4px solid #7a0000;
-  background: #1a1a22;
+  padding: 20px 30px;
+  border-bottom: 4px solid #8b0000;
+  background: #16181f;
 }
 
-.header.small {
-  padding: 16px 32px;
-}
-
-.header h1 {
+.topo h1 {
   font-size: 22px;
-  font-weight: bold;
-  color: #ffd700;
+  color: #e6c27a;
 }
 
-.header span {
+.topo span {
   font-size: 13px;
   color: #bbb;
 }
 
 .logo {
-  height: 70px;
-}
-
-.logo.small {
-  height: 55px;
+  height: 60px;
 }
 
 /* ===============================
-   NAVBAR
+   LOGIN
+================================ */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+}
+
+.login-card {
+  background: #1c1f28;
+  border: 2px solid #8b0000;
+  padding: 35px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.login-card h2 {
+  color: #e6c27a;
+  margin-bottom: 15px;
+}
+
+.login-card p {
+  font-size: 14px;
+  color: #ccc;
+  margin-bottom: 25px;
+}
+
+/* ===============================
+   BOTÕES LOGIN
+================================ */
+.btn-login {
+  display: block;
+  padding: 14px;
+  margin-bottom: 15px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.btn-login.cidadao {
+  background: #8b0000;
+  color: #fff;
+  border: 1px solid #e6c27a;
+}
+
+.btn-login.cidadao:hover {
+  background: #a10000;
+}
+
+.btn-login.staff {
+  background: #2b2f3a;
+  color: #e6c27a;
+  border: 1px solid #e6c27a;
+}
+
+.btn-login.staff:hover {
+  background: #3a3f4f;
+}
+
+/* ===============================
+   AVISOS / FOOTER LOGIN
+================================ */
+.aviso {
+  font-size: 12px;
+  color: #aaa;
+  display: block;
+  margin-top: 10px;
+}
+
+.rodape {
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  padding: 20px;
+}
+
+/* ===============================
+   ABAS / SISTEMA
 ================================ */
 .nav-bar {
   display: flex;
   gap: 10px;
-  padding: 12px 32px;
-  background: #7a0000;
-  border-bottom: 3px solid #c9a24d;
+  padding: 12px 30px;
+  background: #16181f;
+  border-bottom: 3px solid #e6c27a;
 }
 
 .nav-bar button {
-  background: #5a0f0f;
-  color: #ffd700;
-  border: 1px solid #c9a24d;
+  background: #2b2f3a;
+  color: #e6c27a;
+  border: 1px solid #e6c27a;
   padding: 8px 14px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s, transform 0.1s;
+  transition: 0.2s;
 }
 
 .nav-bar button:hover {
   background: #8b0000;
-  transform: translateY(-1px);
+  color: #fff;
 }
 
-/* ===============================
-   CONTEÚDO
-================================ */
 .content {
   padding: 30px;
 }
 
-.content h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
-  color: #ffd700;
-}
-
-.section-desc {
-  font-size: 14px;
-  margin-bottom: 15px;
-  color: #ccc;
-}
-
-/* ===============================
-   ABAS
-================================ */
 .aba {
   display: none;
 }
@@ -116,47 +159,11 @@ body {
 }
 
 /* ===============================
-   INFO BOX
-================================ */
-.info-box {
-  background: #1a1a22;
-  border-left: 6px solid #c9a24d;
-  padding: 15px;
-  margin: 15px 0 25px;
-  font-size: 14px;
-  color: #ddd;
-}
-
-/* ===============================
-   CATEGORIAS
-================================ */
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 15px;
-}
-
-.category-grid button {
-  background: #1a1a22;
-  border: 2px solid #7a0000;
-  padding: 14px;
-  font-size: 14px;
-  cursor: pointer;
-  color: #ffd700;
-  transition: all 0.2s;
-}
-
-.category-grid button:hover {
-  background: #7a0000;
-  color: #fff;
-}
-
-/* ===============================
    CHAT
 ================================ */
 .chat-box {
-  background: #12121a;
-  border: 2px solid #7a0000;
+  background: #16181f;
+  border: 2px solid #8b0000;
   padding: 15px;
   height: 320px;
   overflow-y: auto;
@@ -176,8 +183,8 @@ body {
 .chat-input input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #555;
-  background: #1a1a22;
+  border: 1px solid #444;
+  background: #0f1115;
   color: #fff;
 }
 
@@ -185,119 +192,68 @@ body {
   padding: 10px 16px;
   border: none;
   cursor: pointer;
-  background: #7a0000;
-  color: #ffd700;
-}
-
-.chat-input .btn-secondary {
-  background: #444;
+  background: #8b0000;
   color: #fff;
 }
 
 /* ===============================
-   LISTA DE TICKETS
+   CARDS / TICKETS
 ================================ */
-.card-list {
-  display: grid;
-  gap: 12px;
-}
-
-.card-list .card {
-  background: #1a1a22;
+.card {
+  background: #1c1f28;
   border: 1px solid #444;
-  padding: 12px;
-  cursor: pointer;
-  color: #ddd;
-}
-
-.card-list .card:hover {
-  border-color: #c9a24d;
-}
-
-/* ===============================
-   PREÇOS
-================================ */
-.price-card {
-  background: #1a1a22;
-  border: 2px solid #7a0000;
-  padding: 18px;
-  margin-bottom: 20px;
-}
-
-.price-card h3 {
-  color: #ffd700;
+  padding: 14px;
   margin-bottom: 10px;
 }
 
-.price-card h4 {
-  margin-top: 12px;
-  margin-bottom: 6px;
-  color: #c9a24d;
-}
-
-.price-card ul {
-  list-style: none;
-}
-
-.price-card li {
-  font-size: 14px;
-  padding: 3px 0;
+.card:hover {
+  border-color: #e6c27a;
 }
 
 /* ===============================
-   LOGIN (INDEX)
+   STAFF
 ================================ */
-.login {
-  max-width: 420px;
-  margin: 80px auto;
-  background: #1a1a22;
-  padding: 30px;
-  border-radius: 8px;
-  text-align: center;
-  border: 2px solid #7a0000;
+.layout {
+  display: flex;
+  min-height: 100vh;
 }
 
-.login h2 {
-  color: #ffd700;
+.sidebar {
+  width: 220px;
+  background: #16181f;
+  border-right: 2px solid #8b0000;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  color: #e6c27a;
   margin-bottom: 20px;
 }
 
-.login .btn {
-  display: block;
-  padding: 14px;
-  margin: 15px 0;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
+.sidebar button {
+  width: 100%;
+  margin-bottom: 10px;
+  background: #2b2f3a;
+  color: #e6c27a;
+  border: 1px solid #e6c27a;
+  padding: 8px;
+  cursor: pointer;
 }
 
-.login .btn.cidadao {
-  background: #7a0000;
-  color: #ffd700;
-}
-
-.login .btn.staff {
-  background: #12121a;
+.sidebar button:hover {
+  background: #8b0000;
   color: #fff;
-  border: 1px solid #c9a24d;
-}
-
-.login footer {
-  margin-top: 25px;
-  font-size: 12px;
-  color: #aaa;
 }
 
 /* ===============================
    RESPONSIVO
 ================================ */
 @media (max-width: 768px) {
-  .nav-bar {
-    flex-wrap: wrap;
+  .layout {
+    flex-direction: column;
   }
 
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
+  .sidebar {
+    width: 100%;
   }
 }
