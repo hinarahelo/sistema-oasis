@@ -4,41 +4,28 @@
   <meta charset="UTF-8">
   <title>Supremo Tribunal de Oasis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="style.css">
 </head>
+<body style="font-family: Georgia, serif; background:#5b0f14; color:#fff; display:flex; align-items:center; justify-content:center; height:100vh;">
 
-<body class="login-bg">
+<div style="background:#f6f1e9; color:#1a1a1a; padding:40px; border-radius:18px; width:360px; text-align:center;">
+  <h1>SUPREMO TRIBUNAL DE OASIS ⚖️</h1>
+  <p>Portal Oficial de Serviços Judiciários</p>
 
-  <div class="login-card official">
-    <img src="logo-oasis.png" class="login-logo">
+  <button onclick="login('cidadao')" style="width:100%; padding:14px; margin:10px 0; border-radius:14px; border:none; background:#5b0f14; color:#fff;">
+    👤 Acesso do Cidadão
+  </button>
 
-    <h1>SUPREMO TRIBUNAL DE OASIS</h1>
-    <p class="subtitle">
-      Portal Oficial de Serviços Judiciários
-    </p>
+  <button onclick="login('juridico')" style="width:100%; padding:14px; margin:10px 0; border-radius:14px; border:none; background:#5b0f14; color:#fff;">
+    ⚖️ Acesso Jurídico
+  </button>
 
-    <div class="login-buttons">
-      <button onclick="loginDiscord('cidadao')">
-        👤 Acesso do Cidadão
-      </button>
-
-      <button onclick="loginDiscord('juridico')">
-        ⚖️ Acesso Jurídico
-      </button>
-
-      <button onclick="loginDiscord('coordenacao')">
-        👑 Coordenação
-      </button>
-    </div>
-
-    <span class="gov-note">
-      Sistema institucional — acesso monitorado
-    </span>
-  </div>
+  <button onclick="login('coordenacao')" style="width:100%; padding:14px; margin:10px 0; border-radius:14px; border:none; background:#5b0f14; color:#fff;">
+    👑 Coordenação
+  </button>
+</div>
 
 <script>
-function loginDiscord(nivel) {
+function login(nivel) {
   const url =
     "https://discord.com/oauth2/authorize" +
     "?client_id=1450920482479145195" +
