@@ -18,31 +18,41 @@ import {
 import { enviarArquivo } from "./storage.js";
 import { notificarDiscord } from "./discord.js";
 
-/* 🔥 Firebase */
+/* ======================================================
+   🔥 FIREBASE
+====================================================== */
 const app = initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
 });
+
 const db = getFirestore(app);
 
-/* 🔐 Usuário */
+/* ======================================================
+   🔐 USUÁRIO
+====================================================== */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario || usuario.nivel !== "cidadao") {
   location.href = "index.html";
 }
 
-/* ESTADO */
+/* ======================================================
+   ESTADO GLOBAL
+====================================================== */
 let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
 let typingTimeout = null;
 
-/* ================= ABAS ================= */
+/* ======================================================
+   ABAS
+====================================================== */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a =>
     a.classList.remove("active")
   );
+
   document.getElementById(id)?.classList.add("active");
 
   if (id === "andamento") {
@@ -50,17 +60,23 @@ window.mostrarAba = id => {
   }
 };
 
-/* 🔁 HASH */
+/* ======================================================
+   HASH INICIAL
+====================================================== */
 const hash = location.hash.replace("#", "");
 mostrarAba(hash || "solicitacoes");
 
-/* 🚪 LOGOUT */
+/* ======================================================
+   LOGOUT
+====================================================== */
 window.sair = () => {
   localStorage.clear();
   location.href = "index.html";
 };
 
-/* 📜 LOG */
+/* ======================================================
+   LOGS
+====================================================== */
 async function registrarLog(acao) {
   await addDoc(collection(db, "logs"), {
     ticket: ticketAtual,
@@ -71,7 +87,9 @@ async function registrarLog(acao) {
   });
 }
 
-/* ================= EM ANDAMENTO ================= */
+/* ======================================================
+   🕒 EM ANDAMENTO — POR CATEGORIA
+====================================================== */
 function carregarTicketsEmAndamento() {
   const grid = document.getElementById("categoriasTickets");
   const listaCategoria = document.getElementById("listaPorCategoria");
@@ -88,14 +106,13 @@ function carregarTicketsEmAndamento() {
 
   onSnapshot(q, snap => {
     const categorias = {};
+    grid.innerHTML = "";
 
     snap.forEach(d => {
       const t = d.data();
       if (!categorias[t.categoria]) categorias[t.categoria] = [];
       categorias[t.categoria].push({ id: d.id, ...t });
     });
-
-    grid.innerHTML = "";
 
     if (Object.keys(categorias).length === 0) {
       grid.innerHTML = "<p>Nenhum ticket em andamento.</p>";
@@ -144,7 +161,9 @@ window.voltarCategorias = () => {
   carregarTicketsEmAndamento();
 };
 
-/* ================= ABRIR / CRIAR TICKET ================= */
+/* ======================================================
+   📂 ABRIR / CRIAR TICKET
+====================================================== */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
   document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
@@ -182,7 +201,9 @@ window.abrirCategoria = async categoria => {
   iniciarChat();
 };
 
-/* ================= CHAT ================= */
+/* ======================================================
+   💬 CHAT
+====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
@@ -276,10 +297,13 @@ function iniciarChat() {
   );
 }
 
-/* ================= ENVIAR ================= */
+/* ======================================================
+   📤 ENVIAR MENSAGEM / ARQUIVO
+====================================================== */
 window.enviarMensagem = async () => {
-  const texto = mensagem.value.trim();
-  const file = arquivo?.files[0];
+  const texto = document.getElementById("mensagem").value.trim();
+  const fileInput = document.getElementById("arquivo");
+  const file = fileInput?.files[0];
 
   if (!texto && !file) {
     alert("Mensagem ou anexo obrigatório.");
@@ -293,7 +317,10 @@ window.enviarMensagem = async () => {
   }
 
   let anexo = null;
-  if (file) anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+  if (file) {
+    anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+    fileInput.value = "";
+  }
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} (${usuario.nivel})`,
@@ -304,5 +331,5 @@ window.enviarMensagem = async () => {
 
   await registrarLog("Mensagem enviada");
 
-  mensagem.value = "";
+  document.getElementById("mensagem").value = "";
 };
