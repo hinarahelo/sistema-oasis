@@ -1,51 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Painel Jurídico — Supremo Tribunal de Oasis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="../style.css">
+  <meta charset="UTF-8" />
+  <title>Jurídico — Supremo Tribunal de Oasis</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="bg-paper official">
 
-<!-- 🔐 PROTEÇÃO DE ACESSO -->
+<!-- 🔐 PROTEÇÃO -->
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
   if (!usuario || usuario.nivel !== "juridico") {
-    location.href = "../index.html";
+    location.href = "index.html";
   }
 </script>
 
-<!-- ================= HEADER ================= -->
 <header class="header small official">
-  <img src="../logo-oasis.png" class="logo small">
+  <img src="logo-oasis.png" class="logo small" />
   <div class="header-text">
     <h1>Supremo Tribunal de Oasis</h1>
-    <span>Painel Jurídico Institucional</span>
+    <span>Painel Jurídico</span>
   </div>
 </header>
 
-<!-- ================= NAVBAR ================= -->
 <nav class="nav-bar official">
-  <button type="button" onclick="mostrarPainel()">📂 Tickets</button>
-  <button type="button" onclick="sair()">🚪 Encerrar Sessão</button>
+  <button onclick="mostrarAba('andamento')">🕒 Tickets</button>
+  <button onclick="sair()">🚪 Encerrar Sessão</button>
 </nav>
 
-<!-- ================= CONTEÚDO ================= -->
 <main class="content official">
 
-  <!-- ================= LISTA ================= -->
-  <section id="painel" class="aba active">
-    <h2>📂 Tickets Abertos</h2>
+  <!-- ================= ANDAMENTO ================= -->
+  <section id="andamento" class="aba active">
+    <h2>⚖️ Tickets em Andamento</h2>
 
     <!-- FILTRO -->
-    <select id="filtroCategoria" onchange="filtrarCategoria()">
+    <select id="filtroCategoria" onchange="aplicarFiltro()">
       <option value="">Todas as categorias</option>
     </select>
 
-    <div id="listaTickets" class="card-list official"></div>
+    <div id="ticketsCategoria" class="card-list"></div>
   </section>
 
   <!-- ================= CHAT ================= -->
@@ -55,34 +50,15 @@
     <div id="mensagens" class="chat-box official"></div>
 
     <div class="chat-input official">
-      <input id="mensagem" placeholder="Digite sua resposta jurídica...">
-      <input type="file" id="arquivo">
-
-      <button id="btnEnviar" onclick="enviarMensagem()">Enviar</button>
-      <button class="btn-secondary" onclick="encerrarTicket()">🔒 Encerrar</button>
-      <button class="btn-secondary" onclick="voltarPainel()">⬅ Voltar</button>
+      <input id="mensagem" placeholder="Digite sua resposta..." />
+      <input type="file" id="arquivo" />
+      <button onclick="enviarMensagem()">Enviar</button>
+      <button class="btn-secondary" onclick="mostrarAba('andamento')">⬅ Voltar</button>
     </div>
   </section>
 
 </main>
 
 <script type="module" src="juridico.js"></script>
-
-<script>
-  function sair() {
-    localStorage.clear();
-    location.href = "../index.html";
-  }
-
-  function mostrarPainel() {
-    document.getElementById("painel").classList.add("active");
-    document.getElementById("chat").classList.remove("active");
-  }
-
-  function voltarPainel() {
-    mostrarPainel();
-  }
-</script>
-
 </body>
 </html>
