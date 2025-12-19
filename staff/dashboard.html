@@ -1,46 +1,84 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Coordenação • Tribunal de Justiça de Oasis</title>
-  <link rel="stylesheet" href="../style.css">
+  <meta charset="UTF-8" />
+  <title>Painel Staff — Sistema Oasis</title>
+  <link rel="stylesheet" href="../style.css" />
 </head>
 
 <body class="bg-paper">
 
+<!-- 🔐 PROTEÇÃO REAL -->
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "coordenacao") {
+
+  // Não logado
+  if (!usuario) {
+    location.href = "../index.html";
+  }
+
+  // Apenas staff ou coordenação
+  if (usuario.nivel !== "staff" && usuario.nivel !== "coordenacao") {
     location.href = "../index.html";
   }
 </script>
 
 <header class="header small official">
-  <img src="../logo-oasis.png" class="logo small">
-  <div>
-    <h1>Tribunal de Justiça de Oasis</h1>
-    <span>Painel da Coordenação Jurídica</span>
-  </div>
+  <h2>👮 Painel Staff — Sistema Oasis</h2>
+  <span>Atendimento institucional</span>
 </header>
 
 <nav class="nav-bar official">
-  <button onclick="abrirAba('todos')">📊 Todos os Tickets</button>
-  <button onclick="location.href='staff.html'">👮 Staff</button>
-  <button onclick="localStorage.clear();location.href='../index.html'">🚪 Sair</button>
+  <button onclick="mostrarAba('tickets')">🎫 Tickets</button>
+
+  <!-- ⚖️ só coordenação vê -->
+  <button
+    id="btnCoord"
+    onclick="mostrarAba('coord')"
+    style="display:none"
+  >
+    ⚖️ Coordenação
+  </button>
+
+  <button onclick="sair()">🚪 Sair</button>
 </nav>
 
 <main class="content official">
 
-<section id="todos" class="aba active">
-  <h2>📊 Monitoramento Geral</h2>
-  <p class="section-desc">
-    Visão geral de todos os atendimentos, com SLA e responsáveis.
-  </p>
-  <div id="lista-tickets" class="card-list"></div>
-</section>
+  <!-- ===== TICKETS STAFF ===== -->
+  <section id="tickets" class="aba active">
+    <h3>🎫 Tickets em Atendimento</h3>
+    <div id="listaTickets"></div>
+  </section>
+
+  <!-- ===== COORDENAÇÃO ===== -->
+  <section id="coord" class="aba">
+    <h3>⚖️ Painel de Coordenação</h3>
+    <p>Ferramentas avançadas de controle.</p>
+
+    <div id="listaCoord"></div>
+  </section>
 
 </main>
 
 <script type="module" src="staff.js"></script>
+
+<script>
+  // Mostrar aba coordenação apenas para coord
+  if (usuario.nivel === "coordenacao") {
+    document.getElementById("btnCoord").style.display = "inline-block";
+  }
+
+  function mostrarAba(id) {
+    document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function sair() {
+    localStorage.clear();
+    location.href = "../index.html";
+  }
+</script>
+
 </body>
 </html>
