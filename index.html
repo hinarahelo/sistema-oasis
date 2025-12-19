@@ -15,7 +15,6 @@
       justify-content: center;
       height: 100vh;
     }
-
     .box {
       background: #020617;
       padding: 30px;
@@ -24,7 +23,6 @@
       width: 100%;
       max-width: 360px;
     }
-
     button {
       background: #5865F2;
       border: none;
@@ -34,10 +32,7 @@
       border-radius: 6px;
       font-size: 16px;
       cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -46,21 +41,27 @@
 
   <div class="box">
     <h2>🔐 Sistema Oasis</h2>
-    <p>Faça login para continuar</p>
+    <p>Escolha como deseja entrar</p>
 
-    <button onclick="loginDiscord()">
-      Entrar com Discord
+    <button onclick="loginDiscord('cidadao')">
+      👤 Entrar como Cidadão
+    </button>
+
+    <button onclick="loginDiscord('staff')">
+      👮 Entrar como Staff
     </button>
   </div>
 
   <script>
-    function loginDiscord() {
-      window.location.href =
+    function loginDiscord(nivel) {
+      const base =
         "https://discord.com/oauth2/authorize" +
         "?client_id=1450920482479145195" +
         "&response_type=code" +
         "&scope=identify" +
         "&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback";
+
+      window.location.href = base + "&state=" + nivel;
     }
   </script>
 
