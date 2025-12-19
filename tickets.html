@@ -101,6 +101,12 @@
     <h2 id="chatTitulo">💬 Atendimento</h2>
     <div id="mensagens" class="chat-box official"></div>
 
+    <!-- PREVIEW DO ARQUIVO -->
+    <div id="arquivoPreview" style="display:none; margin:8px 0;">
+      📎 <span id="arquivoNome"></span>
+      <button type="button" class="btn-secondary" onclick="removerArquivo()">❌ Remover</button>
+    </div>
+
     <div class="chat-input official">
       <input id="mensagem" placeholder="Digite sua mensagem..." />
       <input type="file" id="arquivo" />
