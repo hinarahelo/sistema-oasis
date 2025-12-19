@@ -2,6 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore,
   collection,
+  query,
+  where,
   onSnapshot,
   addDoc,
   updateDoc,
@@ -12,15 +14,17 @@ import {
 /* ===============================
    🔥 FIREBASE
 ================================ */
-const app = initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
-});
+};
+
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* ===============================
-   🔐 PERMISSÃO
+   🔐 USUÁRIO (STAFF)
 ================================ */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario || (usuario.nivel !== "juridico" && usuario.nivel !== "coordenacao")) {
@@ -28,22 +32,18 @@ if (!usuario || (usuario.nivel !== "juridico" && usuario.nivel !== "coordenacao"
 }
 
 /* ===============================
-   🧭 ESTADO
+   🧭 ESTADO GLOBAL
 ================================ */
 let ticketAtual = null;
-let unsubscribe = null;
+let unsubscribeChat = null;
 
 /* ===============================
    🗂️ ABAS
 ================================ */
-window.mostrarAba = id => {
+window.abrirAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
-};
-
-window.sair = () => {
-  localStorage.clear();
-  location.href = "../index.html";
+  const aba = document.getElementById(id);
+  if (aba) aba.classList.add("active");
 };
 
 /* ===============================
@@ -51,7 +51,11 @@ window.sair = () => {
 ================================ */
 function calcularSLA(criadoEm) {
   if (!criadoEm) return "🟢 OK";
-  const horas = (Date.now() - criadoEm.toDate().getTime()) / 36e5;
+
+  const agora = Date.now();
+  const inicio = criadoEm.toDate().getTime();
+  const horas = (agora - inicio) / (1000 * 60 * 60);
+
   if (horas <= 3) return "🟢 OK";
   if (horas <= 18) return "🟡 Atenção";
   if (horas > 48) return "🔴 Estourado";
@@ -59,82 +63,124 @@ function calcularSLA(criadoEm) {
 }
 
 /* ===============================
-   🎫 LISTA TICKETS
+   📋 LISTAR TICKETS ABERTOS
 ================================ */
-onSnapshot(collection(db, "tickets"), snap => {
-  const lista = document.getElementById("listaTickets");
-  if (!lista) return;
+function listarTickets(status, containerId) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
 
-  lista.innerHTML = "";
+  const q = query(
+    collection(db, "tickets"),
+    where("status", "==", status)
+  );
 
-  snap.forEach(d => {
-    const t = d.data();
+  onSnapshot(q, snap => {
+    box.innerHTML = "";
 
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <b>${t.categoria}</b><br>
-      ${t.nome} (${t.cid})<br>
-      Status: ${t.status}<br>
-      SLA: ${calcularSLA(t.criadoEm)}
-    `;
+    snap.forEach(d => {
+      const t = d.data();
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <b>${t.categoria}</b><br>
+        ${t.nome}<br>
+        Status: ${t.status}<br>
+        SLA: ${calcularSLA(t.criadoEm)}
+      `;
 
-    div.onclick = () => abrirTicket(d.id, t.categoria);
-    lista.appendChild(div);
+      div.onclick = () => abrirTicket(d.id, t);
+      box.appendChild(div);
+    });
   });
-});
+}
 
 /* ===============================
-   💬 ABRIR TICKET
+   📂 ABRIR TICKET
 ================================ */
-function abrirTicket(id, categoria) {
+function abrirTicket(id, ticket) {
   ticketAtual = id;
-  mostrarAba("chat");
-  document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
+  abrirAba("chat");
+
+  const titulo = document.getElementById("chatTitulo");
+  if (titulo) {
+    titulo.innerText = `💬 ${ticket.categoria} — ${ticket.nome}`;
+  }
+
+  iniciarChat();
+}
+
+/* ===============================
+   💬 CHAT REALTIME
+================================ */
+function iniciarChat() {
+  if (!ticketAtual) return;
 
   const box = document.getElementById("mensagens");
   box.innerHTML = "";
 
-  if (unsubscribe) unsubscribe();
+  if (unsubscribeChat) unsubscribeChat();
 
-  unsubscribe = onSnapshot(
-    collection(db, "tickets", id, "mensagens"),
+  unsubscribeChat = onSnapshot(
+    collection(db, "tickets", ticketAtual, "mensagens"),
     snap => {
       box.innerHTML = "";
       snap.forEach(d => {
         const m = d.data();
-        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
+        let html = `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
+
+        if (m.anexo) {
+          html += `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>`;
+        }
+
+        box.innerHTML += html;
       });
+
       box.scrollTop = box.scrollHeight;
     }
   );
 }
 
 /* ===============================
-   ✉️ RESPONDER
+   ✉️ ENVIAR MENSAGEM (STAFF)
 ================================ */
-window.enviarMensagemStaff = async () => {
+window.enviarMensagem = async () => {
   const input = document.getElementById("mensagem");
   if (!input.value || !ticketAtual) return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: `Staff ${usuario.nome}`,
+    autor: `${usuario.nome} (STAFF)`,
     texto: input.value,
     criadoEm: serverTimestamp()
   });
 
   await updateDoc(doc(db, "tickets", ticketAtual), {
-    status: "em_atendimento"
+    status: "em_atendimento",
+    staff: usuario.nome
   });
 
   input.value = "";
 };
 
 /* ===============================
-   🔄 STATUS
+   ✅ FECHAR TICKET
 ================================ */
-window.alterarStatus = async status => {
+window.fecharTicket = async () => {
   if (!ticketAtual) return;
-  await updateDoc(doc(db, "tickets", ticketAtual), { status });
-  alert(`Status alterado para: ${status}`);
+
+  await updateDoc(doc(db, "tickets", ticketAtual), {
+    status: "fechado",
+    fechadoEm: serverTimestamp()
+  });
+
+  ticketAtual = null;
+  abrirAba("abertos");
 };
+
+/* ===============================
+   🚀 INIT
+================================ */
+listarTickets("aberto", "lista-abertos");
+listarTickets("em_atendimento", "lista-abertos");
+listarTickets("fechado", "lista-fechados");
+
+abrirAba("abertos");
