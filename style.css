@@ -59,9 +59,18 @@ body {
   opacity: 0.9;
 }
 
-.logo { width: 110px; }
-.logo.small { width: 70px; }
-.logo-grande { width: 140px; margin-bottom: 14px; }
+.logo {
+  width: 110px;
+}
+
+.logo.small {
+  width: 70px;
+}
+
+.logo-grande {
+  width: 140px;
+  margin-bottom: 14px;
+}
 
 /* ======================================================
    NAVBAR
@@ -93,8 +102,13 @@ body {
 /* ======================================================
    ABAS
 ====================================================== */
-.aba { display: none; }
-.aba.active { display: block; }
+.aba {
+  display: none;
+}
+
+.aba.active {
+  display: block;
+}
 
 /* ======================================================
    SOLICITAÇÕES
@@ -104,7 +118,9 @@ body {
   margin-bottom: 30px;
 }
 
-.bloco-servicos { margin-bottom: 40px; }
+.bloco-servicos {
+  margin-bottom: 40px;
+}
 
 .grid-servicos {
   display: grid;
@@ -157,7 +173,9 @@ body {
   color: #5b0f0f;
 }
 
-.lista-categoria.hidden { display: none; }
+.lista-categoria.hidden {
+  display: none;
+}
 
 /* ======================================================
    CARDS DE TICKET
@@ -189,70 +207,61 @@ body {
   background: #fff;
   border-radius: 18px;
   padding: 18px;
-  height: 360px;
+  height: 380px;
   overflow-y: auto;
   border: 1px solid #ddd;
   margin-bottom: 10px;
 }
 
-/* ===== CONTAINER DE MENSAGEM ===== */
+/* ===== MENSAGEM ===== */
 .mensagem {
-  margin-bottom: 14px;
   max-width: 75%;
-}
-
-/* ===== BALÕES ===== */
-.mensagem .conteudo {
+  margin-bottom: 14px;
   padding: 12px 16px;
   border-radius: 16px;
   font-size: 14px;
   line-height: 1.5;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
 /* CIDADÃO */
 .mensagem.cidadao {
-  margin-left: auto;
-}
-
-.mensagem.cidadao .conteudo {
   background: #e8f0ff;
-  border-bottom-right-radius: 4px;
+  margin-left: auto;
+  border-bottom-right-radius: 6px;
 }
 
 /* JURÍDICO */
-.mensagem.juridico .conteudo {
+.mensagem.juridico {
   background: #fff6d8;
-  border-bottom-left-radius: 4px;
+  margin-right: auto;
+  border-bottom-left-radius: 6px;
 }
 
 /* COORDENAÇÃO */
-.mensagem.coordenacao .conteudo {
+.mensagem.coordenacao {
   background: #ffe5e5;
-  border-bottom-left-radius: 4px;
+  margin-right: auto;
+  border-bottom-left-radius: 6px;
+}
+
+/* CONTEÚDO */
+.mensagem .conteudo {
+  white-space: pre-wrap;
 }
 
 /* AUTOR */
-.mensagem .autor {
-  font-weight: bold;
-  margin-bottom: 4px;
+.autor {
   display: block;
-}
-
-/* ANEXO */
-.mensagem .anexo a {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 13px;
-  color: #6b0f0f;
-  text-decoration: none;
+  margin-bottom: 4px;
 }
 
 /* DATA / HORA */
 .mensagem .hora {
-  margin-top: 4px;
+  text-align: right;
   font-size: 11px;
   color: #666;
-  text-align: right;
+  margin-top: 6px;
 }
 
 /* ======================================================
@@ -281,14 +290,49 @@ body {
   cursor: pointer;
 }
 
-.chat-input button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.chat-input button:hover {
+  background: #8c1d1d;
 }
 
 .btn-secondary {
   background: #aaa !important;
   color: #000 !important;
+}
+
+/* ======================================================
+   CORES POR NÍVEL
+====================================================== */
+.nome-cidadao {
+  color: #1e5eff;
+  font-weight: bold;
+}
+
+.nome-juridico {
+  color: #c9a227;
+  font-weight: bold;
+}
+
+.nome-coordenacao {
+  color: #b00000;
+  font-weight: bold;
+}
+
+/* ======================================================
+   ANEXO
+====================================================== */
+.anexo a {
+  color: #6b0f0f;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* ======================================================
+   DIGITANDO
+====================================================== */
+#digitando {
+  font-size: 13px;
+  color: #2f7d32;
+  margin: 6px 0 10px;
 }
 
 /* ======================================================
