@@ -1,21 +1,13 @@
 const params = new URLSearchParams(window.location.search);
 const session = params.get("session");
-const tipo = params.get("tipo");
 
 if (session) {
-  localStorage.setItem("session", session);
-  localStorage.setItem("tipo", tipo);
-
-  // limpa URL
-  window.history.replaceState({}, document.title, "/");
-
-  if (tipo === "staff") {
-    window.location.href = "/staff/dashboard.html";
-  } else {
-    window.location.href = "/tickets.html";
-  }
-} else {
-  if (!localStorage.getItem("session")) {
-    window.location.href = "/login.html";
+  try {
+    const usuario = JSON.parse(atob(session));
+    localStorage.setItem("usuario", JSON.stringify(usuario));
+    window.history.replaceState({}, document.title, "/sistema-oasis/");
+    location.href = "tickets.html";
+  } catch {
+    localStorage.removeItem("usuario");
   }
 }
