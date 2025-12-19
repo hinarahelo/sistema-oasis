@@ -12,86 +12,87 @@
       background: radial-gradient(circle, #7a1c1c, #3b0d0d);
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
     }
 
-    .container {
+    .box {
       background: #f8f4ee;
-      border-radius: 22px;
-      max-width: 540px;
-      width: 100%;
-      padding: 42px 34px;
-      border: 2px solid #d4af37;
-      box-shadow: 0 30px 70px rgba(0,0,0,.45);
+      border-radius: 20px;
+      padding: 40px;
+      width: 420px;
       text-align: center;
+      border: 2px solid #d4af37;
+      box-shadow: 0 30px 80px rgba(0,0,0,.45);
     }
 
     .logo {
-      width: 130px;
-      margin-bottom: 18px;
+      width: 120px;
+      margin-bottom: 20px;
     }
 
     h1 {
-      font-size: 22px;
       color: #5b0f0f;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
+      font-size: 22px;
+      margin-bottom: 10px;
     }
 
-    .welcome {
+    p {
       font-size: 14px;
       color: #333;
+      margin-bottom: 25px;
       line-height: 1.6;
-      margin-bottom: 26px;
     }
 
     .btn {
       width: 100%;
       padding: 14px;
+      margin: 8px 0;
       border-radius: 14px;
       border: none;
       background: #6b0f0f;
       color: #fff;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: bold;
       cursor: pointer;
-      margin-bottom: 12px;
-    }
-
-    .btn.secondary {
-      background: #8c1d1d;
-    }
-
-    .btn.ghost {
-      background: #bfa76a;
-      color: #3b2a00;
     }
 
     .btn:hover {
-      opacity: .92;
+      background: #8c1d1d;
     }
 
     .footer {
-      margin-top: 22px;
+      margin-top: 18px;
       font-size: 11px;
       color: #555;
-      letter-spacing: .4px;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container">
-  <img src="logo-oasis.png" class="logo" alt="Supremo Tribunal de Oasis">
+<div class="box">
+  <img src="logo-oasis.png" class="logo">
 
   <h1>SUPREMO TRIBUNAL DE OASIS ⚖️</h1>
+  <p id="boasVindas"></p>
 
-  <div class="welcome" id="texto"></div>
+  <!-- BOTÕES CIDADÃO -->
+  <div id="menuCidadao">
+    <button class="btn" onclick="ir('tickets')">📂 Nova Solicitação</button>
+    <button class="btn" onclick="ir('andamento')">🕒 Solicitações em Andamento</button>
+    <button class="btn" onclick="ir('valores')">💰 Tabela de Serviços</button>
+  </div>
 
-  <div id="botoes"></div>
+  <!-- BOTÕES JURÍDICO -->
+  <div id="menuJuridico" style="display:none;">
+    <button class="btn" onclick="ir('juridico')">⚖️ Painel Jurídico</button>
+  </div>
+
+  <!-- BOTÕES COORDENAÇÃO -->
+  <div id="menuCoord" style="display:none;">
+    <button class="btn" onclick="ir('coordenacao')">👑 Painel da Coordenação</button>
+  </div>
 
   <div class="footer">
     Sistema institucional • acesso monitorado
@@ -102,81 +103,32 @@
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
   if (!usuario || !usuario.nivel) {
-    location.replace("index.html");
+    location.href = "index.html";
   }
 
-  const texto = document.getElementById("texto");
-  const botoes = document.getElementById("botoes");
+  const texto = document.getElementById("boasVindas");
 
-  /* ================= CIDADAO ================= */
+  texto.innerText = `Bem-vindo(a), ${usuario.nome}.
+  Utilize o portal oficial do Supremo Tribunal de Oasis.`;
+
   if (usuario.nivel === "cidadao") {
-    texto.innerHTML = `
-      Bem-vindo(a), <b>${usuario.nome}</b>.<br>
-      Utilize o portal oficial do Supremo Tribunal de Oasis
-      para acessar serviços judiciais.
-    `;
-
-    botoes.innerHTML = `
-      <button class="btn" onclick="go('tickets.html')">
-        📂 Solicitações
-      </button>
-
-      <button class="btn secondary" onclick="go('tickets.html#chat')">
-        🎫 Tickets
-      </button>
-
-      <button class="btn ghost" onclick="go('tickets.html#precos')">
-        💰 Valores e serviços
-      </button>
-
-      <button class="btn secondary" onclick="go('tickets.html#andamento')">
-        🕒 Solicitações em andamento
-      </button>
-    `;
+    document.getElementById("menuCidadao").style.display = "block";
   }
 
-  /* ================= JURIDICO ================= */
   if (usuario.nivel === "juridico") {
-    texto.innerHTML = `
-      Bem-vindo(a), <b>${usuario.nome}</b>.<br>
-      Acesso ao painel jurídico institucional.
-    `;
-
-    botoes.innerHTML = `
-      <button class="btn" onclick="go('staff/dashboard.html')">
-        ⚖️ Painel jurídico
-      </button>
-
-      <button class="btn secondary" onclick="go('tickets.html#precos')">
-        💰 Tabela de serviços
-      </button>
-    `;
+    document.getElementById("menuJuridico").style.display = "block";
   }
 
-  /* ================= COORDENACAO ================= */
   if (usuario.nivel === "coordenacao") {
-    texto.innerHTML = `
-      Bem-vindo(a), <b>${usuario.nome}</b>.<br>
-      Painel administrativo do Supremo Tribunal de Oasis.
-    `;
-
-    botoes.innerHTML = `
-      <button class="btn" onclick="go('staff/coordenacao.html')">
-        👑 Painel da coordenação
-      </button>
-
-      <button class="btn secondary" onclick="go('staff/dashboard.html')">
-        ⚖️ Solicitações abertas
-      </button>
-
-      <button class="btn ghost" onclick="go('tickets.html#precos')">
-        💰 Valores institucionais
-      </button>
-    `;
+    document.getElementById("menuCoord").style.display = "block";
   }
 
-  function go(url) {
-    location.href = url;
+  function ir(destino) {
+    if (destino === "tickets") location.href = "tickets.html";
+    if (destino === "andamento") location.href = "andamento.html";
+    if (destino === "valores") location.href = "valores.html";
+    if (destino === "juridico") location.href = "staff/dashboard.html";
+    if (destino === "coordenacao") location.href = "staff/coordenacao.html";
   }
 </script>
 
