@@ -3,50 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <title>Autenticando...</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-  <p>🔐 Finalizando autenticação, aguarde...</p>
+<p>🔐 Finalizando autenticação, aguarde...</p>
 
-  <script>
-    try {
-      /**
-       * O Worker redireciona assim:
-       * auth.html#user=BASE64_JSON
-       */
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      const payload = params.get("user");
+<script>
+try {
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const payload = params.get("user");
 
-      if (!payload) {
-        throw new Error("Payload não recebido");
-      }
+  if (!payload) throw "Payload não recebido";
 
-      const usuario = JSON.parse(atob(payload));
+  const usuario = JSON.parse(decodeURIComponent(payload));
 
-      /**
-       * Estrutura PADRÃO usada em TODO o sistema
-       * (script.js, staff.js, dashboard, etc)
-       */
-      const usuarioFinal = {
-        nome: usuario.nome,
-        cid: usuario.id,        // ID do Discord vira CID
-        nivel: usuario.nivel    // cidadao | staff | coordenacao
-      };
+  const usuarioFinal = {
+    nome: usuario.nome,
+    cid: usuario.id,
+    nivel: usuario.nivel
+  };
 
-      localStorage.setItem("usuario", JSON.stringify(usuarioFinal));
+  localStorage.setItem("usuario", JSON.stringify(usuarioFinal));
 
-      /**
-       * Redirecionamento FINAL
-       */
-      window.location.href = "tickets.html";
+  if (usuarioFinal.nivel === "cidadao") {
+    location.href = "tickets.html";
+  } else {
+    location.href = "staff/dashboard.html";
+  }
 
-    } catch (e) {
-      console.error("Erro na autenticação:", e);
-      localStorage.clear();
-      window.location.href = "index.html";
-    }
-  </script>
+} catch (e) {
+  console.error("Erro auth:", e);
+  localStorage.clear();
+  location.href = "index.html";
+}
+</script>
 </body>
 </html>
