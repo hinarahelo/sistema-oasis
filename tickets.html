@@ -8,6 +8,21 @@
 
 <body class="bg-paper">
 
+<!-- 🔐 PROTEÇÃO DE ACESSO (NÍVEL REAL) -->
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  // Não logado
+  if (!usuario) {
+    window.location.href = "index.html";
+  }
+
+  // Apenas cidadão pode acessar esta tela
+  if (usuario.nivel !== "cidadao") {
+    window.location.href = "index.html";
+  }
+</script>
+
 <!-- ================= HEADER ================= -->
 <header class="header small official">
   <img src="logo-oasis.png" class="logo small" />
@@ -34,7 +49,7 @@
     <h2>🎫 Sistema de Tickets</h2>
 
     <div class="info-box official">
-      <b>Bem-vindo ao sistema oficial de atendimento.</b><br><br>
+      <b>Bem-vindo, <span id="nomeUsuario"></span></b><br><br>
       • Apenas usuários autorizados podem abrir tickets<br>
       • Limite de <b>1 ticket ativo por categoria</b><br>
       • Resposta em até 24 horas<br>
@@ -159,5 +174,16 @@
 </main>
 
 <script type="module" src="script.js"></script>
+
+<script>
+  // Mostrar nome do usuário
+  document.getElementById("nomeUsuario").innerText = usuario.nome;
+
+  function sair() {
+    localStorage.clear();
+    window.location.href = "index.html";
+  }
+</script>
+
 </body>
 </html>
