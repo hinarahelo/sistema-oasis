@@ -25,7 +25,9 @@ const db = getFirestore(app);
 
 /* 🔐 Usuário */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario) location.href = "index.html";
+if (!usuario || usuario.nivel !== "cidadao") {
+  location.href = "index.html";
+}
 
 /* ESTADO */
 let ticketAtual = null;
@@ -43,7 +45,18 @@ window.sair = () => {
   location.href = "index.html";
 };
 
-/* ABRIR / CRIAR */
+/* 📜 LOG */
+async function registrarLog(acao) {
+  await addDoc(collection(db, "logs"), {
+    ticket: ticketAtual,
+    cid: usuario.cid,
+    usuario: usuario.nome,
+    acao,
+    data: serverTimestamp()
+  });
+}
+
+/* ABRIR / CRIAR TICKET */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
   document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
@@ -52,7 +65,7 @@ window.abrirCategoria = async categoria => {
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
     where("categoria", "==", categoria),
-    where("status", "!=", "fechado")
+    where("status", "!=", "encerrado")
   );
 
   const snap = await getDocs(q);
@@ -70,6 +83,8 @@ window.abrirCategoria = async categoria => {
 
     ticketAtual = ref.id;
 
+    await registrarLog("Ticket criado");
+
     await notificarDiscord(
       `📩 NOVO TICKET\nCategoria: ${categoria}\nCidadão: ${usuario.nome}`,
       "WEBHOOK_JURIDICO_AQUI"
@@ -84,7 +99,25 @@ function iniciarChat() {
   const box = document.getElementById("mensagens");
   box.innerHTML = "";
 
+  const input = document.getElementById("mensagem");
+  const btnEnviar = document.querySelector(".chat-input button");
+
   if (unsubscribe) unsubscribe();
+
+  /* 🔒 OBSERVA STATUS DO TICKET */
+  onSnapshot(doc(db, "tickets", ticketAtual), snap => {
+    const t = snap.data();
+
+    if (t.status === "encerrado") {
+      input.disabled = true;
+      input.placeholder = "🔒 Ticket encerrado";
+      btnEnviar.disabled = true;
+    } else {
+      input.disabled = false;
+      input.placeholder = "Digite sua mensagem...";
+      btnEnviar.disabled = false;
+    }
+  });
 
   unsubscribe = onSnapshot(
     collection(db, "tickets", ticketAtual, "mensagens"),
@@ -94,7 +127,12 @@ function iniciarChat() {
         const m = d.data();
         box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
         if (m.anexo) {
-          box.innerHTML += `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>`;
+          box.innerHTML += `
+            <p>📎 
+              <a href="${m.anexo.url}" target="_blank">
+                ${m.anexo.nome}
+              </a>
+            </p>`;
         }
       });
       box.scrollTop = box.scrollHeight;
@@ -102,7 +140,7 @@ function iniciarChat() {
   );
 }
 
-/* ENVIAR */
+/* ✉️ ENVIAR MENSAGEM */
 window.enviarMensagem = async () => {
   const texto = mensagem.value.trim();
   const file = arquivo?.files[0];
@@ -112,8 +150,21 @@ window.enviarMensagem = async () => {
     return;
   }
 
+  /* 🔒 BLOQUEIO LÓGICO */
+  const snap = await getDocs(
+    query(collection(db, "tickets"), where("__name__", "==", ticketAtual))
+  );
+  const ticket = snap.docs[0].data();
+
+  if (ticket.status === "encerrado") {
+    alert("Este ticket está encerrado.");
+    return;
+  }
+
   let anexo = null;
-  if (file) anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+  if (file) {
+    anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+  }
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} ${usuario.cid}`,
@@ -121,6 +172,8 @@ window.enviarMensagem = async () => {
     anexo,
     criadoEm: serverTimestamp()
   });
+
+  await registrarLog("Mensagem enviada");
 
   await notificarDiscord(
     `💬 NOVA RESPOSTA\nTicket: ${ticketAtual}\nPor: ${usuario.nome}`,
