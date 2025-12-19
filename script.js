@@ -11,8 +11,7 @@ import {
   updateDoc,
   doc,
   getDoc,
-  orderBy,
-  setDoc
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { notificarDiscord } from "./discord.js";
@@ -42,7 +41,6 @@ if (!usuario || usuario.nivel !== "cidadao") {
 let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
-let typingTimeout = null;
 
 let arquivoSelecionado = null;
 let enviando = false;
@@ -51,10 +49,7 @@ let enviando = false;
    ABAS
 ====================================================== */
 window.mostrarAba = id => {
-  document.querySelectorAll(".aba").forEach(a =>
-    a.classList.remove("active")
-  );
-
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
 
   if (id === "andamento") carregarTicketsEmAndamento();
@@ -196,7 +191,7 @@ window.abrirCategoria = async categoria => {
 };
 
 /* ======================================================
-   💬 CHAT
+   💬 CHAT (COM DATA/HORA BRASILIA)
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
@@ -221,23 +216,42 @@ function iniciarChat() {
     ),
     snap => {
       box.innerHTML = "";
+
       snap.forEach(d => {
         const m = d.data();
+
+        const dataHora = m.criadoEm
+          ? m.criadoEm.toDate().toLocaleString("pt-BR", {
+              timeZone: "America/Sao_Paulo",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : "";
+
         box.innerHTML += `
-          <p>
-            <b>${m.autor}</b><br>
-            ${m.texto || ""}
-          </p>
-          ${m.anexo ? `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>` : ""}
+          <div style="margin-bottom:10px;">
+            <p>
+              <b>${m.autor}</b><br>
+              ${m.texto || ""}
+            </p>
+            ${m.anexo ? `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>` : ""}
+            <div style="text-align:right;font-size:11px;color:#666;">
+              ${dataHora}
+            </div>
+          </div>
         `;
       });
+
       box.scrollTop = box.scrollHeight;
     }
   );
 }
 
 /* ======================================================
-   📎 ARQUIVO — SELEÇÃO / REMOVER
+   📎 ARQUIVO
 ====================================================== */
 const fileInput = document.getElementById("arquivo");
 
@@ -263,7 +277,7 @@ window.removerArquivo = () => {
 };
 
 /* ======================================================
-   ☁️ CLOUDINARY UPLOAD
+   ☁️ CLOUDINARY
 ====================================================== */
 async function uploadCloudinary(file) {
   const formData = new FormData();
@@ -276,12 +290,11 @@ async function uploadCloudinary(file) {
   );
 
   const data = await res.json();
-
   return { nome: file.name, url: data.secure_url };
 }
 
 /* ======================================================
-   📤 ENVIAR MENSAGEM (ANTI DUPLICAÇÃO)
+   📤 ENVIAR
 ====================================================== */
 window.enviarMensagem = async () => {
   if (enviando) return;
@@ -296,12 +309,6 @@ window.enviarMensagem = async () => {
 
     if (!texto && !arquivoSelecionado) {
       alert("Mensagem ou anexo obrigatório.");
-      return;
-    }
-
-    const ticketSnap = await getDoc(doc(db, "tickets", ticketAtual));
-    if (ticketSnap.data().status === "encerrado") {
-      alert("Este ticket está encerrado.");
       return;
     }
 
