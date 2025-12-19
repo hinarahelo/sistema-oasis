@@ -9,7 +9,8 @@ import {
   onSnapshot,
   serverTimestamp,
   updateDoc,
-  doc
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { enviarArquivo } from "./storage.js";
@@ -31,13 +32,24 @@ if (!usuario || usuario.nivel !== "cidadao") {
 
 /* ESTADO */
 let ticketAtual = null;
-let unsubscribe = null;
+let unsubscribeMensagens = null;
+let unsubscribeStatus = null;
 
-/* ABAS */
+/* ================= ABAS ================= */
 window.mostrarAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.querySelectorAll(".aba").forEach(a =>
+    a.classList.remove("active")
+  );
   document.getElementById(id)?.classList.add("active");
 };
+
+/* 🔁 ABRIR ABA VIA HASH */
+const hash = location.hash.replace("#", "");
+if (hash) {
+  mostrarAba(hash);
+} else {
+  mostrarAba("solicitacoes");
+}
 
 /* LOGOUT */
 window.sair = () => {
@@ -56,7 +68,7 @@ async function registrarLog(acao) {
   });
 }
 
-/* ABRIR / CRIAR TICKET */
+/* ================= ABRIR / CRIAR TICKET ================= */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
   document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
@@ -94,38 +106,41 @@ window.abrirCategoria = async categoria => {
   iniciarChat();
 };
 
-/* CHAT */
+/* ================= CHAT ================= */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
-  box.innerHTML = "";
-
   const input = document.getElementById("mensagem");
   const btnEnviar = document.querySelector(".chat-input button");
 
-  if (unsubscribe) unsubscribe();
+  box.innerHTML = "";
 
-  /* 🔒 OBSERVA STATUS DO TICKET */
-  onSnapshot(doc(db, "tickets", ticketAtual), snap => {
+  if (unsubscribeMensagens) unsubscribeMensagens();
+  if (unsubscribeStatus) unsubscribeStatus();
+
+  /* 🔒 STATUS DO TICKET */
+  unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), snap => {
     const t = snap.data();
 
     if (t.status === "encerrado") {
       input.disabled = true;
-      input.placeholder = "🔒 Ticket encerrado";
       btnEnviar.disabled = true;
+      input.placeholder = "🔒 Ticket encerrado";
     } else {
       input.disabled = false;
-      input.placeholder = "Digite sua mensagem...";
       btnEnviar.disabled = false;
+      input.placeholder = "Digite sua mensagem...";
     }
   });
 
-  unsubscribe = onSnapshot(
+  /* 💬 MENSAGENS */
+  unsubscribeMensagens = onSnapshot(
     collection(db, "tickets", ticketAtual, "mensagens"),
     snap => {
       box.innerHTML = "";
       snap.forEach(d => {
         const m = d.data();
         box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
+
         if (m.anexo) {
           box.innerHTML += `
             <p>📎 
@@ -135,12 +150,13 @@ function iniciarChat() {
             </p>`;
         }
       });
+
       box.scrollTop = box.scrollHeight;
     }
   );
 }
 
-/* ✉️ ENVIAR MENSAGEM */
+/* ================= ENVIAR MENSAGEM ================= */
 window.enviarMensagem = async () => {
   const texto = mensagem.value.trim();
   const file = arquivo?.files[0];
@@ -150,11 +166,9 @@ window.enviarMensagem = async () => {
     return;
   }
 
-  /* 🔒 BLOQUEIO LÓGICO */
-  const snap = await getDocs(
-    query(collection(db, "tickets"), where("__name__", "==", ticketAtual))
-  );
-  const ticket = snap.docs[0].data();
+  /* 🔒 VERIFICA STATUS */
+  const ticketSnap = await getDoc(doc(db, "tickets", ticketAtual));
+  const ticket = ticketSnap.data();
 
   if (ticket.status === "encerrado") {
     alert("Este ticket está encerrado.");
@@ -182,5 +196,3 @@ window.enviarMensagem = async () => {
 
   mensagem.value = "";
 };
-
-mostrarAba("solicitacoes");
