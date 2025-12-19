@@ -1,88 +1,154 @@
-/* RESET */
+/* ===============================
+   SUPREMO TRIBUNAL DE OASIS
+   ESTILO INSTITUCIONAL
+================================ */
+
+:root {
+  --vinho: #5B0F14;
+  --dourado: #D4AF37;
+  --dourado-claro: #F1D37A;
+  --papel: #F6F1E9;
+  --preto: #1A1A1A;
+  --cinza: #3A3A3A;
+}
+
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  box-sizing: border-box;
 }
 
 body {
-  background: #f4f1ec;
-  color: #2b2b2b;
-  min-height: 100vh;
+  font-family: "Georgia", "Times New Roman", serif;
+  background: var(--papel);
+  color: var(--cinza);
 }
 
-/* FUNDO PAPEL */
-.bg-paper {
-  background:
-    linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.9)),
-    url("paper-texture.png");
-  background-size: cover;
-}
-
-/* HEADER */
-.header {
+/* ===== HEADER ===== */
+.header.official {
+  background: var(--vinho);
+  color: #fff;
+  padding: 25px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px 32px;
-  border-bottom: 4px solid #8b0000;
-  background: #fff;
+  gap: 20px;
+  border-bottom: 4px solid var(--dourado);
 }
 
-.logo.small { height: 55px; }
+.logo {
+  height: 70px;
+}
 
-/* NAV */
-.nav-bar {
+.header-text h1 {
+  font-size: 26px;
+  letter-spacing: 1px;
+}
+
+.header-text span {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* ===== NAVBAR ===== */
+.nav-bar.official {
+  background: #fff;
+  border-bottom: 2px solid var(--dourado);
   display: flex;
+  justify-content: center;
   gap: 10px;
-  padding: 12px 32px;
-  background: #5a0f0f;
-  border-bottom: 3px solid #c9a24d;
+  padding: 12px;
 }
 
 .nav-bar button {
-  background: #7a1515;
-  color: #fff;
-  border: 1px solid #c9a24d;
+  background: transparent;
+  border: 2px solid var(--vinho);
+  color: var(--vinho);
   padding: 8px 14px;
+  font-weight: bold;
   cursor: pointer;
+  transition: 0.3s;
 }
 
-/* CONTEÚDO */
-.content { padding: 30px; }
-.aba { display: none; }
-.aba.active { display: block; }
+.nav-bar button:hover {
+  background: var(--vinho);
+  color: #fff;
+}
 
-/* INFO */
-.info-box {
-  background: #faf8f4;
-  border-left: 6px solid #c9a24d;
+/* ===== CONTEÚDO ===== */
+.content.official {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.aba {
+  display: none;
+}
+
+.aba.active {
+  display: block;
+}
+
+/* ===== INFO BOX ===== */
+.info-box.official {
+  background: #fff;
+  border-left: 6px solid var(--dourado);
   padding: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* CATEGORIAS */
+/* ===== CATEGORIAS ===== */
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 15px;
 }
 
 .category-grid button {
-  border: 2px solid #5a0f0f;
   background: #fff;
-  padding: 14px;
+  border: 2px solid var(--dourado);
+  color: var(--preto);
+  padding: 15px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.category-grid button:hover {
+  background: var(--dourado);
+  color: #000;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card button {
+  margin-top: 10px;
+  background: var(--vinho);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
   cursor: pointer;
 }
 
-/* CHAT */
+.card button:hover {
+  background: #7a151a;
+}
+
+/* ===== CHAT ===== */
 .chat-box {
-  border: 2px solid #5a0f0f;
   background: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
   height: 320px;
   overflow-y: auto;
-  padding: 12px;
 }
 
 .chat-input {
@@ -94,48 +160,35 @@ body {
 .chat-input input {
   flex: 1;
   padding: 10px;
+  border: 1px solid #ccc;
 }
 
 .chat-input button {
-  background: #5a0f0f;
+  background: var(--vinho);
   color: #fff;
   border: none;
-  padding: 10px;
+  padding: 10px 15px;
 }
 
-/* PREÇOS */
+/* ===== PREÇOS ===== */
 .price-card {
-  border: 2px solid #5a0f0f;
   background: #fff;
-  padding: 18px;
+  border: 2px solid var(--dourado);
+  padding: 20px;
   margin-bottom: 20px;
 }
 
-/* 🔔 NOTIFICAÇÕES */
-.notif {
-  margin-left: auto;
-  position: relative;
-  cursor: pointer;
+.price-card h3 {
+  color: var(--vinho);
+  margin-bottom: 10px;
 }
 
-#notif-count {
-  background: #8b0000;
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 50%;
-  font-size: 12px;
-  display: none;
-}
-
-#notif-list {
-  position: absolute;
-  right: 0;
-  top: 25px;
-  background: #fff;
-  border: 1px solid #ccc;
-  width: 260px;
+.price-card ul {
   list-style: none;
-  display: none;
+  padding-left: 0;
 }
 
-.notif:hover #notif-list { display: block; }
+.price-card li {
+  padding: 6px 0;
+  border-bottom: 1px dotted #ccc;
+}
