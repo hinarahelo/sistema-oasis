@@ -44,6 +44,10 @@ window.mostrarAba = id => {
     a.classList.remove("active")
   );
   document.getElementById(id)?.classList.add("active");
+
+  if (id === "andamento") {
+    carregarTicketsEmAndamento();
+  }
 };
 
 /* 🔁 HASH */
@@ -64,6 +68,48 @@ async function registrarLog(acao) {
     usuario: usuario.nome,
     acao,
     data: serverTimestamp()
+  });
+}
+
+/* ================= EM ANDAMENTO ================= */
+function carregarTicketsEmAndamento() {
+  const lista = document.getElementById("listaTickets");
+  lista.innerHTML = "";
+
+  const q = query(
+    collection(db, "tickets"),
+    where("cid", "==", usuario.cid),
+    where("status", "==", "aberto")
+  );
+
+  onSnapshot(q, snap => {
+    lista.innerHTML = "";
+
+    if (snap.empty) {
+      lista.innerHTML = "<p>Nenhum ticket em andamento.</p>";
+      return;
+    }
+
+    snap.forEach(d => {
+      const t = d.data();
+
+      const card = document.createElement("div");
+      card.className = "card-ticket official";
+      card.innerHTML = `
+        <h4>${t.categoria}</h4>
+        <p>Status: <b>Em andamento</b></p>
+        <small>${t.criadoEm?.toDate().toLocaleString("pt-BR")}</small>
+      `;
+
+      card.onclick = () => {
+        ticketAtual = d.id;
+        document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
+        mostrarAba("chat");
+        iniciarChat();
+      };
+
+      lista.appendChild(card);
+    });
   });
 }
 
@@ -117,17 +163,16 @@ function iniciarChat() {
   if (unsubscribeMensagens) unsubscribeMensagens();
   if (unsubscribeStatus) unsubscribeStatus();
 
-  /* 🔒 STATUS */
   unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), snap => {
     const t = snap.data();
     input.disabled = t.status === "encerrado";
     btnEnviar.disabled = t.status === "encerrado";
-    input.placeholder = t.status === "encerrado"
-      ? "🔒 Ticket encerrado"
-      : "Digite sua mensagem...";
+    input.placeholder =
+      t.status === "encerrado"
+        ? "🔒 Ticket encerrado"
+        : "Digite sua mensagem...";
   });
 
-  /* 💬 MENSAGENS */
   unsubscribeMensagens = onSnapshot(
     query(
       collection(db, "tickets", ticketAtual, "mensagens"),
@@ -170,16 +215,12 @@ function iniciarChat() {
     }
   );
 
-  /* 🟢 DIGITANDO */
   input.oninput = () => {
-    setDoc(
-      doc(db, "tickets", ticketAtual, "digitando", usuario.cid),
-      {
-        nome: usuario.nome,
-        nivel: usuario.nivel,
-        em: serverTimestamp()
-      }
-    );
+    setDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid), {
+      nome: usuario.nome,
+      nivel: usuario.nivel,
+      em: serverTimestamp()
+    });
 
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
