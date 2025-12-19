@@ -63,6 +63,9 @@ onSnapshot(collection(db, "tickets"), snap => {
     const ticket = d.data();
     const ticketId = d.id;
 
+    const statusAtual =
+      (ticket.status || "").toLowerCase().trim();
+
     const card = document.createElement("div");
     card.className = "card";
 
@@ -75,11 +78,7 @@ onSnapshot(collection(db, "tickets"), snap => {
       ⏱ SLA: <b>${calcularSLA(ticket)}</b><br><br>
     `;
 
-    /* =====================================================
-       ✏️ ALTERAR NOME DO CIDADÃO
-       (Jurídico e Coordenação)
-    ===================================================== */
-
+    /* ✏️ ALTERAR NOME DO CIDADÃO */
     const btnCidadao = document.createElement("button");
     btnCidadao.textContent = "✏️ Alterar nome do cidadão";
     btnCidadao.onclick = async () => {
@@ -101,11 +100,7 @@ onSnapshot(collection(db, "tickets"), snap => {
     };
     card.appendChild(btnCidadao);
 
-    /* =====================================================
-       ✏️ ALTERAR NOME DO JURÍDICO
-       (Somente Coordenação)
-    ===================================================== */
-
+    /* ✏️ ALTERAR NOME DO JURÍDICO (coordenação) */
     if (usuario.nivel === "coordenacao" && ticket.atendente) {
       const btnJuridico = document.createElement("button");
       btnJuridico.textContent = "✏️ Alterar nome do jurídico";
@@ -129,11 +124,7 @@ onSnapshot(collection(db, "tickets"), snap => {
       card.appendChild(btnJuridico);
     }
 
-    /* =====================================================
-       👑 ALTERAR NOME DA COORDENAÇÃO
-       (Somente Coordenação)
-    ===================================================== */
-
+    /* 👑 ALTERAR NOME DA COORDENAÇÃO */
     if (usuario.nivel === "coordenacao") {
       const btnCoord = document.createElement("button");
       btnCoord.textContent = "👑 Alterar nome da coordenação";
@@ -145,11 +136,10 @@ onSnapshot(collection(db, "tickets"), snap => {
         if (!novoNome) return;
 
         usuario.nome = novoNome;
-        localStorage.setItem("usuario", JSON.stringify(usuario));
-
-        await updateDoc(doc(db, "tickets", ticketId), {
-          atendente: novoNome
-        });
+        localStorage.setItem(
+          "usuario",
+          JSON.stringify(usuario)
+        );
 
         await registrarLog(
           ticketId,
@@ -157,17 +147,13 @@ onSnapshot(collection(db, "tickets"), snap => {
           `Coordenação alterou o próprio nome para "${novoNome}"`
         );
 
-        alert("Nome da coordenação atualizado com sucesso.");
+        alert("Nome da coordenação atualizado.");
       };
       card.appendChild(btnCoord);
     }
 
-    /* =====================================================
-       ⚖️ ENCERRAR TICKET
-       (Jurídico e Coordenação)
-    ===================================================== */
-
-    if (ticket.status !== "encerrado") {
+    /* ⚖️ ENCERRAR TICKET — JURÍDICO E COORDENAÇÃO */
+    if (statusAtual !== "encerrado") {
       const btnEncerrar = document.createElement("button");
       btnEncerrar.textContent = "⚖️ Encerrar Ticket";
       btnEncerrar.onclick = async () => {
