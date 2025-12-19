@@ -1,6 +1,9 @@
 import {
   collection,
-  onSnapshot
+  onSnapshot,
+  updateDoc,
+  doc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { db } from "../firebase.js";
@@ -12,7 +15,7 @@ if (!usuario || (usuario.nivel !== "staff" && usuario.nivel !== "coordenacao")) 
   location.href = "../index.html";
 }
 
-/* ⏱ SLA */
+/* ⏱ SLA (mantido) */
 function calcularSLA(ticket) {
   if (!ticket.criadoEm) return "🟢 OK";
 
@@ -24,7 +27,7 @@ function calcularSLA(ticket) {
   return "🔴 Estourado";
 }
 
-/* 🎫 Tickets */
+/* 🎫 Tickets — tempo real */
 onSnapshot(collection(db, "tickets"), snap => {
   const box = document.getElementById("lista-tickets");
   if (!box) return;
@@ -33,13 +36,64 @@ onSnapshot(collection(db, "tickets"), snap => {
 
   snap.forEach(d => {
     const t = d.data();
-    box.innerHTML += `
-      <div class="card">
-        <b>${t.categoria}</b><br>
-        Usuário: ${t.nome}<br>
-        Status: ${t.status}<br>
-        SLA: <b>${calcularSLA(t)}</b>
-      </div>
+    const id = d.id;
+
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <b>${t.categoria}</b><br>
+      Usuário: ${t.nome}<br>
+      Status: ${t.status || "aberto"}<br>
+      Atendente: ${t.atendente || "—"}<br>
+      SLA: <b>${calcularSLA(t)}</b><br><br>
     `;
+
+    /* 👮 STAFF — assumir ticket */
+    if (!t.atendente && usuario.nivel === "staff") {
+      const btnAssumir = document.createElement("button");
+      btnAssumir.textContent = "👮 Assumir Ticket";
+      btnAssumir.onclick = async () => {
+        await updateDoc(doc(db, "tickets", id), {
+          atendente: usuario.nome,
+          status: "em atendimento",
+          assumidoEm: serverTimestamp()
+        });
+      };
+      div.appendChild(btnAssumir);
+    }
+
+    /* ⚖️ COORDENAÇÃO — PODER REAL */
+    if (usuario.nivel === "coordenacao") {
+
+      // Encerrar ticket
+      if (t.status !== "encerrado") {
+        const btnFechar = document.createElement("button");
+        btnFechar.textContent = "⚖️ Encerrar Ticket";
+        btnFechar.onclick = async () => {
+          await updateDoc(doc(db, "tickets", id), {
+            status: "encerrado",
+            encerradoPor: usuario.nome,
+            encerradoEm: serverTimestamp()
+          });
+        };
+        div.appendChild(btnFechar);
+      }
+
+      // Liberar ticket (remover atendente)
+      if (t.atendente) {
+        const btnLiberar = document.createElement("button");
+        btnLiberar.textContent = "🔓 Liberar Ticket";
+        btnLiberar.onclick = async () => {
+          await updateDoc(doc(db, "tickets", id), {
+            atendente: null,
+            status: "aberto"
+          });
+        };
+        div.appendChild(btnLiberar);
+      }
+    }
+
+    box.appendChild(div);
   });
 });
