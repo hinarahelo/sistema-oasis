@@ -39,31 +39,35 @@
 
 <body>
 
-  <div class="box">
-    <h2>🔐 Sistema Oasis</h2>
-    <p>Escolha como deseja entrar</p>
+<div class="box">
+  <h2>🔐 Sistema Oasis</h2>
+  <p>Escolha como deseja entrar</p>
 
-    <button onclick="loginDiscord('cidadao')">
-      👤 Entrar como Cidadão
-    </button>
+  <button onclick="loginDiscord('cidadao')">
+    👤 Entrar como Cidadão
+  </button>
 
-    <button onclick="loginDiscord('staff')">
-      👮 Entrar como Staff
-    </button>
-  </div>
+  <button onclick="loginDiscord('juridico')">
+    ⚖️ Entrar como Jurídico
+  </button>
 
-  <script>
-    function loginDiscord(nivel) {
-      const base =
-        "https://discord.com/oauth2/authorize" +
-        "?client_id=1450920482479145195" +
-        "&response_type=code" +
-        "&scope=identify" +
-        "&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback";
+  <button onclick="loginDiscord('coordenacao')">
+    👑 Entrar como Coordenação
+  </button>
+</div>
 
-      window.location.href = base + "&state=" + nivel;
-    }
-  </script>
+<script>
+  function loginDiscord(nivel) {
+    const base =
+      "https://discord.com/oauth2/authorize" +
+      "?client_id=1450920482479145195" +
+      "&response_type=code" +
+      "&scope=identify" +
+      "&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback";
+
+    window.location.href = base + "&state=" + nivel;
+  }
+</script>
 
 </body>
 </html>
