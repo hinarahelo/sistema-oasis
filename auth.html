@@ -3,44 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <title>Autenticando — Sistema Oasis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
 <body>
-  <p>🔐 Finalizando autenticação, aguarde...</p>
+  <p>🔐 Finalizando autenticação...</p>
 
   <script>
     try {
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      const payload = params.get("user");
+      const hash = new URLSearchParams(window.location.hash.substring(1));
+      const payload = hash.get("user");
 
-      if (!payload) {
-        throw new Error("Payload ausente");
+      if (!payload) throw "Payload ausente";
+
+      const user = JSON.parse(decodeURIComponent(payload));
+
+      if (!["cidadao", "staff", "coordenacao"].includes(user.nivel)) {
+        throw "Nível inválido";
       }
 
-      const usuario = JSON.parse(decodeURIComponent(payload));
+      localStorage.setItem("usuario", JSON.stringify({
+        cid: user.id,
+        nome: user.nome,
+        nivel: user.nivel
+      }));
 
-      // 🔒 Estrutura ÚNICA usada no sistema inteiro
-      const usuarioFinal = {
-        nome: usuario.nome,
-        cid: usuario.id,
-        nivel: usuario.nivel || "cidadao"
-      };
-
-      localStorage.setItem("usuario", JSON.stringify(usuarioFinal));
-
-      // 🔁 Redirecionamento por nível
-      if (usuarioFinal.nivel === "staff" || usuarioFinal.nivel === "coordenacao") {
-        window.location.href = "staff/dashboard.html";
+      if (user.nivel === "cidadao") {
+        location.href = "tickets.html";
       } else {
-        window.location.href = "tickets.html";
+        location.href = "staff/dashboard.html";
       }
 
     } catch (e) {
-      console.error("Erro de autenticação:", e);
       localStorage.clear();
-      window.location.href = "index.html";
+      location.href = "index.html";
     }
   </script>
 </body>
