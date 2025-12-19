@@ -14,21 +14,21 @@ body {
   min-height: 100vh;
 }
 
-/* ======================================================
-   LAYOUT GERAL
-====================================================== */
 .bg-paper {
   background: #f8f4ee;
 }
 
+.official {
+  letter-spacing: .2px;
+}
+
+/* ======================================================
+   LAYOUT
+====================================================== */
 .content {
   max-width: 1200px;
   margin: auto;
   padding: 24px;
-}
-
-.official {
-  letter-spacing: 0.2px;
 }
 
 /* ======================================================
@@ -37,38 +37,24 @@ body {
 .header {
   background: linear-gradient(to right, #5b0f0f, #7a1c1c);
   color: #f8f4ee;
-  padding: 28px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   border-bottom: 4px solid #d4af37;
 }
 
-.header.small {
-  padding: 18px 24px;
+.logo {
+  width: 80px;
 }
 
 .header-text h1 {
-  font-size: 22px;
-  font-weight: bold;
+  font-size: 20px;
 }
 
 .header-text span {
-  font-size: 13px;
-  opacity: 0.9;
-}
-
-.logo {
-  width: 110px;
-}
-
-.logo.small {
-  width: 70px;
-}
-
-.logo-grande {
-  width: 140px;
-  margin-bottom: 14px;
+  font-size: 12px;
+  opacity: .85;
 }
 
 /* ======================================================
@@ -79,7 +65,6 @@ body {
   padding: 10px;
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
   border-bottom: 2px solid #d4af37;
 }
 
@@ -87,11 +72,9 @@ body {
   background: #6b0f0f;
   color: #fff;
   border: none;
-  padding: 10px 18px;
+  padding: 10px 16px;
   border-radius: 14px;
   cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s;
 }
 
 .nav-bar button:hover {
@@ -110,65 +93,53 @@ body {
 }
 
 /* ======================================================
-   SOLICITAÇÕES
+   LISTAS / CARDS
 ====================================================== */
-.solicitacoes-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.bloco-servicos {
-  margin-bottom: 40px;
-}
-
-.grid-servicos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+.card-list {
+  display: flex;
+  flex-direction: column;
   gap: 14px;
-}
-
-.grid-servicos button {
-  background: #fff;
-  border: 2px solid #d4af37;
-  padding: 16px;
-  border-radius: 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s;
-}
-
-.grid-servicos button:hover {
-  background: #fdf6e9;
-  transform: translateY(-2px);
-}
-
-/* ======================================================
-   EM ANDAMENTO – CATEGORIAS
-====================================================== */
-.categoria-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
   margin-top: 20px;
 }
 
-.categoria-card {
+.card-ticket {
   background: #fff;
-  border: 2px solid #d4af37;
-  border-radius: 18px;
-  padding: 22px;
-  text-align: center;
+  border-radius: 14px;
+  padding: 16px;
+  border-left: 6px solid #6b0f0f;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.categoria-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+.card-ticket:hover {
+  background: #fdf6e9;
 }
 
-.lista-categoria.hidden {
-  display: none;
+/* ======================================================
+   BADGES (PRIORIDADE / STATUS)
+====================================================== */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+.badge-baixa {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-media {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.badge-alta {
+  background: #f8d7da;
+  color: #721c24;
 }
 
 /* ======================================================
@@ -177,130 +148,110 @@ body {
 .chat-box {
   background: #fff;
   border-radius: 18px;
-  padding: 16px;
-  height: 360px;
+  padding: 18px;
+  height: 380px;
   overflow-y: auto;
   border: 1px solid #ddd;
   margin-bottom: 10px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
-/* ======================================================
-   MENSAGENS
-====================================================== */
+/* MENSAGEM */
 .mensagem {
-  max-width: 65%;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  position: relative;
 }
 
 .mensagem.cidadao {
-  align-self: flex-end;
-}
-
-.mensagem.juridico,
-.mensagem.coordenacao {
-  align-self: flex-start;
-}
-
-.mensagem .autor {
-  font-size: 12px;
-}
-
-.mensagem .conteudo {
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.4;
-  word-wrap: break-word;
-}
-
-/* CORES DOS BALÕES */
-.mensagem.cidadao .conteudo {
   background: #e8f0ff;
+  margin-right: auto;
 }
 
-.mensagem.juridico .conteudo {
+.mensagem.juridico {
   background: #fff6dc;
+  margin-left: auto;
 }
 
-.mensagem.coordenacao .conteudo {
-  background: #ffe5e5;
+.mensagem.coordenacao {
+  background: #ffecec;
+  margin-left: auto;
 }
 
-/* DATA / HORA */
-.mensagem .hora {
-  font-size: 11px;
+/* AUTOR */
+.autor {
+  font-size: 12px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* CORES POR CARGO */
+.nome-cidadao { color: #1e5eff; }
+.nome-juridico { color: #c9a227; }
+.nome-coordenacao { color: #b00000; }
+
+/* TEXTO */
+.conteudo {
+  white-space: pre-wrap;
+}
+
+/* DATA/HORA */
+.hora {
+  font-size: 10px;
   color: #666;
   text-align: right;
-}
-
-/* ======================================================
-   CORES POR CARGO (NÃO REMOVER)
-====================================================== */
-.nome-cidadao {
-  color: #1e5eff;
-  font-weight: bold;
-}
-
-.nome-juridico {
-  color: #c9a227;
-  font-weight: bold;
-}
-
-.nome-coordenacao {
-  color: #b00000;
-  font-weight: bold;
+  margin-top: 6px;
 }
 
 /* ======================================================
    ANEXOS / PREVIEW
 ====================================================== */
-.anexo {
-  margin-top: 6px;
-}
-
-.anexo a {
-  color: #6b0f0f;
-  font-size: 13px;
-  font-weight: bold;
-}
-
 .preview-img img {
-  max-width: 180px;
-  border-radius: 10px;
-  border: 2px solid #d4af37;
+  max-width: 160px;
+  border-radius: 8px;
   margin-top: 6px;
+  cursor: pointer;
 }
 
 .preview-pdf {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.preview-pdf a,
+.anexo a {
+  color: #6b0f0f;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 /* ======================================================
-   CHAT INPUT
+   INPUT CHAT
 ====================================================== */
 .chat-input {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
-.chat-input input,
-.chat-input input[type="file"] {
+.chat-input input[type="text"] {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   border-radius: 14px;
   border: 1px solid #ccc;
 }
 
+.chat-input input[type="file"] {
+  font-size: 12px;
+}
+
 .chat-input button {
-  padding: 12px 18px;
+  padding: 10px 16px;
   border-radius: 14px;
   border: none;
   background: #6b0f0f;
@@ -314,35 +265,15 @@ body {
 }
 
 /* ======================================================
-   PREÇOS
-====================================================== */
-.price-card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 22px;
-  margin-bottom: 22px;
-  border-top: 6px solid #d4af37;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-}
-
-/* ======================================================
    RESPONSIVO
 ====================================================== */
 @media (max-width: 700px) {
-  .header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .nav-bar {
-    justify-content: center;
+  .mensagem {
+    max-width: 100%;
   }
 
   .chat-input {
     flex-direction: column;
-  }
-
-  .mensagem {
-    max-width: 100%;
+    align-items: stretch;
   }
 }
