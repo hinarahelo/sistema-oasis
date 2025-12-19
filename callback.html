@@ -18,11 +18,27 @@
 </head>
 <body>
 
-<h2>🔐 Finalizando autenticação...</h2>
+<h2>🔐 Processando autenticação...</h2>
 
 <script>
   try {
+    /* ===============================
+       1️⃣ SE VEIO COM ?code → ENVIA PARA O WORKER
+    =============================== */
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (code) {
+      window.location.href =
+        "https://sistema-oasis-auth.hinarah elo.workers.dev/callback?code=" + code;
+      throw new Error("Redirecionando para autenticação segura...");
+    }
+
+    /* ===============================
+       2️⃣ SE VEIO COM #user → FINALIZA LOGIN
+    =============================== */
     const hash = window.location.hash;
+
     if (!hash.includes("user=")) {
       throw new Error("Dados não recebidos");
     }
@@ -30,10 +46,11 @@
     const encoded = hash.split("user=")[1];
     const user = JSON.parse(decodeURIComponent(encoded));
 
-    // salva sessão
     localStorage.setItem("usuario", JSON.stringify(user));
 
-    // redirecionamento por nível
+    /* ===============================
+       3️⃣ REDIRECIONAMENTO POR NÍVEL
+    =============================== */
     if (user.nivel === "juridico" || user.nivel === "coordenacao") {
       window.location.href = "staff/dashboard.html";
     } else {
@@ -41,12 +58,12 @@
     }
 
   } catch (e) {
+    console.error(e);
     document.body.innerHTML = `
       <h2>❌ Erro ao autenticar</h2>
-      <p>Por favor, tente novamente.</p>
+      <p>Não foi possível concluir o login.</p>
       <a href="index.html">Voltar</a>
     `;
-    console.error(e);
   }
 </script>
 
