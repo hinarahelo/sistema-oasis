@@ -2,13 +2,11 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Autenticando — Supremo Tribunal de Oasis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autenticando</title>
 </head>
-
 <body>
 
-<p>🔐 Finalizando autenticação, aguarde...</p>
+<p>Autenticando, aguarde...</p>
 
 <script>
 (function () {
@@ -19,43 +17,29 @@
     }
 
     let raw = hash.replace("#user=", "");
-    let usuario = null;
+    let usuario;
 
-    /* 🔐 TENTA URL ENCODED */
     try {
       usuario = JSON.parse(decodeURIComponent(raw));
-    } catch (e) {
-      /* 🔐 TENTA BASE64 */
-      try {
-        usuario = JSON.parse(atob(raw));
-      } catch (e2) {
-        throw "Payload inválido";
-      }
+    } catch {
+      usuario = JSON.parse(atob(raw));
     }
 
     if (!usuario || !usuario.id || !usuario.nivel) {
-      throw "Estrutura inválida";
+      throw "Usuário inválido";
     }
 
-    /* NORMALIZA */
-    const usuarioFinal = {
+    localStorage.setItem("usuario", JSON.stringify({
       nome: usuario.nome || usuario.username || "Usuário",
-      cid: usuario.cid || usuario.id,
+      cid: usuario.id,
       nivel: usuario.nivel
-    };
+    }));
 
-    localStorage.setItem(
-      "usuario",
-      JSON.stringify(usuarioFinal)
-    );
-
-    /* REDIRECIONA SEM LOOP */
-    window.location.replace("welcome.html");
+    location.replace("welcome.html");
 
   } catch (e) {
-    console.error("AUTH ERROR:", e);
-    localStorage.removeItem("usuario");
-    window.location.replace("index.html");
+    console.error(e);
+    location.replace("index.html");
   }
 })();
 </script>
