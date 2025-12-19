@@ -3,12 +3,12 @@ import {
   onSnapshot,
   updateDoc,
   doc,
-  serverTimestamp
+  serverTimestamp,
+  addDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { db } from "../firebase.js";
 
-/* 🔐 Usuário */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
@@ -18,13 +18,21 @@ if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
 /* ⏱ SLA */
 function calcularSLA(ticket) {
   if (!ticket.criadoEm) return "🟢 OK";
-
-  const inicio = ticket.criadoEm.toDate().getTime();
-  const horas = (Date.now() - inicio) / 36e5;
-
+  const horas = (Date.now() - ticket.criadoEm.toDate().getTime()) / 36e5;
   if (horas <= 3) return "🟢 OK";
   if (horas <= 18) return "🟡 Atenção";
   return "🔴 Estourado";
+}
+
+/* 📜 Log */
+async function registrarLog(ticketId, acao) {
+  await addDoc(collection(db, "logs"), {
+    ticket: ticketId,
+    acao,
+    usuario: usuario.nome,
+    nivel: usuario.nivel,
+    data: serverTimestamp()
+  });
 }
 
 /* 🎫 Tickets */
@@ -44,12 +52,10 @@ onSnapshot(collection(db, "tickets"), snap => {
     div.innerHTML = `
       <b>${t.categoria}</b><br>
       Usuário: ${t.nome}<br>
-      Status: ${t.status || "aberto"}<br>
-      Atendente: ${t.atendente || "—"}<br>
+      Status: ${t.status}<br>
       SLA: <b>${calcularSLA(t)}</b><br><br>
     `;
 
-    /* ⚖️ JURÍDICO E COORDENAÇÃO — ENCERRAR */
     if (t.status !== "encerrado") {
       const btnEncerrar = document.createElement("button");
       btnEncerrar.textContent = "⚖️ Encerrar Ticket";
@@ -59,21 +65,9 @@ onSnapshot(collection(db, "tickets"), snap => {
           encerradoPor: usuario.nome,
           encerradoEm: serverTimestamp()
         });
+        await registrarLog(id, "Ticket encerrado");
       };
       div.appendChild(btnEncerrar);
-    }
-
-    /* 👑 COORDENAÇÃO — LIBERAR */
-    if (usuario.nivel === "coordenacao" && t.atendente) {
-      const btnLiberar = document.createElement("button");
-      btnLiberar.textContent = "🔓 Liberar Ticket";
-      btnLiberar.onclick = async () => {
-        await updateDoc(doc(db, "tickets", id), {
-          atendente: null,
-          status: "aberto"
-        });
-      };
-      div.appendChild(btnLiberar);
     }
 
     box.appendChild(div);
