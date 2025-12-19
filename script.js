@@ -1,40 +1,52 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp
+  getFirestore, collection, addDoc, query, where,
+  getDocs, onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
+import { registrarLog } from "./logs.js";
+import { iniciarNotificacoes } from "./notifications.js";
+
+/* Firebase */
+const app = initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
-};
-
-const app = initializeApp(firebaseConfig);
+});
 const db = getFirestore(app);
 
+/* Usuário */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario) location.href = "index.html";
 
-let ticketAtual = null;
-let unsubscribe = null;
+/* Notificações */
+iniciarNotificacoes(db, usuario);
 
+/* Logs */
+registrarLog(db, { tipo: "login", usuario: usuario.nome, cid: usuario.cid });
+
+let ticketAtual = null;
+
+/* Abas */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 };
 
+/* Logout */
 window.sair = () => {
   localStorage.clear();
   location.href = "index.html";
 };
 
+/* Abrir Categoria */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
-  document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
+  document.getElementById("chatTitulo").innerText = categoria;
 
   const q = query(
     collection(db, "tickets"),
-    where("cid", "==", usuario.id),
+    where("cid", "==", usuario.cid),
     where("categoria", "==", categoria),
     where("status", "==", "aberto")
   );
@@ -44,47 +56,40 @@ window.abrirCategoria = async categoria => {
   if (!snap.empty) {
     ticketAtual = snap.docs[0].id;
   } else {
-    const docRef = await addDoc(collection(db, "tickets"), {
+    const ref = await addDoc(collection(db, "tickets"), {
       nome: usuario.nome,
-      cid: usuario.id,
+      cid: usuario.cid,
       categoria,
       status: "aberto",
       criadoEm: serverTimestamp()
     });
-    ticketAtual = docRef.id;
+    ticketAtual = ref.id;
+
+    registrarLog(db, { tipo: "abertura_ticket", categoria, cid: usuario.cid });
   }
 
-  iniciarChat();
+  onSnapshot(collection(db, "tickets", ticketAtual, "mensagens"), snap => {
+    const box = document.getElementById("mensagens");
+    box.innerHTML = "";
+    snap.forEach(d => {
+      const m = d.data();
+      box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
+    });
+    box.scrollTop = box.scrollHeight;
+  });
 };
 
-function iniciarChat() {
-  const box = document.getElementById("mensagens");
-  box.innerHTML = "";
-
-  if (unsubscribe) unsubscribe();
-
-  unsubscribe = onSnapshot(
-    collection(db, "tickets", ticketAtual, "mensagens"),
-    snap => {
-      box.innerHTML = "";
-      snap.forEach(d => {
-        const m = d.data();
-        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto}</p>`;
-      });
-      box.scrollTop = box.scrollHeight;
-    }
-  );
-}
-
+/* Enviar Mensagem */
 window.enviarMensagem = async () => {
   const input = document.getElementById("mensagem");
   if (!input.value.trim()) return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: usuario.nome,
+    autor: `${usuario.nome} ${usuario.cid}`,
     texto: input.value,
     criadoEm: serverTimestamp()
   });
 
+  registrarLog(db, { tipo: "mensagem", cid: usuario.cid });
   input.value = "";
 };
