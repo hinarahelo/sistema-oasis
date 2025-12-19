@@ -30,7 +30,9 @@ const db = getFirestore(app);
    🔐 USUÁRIO
 ================================ */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario) location.href = "index.html";
+if (!usuario) {
+  location.href = "index.html";
+}
 
 /* ===============================
    🧭 ESTADO GLOBAL
@@ -43,7 +45,8 @@ let unsubscribeMensagens = null;
 ================================ */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
+  const aba = document.getElementById(id);
+  if (aba) aba.classList.add("active");
 };
 
 /* ===============================
@@ -65,7 +68,7 @@ window.abrirCategoria = async categoria => {
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
     where("categoria", "==", categoria),
-    where("status", "!=", "fechado")
+    where("status", "in", ["aberto", "em_atendimento"])
   );
 
   const snap = await getDocs(q);
@@ -101,9 +104,9 @@ function iniciarChat() {
     collection(db, "tickets", ticketAtual, "mensagens"),
     snap => {
       box.innerHTML = "";
+
       snap.forEach(d => {
         const m = d.data();
-
         let html = `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
 
         if (m.anexo) {
@@ -112,6 +115,7 @@ function iniciarChat() {
 
         box.innerHTML += html;
       });
+
       box.scrollTop = box.scrollHeight;
     }
   );
@@ -126,7 +130,9 @@ window.enviarMensagem = async () => {
   if (!ticketAtual) return;
 
   let anexo = null;
-  if (file) anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+  if (file) {
+    anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+  }
 
   if (!input.value && !anexo) return;
 
@@ -137,13 +143,14 @@ window.enviarMensagem = async () => {
     criadoEm: serverTimestamp()
   });
 
-  // muda status automaticamente
   await updateDoc(doc(db, "tickets", ticketAtual), {
     status: "em_atendimento"
   });
 
   input.value = "";
-  if (document.getElementById("arquivo")) document.getElementById("arquivo").value = "";
+  if (document.getElementById("arquivo")) {
+    document.getElementById("arquivo").value = "";
+  }
 };
 
 /* ===============================
@@ -159,7 +166,6 @@ function calcularSLA(criadoEm) {
   if (horas <= 3) return "🟢 OK";
   if (horas <= 18) return "🟡 Atenção";
   if (horas > 48) return "🔴 Estourado";
-
   return "🟡 Atenção";
 }
 
@@ -173,7 +179,7 @@ async function carregarTicketsEmAndamento() {
   const q = query(
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
-    where("status", "!=", "fechado")
+    where("status", "in", ["aberto", "em_atendimento"])
   );
 
   const snap = await getDocs(q);
