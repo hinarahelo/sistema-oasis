@@ -11,11 +11,11 @@ import { db } from "../firebase.js";
 /* 🔐 Usuário */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-if (!usuario || (usuario.nivel !== "staff" && usuario.nivel !== "coordenacao")) {
+if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
   location.href = "../index.html";
 }
 
-/* ⏱ SLA (mantido) */
+/* ⏱ SLA */
 function calcularSLA(ticket) {
   if (!ticket.criadoEm) return "🟢 OK";
 
@@ -27,7 +27,7 @@ function calcularSLA(ticket) {
   return "🔴 Estourado";
 }
 
-/* 🎫 Tickets — tempo real */
+/* 🎫 Tickets */
 onSnapshot(collection(db, "tickets"), snap => {
   const box = document.getElementById("lista-tickets");
   if (!box) return;
@@ -49,49 +49,31 @@ onSnapshot(collection(db, "tickets"), snap => {
       SLA: <b>${calcularSLA(t)}</b><br><br>
     `;
 
-    /* 👮 STAFF — assumir ticket */
-    if (!t.atendente && usuario.nivel === "staff") {
-      const btnAssumir = document.createElement("button");
-      btnAssumir.textContent = "👮 Assumir Ticket";
-      btnAssumir.onclick = async () => {
+    /* ⚖️ JURÍDICO E COORDENAÇÃO — ENCERRAR */
+    if (t.status !== "encerrado") {
+      const btnEncerrar = document.createElement("button");
+      btnEncerrar.textContent = "⚖️ Encerrar Ticket";
+      btnEncerrar.onclick = async () => {
         await updateDoc(doc(db, "tickets", id), {
-          atendente: usuario.nome,
-          status: "em atendimento",
-          assumidoEm: serverTimestamp()
+          status: "encerrado",
+          encerradoPor: usuario.nome,
+          encerradoEm: serverTimestamp()
         });
       };
-      div.appendChild(btnAssumir);
+      div.appendChild(btnEncerrar);
     }
 
-    /* ⚖️ COORDENAÇÃO — PODER REAL */
-    if (usuario.nivel === "coordenacao") {
-
-      // Encerrar ticket
-      if (t.status !== "encerrado") {
-        const btnFechar = document.createElement("button");
-        btnFechar.textContent = "⚖️ Encerrar Ticket";
-        btnFechar.onclick = async () => {
-          await updateDoc(doc(db, "tickets", id), {
-            status: "encerrado",
-            encerradoPor: usuario.nome,
-            encerradoEm: serverTimestamp()
-          });
-        };
-        div.appendChild(btnFechar);
-      }
-
-      // Liberar ticket (remover atendente)
-      if (t.atendente) {
-        const btnLiberar = document.createElement("button");
-        btnLiberar.textContent = "🔓 Liberar Ticket";
-        btnLiberar.onclick = async () => {
-          await updateDoc(doc(db, "tickets", id), {
-            atendente: null,
-            status: "aberto"
-          });
-        };
-        div.appendChild(btnLiberar);
-      }
+    /* 👑 COORDENAÇÃO — LIBERAR */
+    if (usuario.nivel === "coordenacao" && t.atendente) {
+      const btnLiberar = document.createElement("button");
+      btnLiberar.textContent = "🔓 Liberar Ticket";
+      btnLiberar.onclick = async () => {
+        await updateDoc(doc(db, "tickets", id), {
+          atendente: null,
+          status: "aberto"
+        });
+      };
+      div.appendChild(btnLiberar);
     }
 
     box.appendChild(div);
