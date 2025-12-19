@@ -3,35 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <title>Tribunal de Justiça de Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body class="bg-paper">
 
 <header class="header official">
-  <img src="logo-oasis.png" class="logo" />
-  <div>
+  <img src="logo-oasis.png" class="logo" alt="Tribunal de Justiça de Oasis" />
+  <div class="header-text">
     <h1>Tribunal de Justiça de Oasis</h1>
-    <span>Central Oficial de Atendimento ao Cidadão</span>
+    <span>Sistema Oficial de Atendimento ao Cidadão</span>
   </div>
 </header>
 
 <main class="login-container">
-  <section class="login-card official">
-    <h2>Central de Atendimento</h2>
-    <p>
-      Para abrir solicitações, acompanhar processos e acessar serviços oficiais,
-      é necessário realizar a autenticação institucional.
+  <div class="login-card official">
+    <h2>🎫 Central de Atendimento</h2>
+
+    <p class="section-desc">
+      Para abrir solicitações, acompanhar atendimentos e acessar serviços
+      oficiais do Tribunal de Justiça de Oasis, é necessário realizar a
+      autenticação.
     </p>
 
-    <a class="btn-primary" href="auth.html">
+    <a class="btn-primary official" href="login.html">
       🔐 Entrar com Discord
     </a>
-  </section>
+
+    <p class="info-small">
+      O acesso é restrito a usuários autorizados.<br />
+      Todas as ações são registradas.
+    </p>
+  </div>
 </main>
 
-<footer class="footer">
-  Tribunal de Justiça de Oasis © Todos os direitos reservados
+<footer class="footer official">
+  <p>
+    Tribunal de Justiça de Oasis © <span id="ano"></span><br />
+    Sistema Oficial • Uso Institucional
+  </p>
 </footer>
+
+<script>
+  document.getElementById("ano").innerText = new Date().getFullYear();
+</script>
 
 </body>
 </html>
