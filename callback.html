@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Autenticação Discord</title>
+  <meta charset="UTF-8">
+  <title>Login concluído</title>
 </head>
 <body>
-  <h3>Processando autenticação…</h3>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
+<script>
+  const hash = new URLSearchParams(window.location.hash.substring(1));
+  const user = hash.get("user");
 
-    if (!code) {
-      document.body.innerHTML = "<h3>Erro na autenticação.</h3>";
-    } else {
-      window.location.href =
-        "https://13b4a7c8-ef9d-497c-9f6b-481e6dcfaa0b-00-2noz7t8kac8b2.riker.replit.dev/callback?code=" +
-        code;
-    }
-  </script>
+  if (!user) {
+    document.body.innerHTML = "<h2>Erro no login</h2>";
+  } else {
+    localStorage.setItem("usuario", decodeURIComponent(user));
+    window.location.href = "tickets.html";
+  }
+</script>
+
 </body>
 </html>
