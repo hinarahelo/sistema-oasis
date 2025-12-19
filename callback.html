@@ -2,22 +2,10 @@
 <html lang="pt-BR">
 <body>
 <script>
-try {
-  if (!location.hash.includes("user=")) throw "payload ausente";
-
-  const payload = JSON.parse(
-    decodeURIComponent(location.hash.split("user=")[1])
-  );
-
-  localStorage.setItem("usuario", JSON.stringify(payload));
-
-  if (payload.nivel === "cidadao") {
-    location.href = "tickets.html";
-  } else {
-    location.href = "staff/dashboard.html";
-  }
-} catch (e) {
+if (!location.hash.includes("user=")) {
   document.body.innerHTML = "<h2>Erro de autenticação</h2>";
+} else {
+  location.href = "auth.html" + location.hash;
 }
 </script>
 </body>
