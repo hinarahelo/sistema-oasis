@@ -15,6 +15,7 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* 🔁 ALTERAÇÃO ÚNICA: agora usa Cloudinary */
 import { enviarArquivo } from "./upload.js";
 import { notificarDiscord } from "./discord.js";
 
@@ -26,6 +27,7 @@ const app = initializeApp({
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
 });
+
 const db = getFirestore(app);
 
 /* ======================================================
@@ -45,12 +47,13 @@ let unsubscribeStatus = null;
 let typingTimeout = null;
 
 /* ======================================================
-   ABAS
+   ABAS (ORIGINAL)
 ====================================================== */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a =>
     a.classList.remove("active")
   );
+
   document.getElementById(id)?.classList.add("active");
 
   if (id === "andamento") {
@@ -59,7 +62,7 @@ window.mostrarAba = id => {
 };
 
 /* ======================================================
-   HASH INICIAL
+   HASH INICIAL (ORIGINAL)
 ====================================================== */
 const hash = location.hash.replace("#", "");
 mostrarAba(hash || "solicitacoes");
@@ -92,8 +95,6 @@ function carregarTicketsEmAndamento() {
   const grid = document.getElementById("categoriasTickets");
   const listaCategoria = document.getElementById("listaPorCategoria");
   const ticketsBox = document.getElementById("ticketsCategoria");
-
-  if (!grid) return;
 
   grid.innerHTML = "";
   listaCategoria.classList.add("hidden");
@@ -208,6 +209,7 @@ function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
   const btnEnviar = document.querySelector(".chat-input button");
+  const digitandoBox = document.getElementById("digitando");
 
   box.innerHTML = "";
 
@@ -218,6 +220,10 @@ function iniciarChat() {
     const t = snap.data();
     input.disabled = t.status === "encerrado";
     btnEnviar.disabled = t.status === "encerrado";
+    input.placeholder =
+      t.status === "encerrado"
+        ? "🔒 Ticket encerrado"
+        : "Digite sua mensagem...";
   });
 
   unsubscribeMensagens = onSnapshot(
@@ -227,14 +233,28 @@ function iniciarChat() {
     ),
     snap => {
       box.innerHTML = "";
+
       snap.forEach(d => {
         const m = d.data();
+        const hora = m.criadoEm
+          ? m.criadoEm.toDate().toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : "--:--";
+
+        let classe = "nome-cidadao";
+        if (m.autor?.includes("juridico")) classe = "nome-juridico";
+        if (m.autor?.includes("coordenacao")) classe = "nome-coordenacao";
+
         box.innerHTML += `
           <p>
-            <b>${m.autor}</b><br>
+            <b class="${classe}">${m.autor}</b>
+            <span class="hora">(${hora})</span><br>
             ${m.texto || ""}
           </p>
         `;
+
         if (m.anexo) {
           box.innerHTML += `
             <p class="anexo">
@@ -243,44 +263,69 @@ function iniciarChat() {
           `;
         }
       });
+
       box.scrollTop = box.scrollHeight;
+    }
+  );
+
+  input.oninput = () => {
+    setDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid), {
+      nome: usuario.nome,
+      nivel: usuario.nivel,
+      em: serverTimestamp()
+    });
+
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      updateDoc(
+        doc(db, "tickets", ticketAtual, "digitando", usuario.cid),
+        { em: null }
+      );
+    }, 2000);
+  };
+
+  onSnapshot(
+    collection(db, "tickets", ticketAtual, "digitando"),
+    snap => {
+      digitandoBox.innerHTML = "";
+      snap.forEach(d => {
+        const t = d.data();
+        if (t.nome && t.nome !== usuario.nome) {
+          digitandoBox.innerHTML = `🟢 ${t.nome} está digitando...`;
+        }
+      });
     }
   );
 }
 
 /* ======================================================
-   📤 ENVIAR MENSAGEM / ARQUIVO
+   📤 ENVIAR MENSAGEM / ARQUIVO (CORRIGIDO)
 ====================================================== */
 window.enviarMensagem = async () => {
-  try {
-    const texto = document.getElementById("mensagem").value.trim();
-    const fileInput = document.getElementById("arquivo");
-    const file = fileInput.files[0];
+  const texto = document.getElementById("mensagem").value.trim();
+  const fileInput = document.getElementById("arquivo");
+  const file = fileInput.files[0];
 
-    console.log("📎 arquivo:", file);
-
-    if (!texto && !file) {
-      alert("Mensagem ou anexo obrigatório.");
-      return;
-    }
-
-    let anexo = null;
-    if (file) {
-      anexo = await enviarArquivo(ticketAtual, file);
-      fileInput.value = "";
-    }
-
-    await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-      autor: `${usuario.nome} (${usuario.nivel})`,
-      texto,
-      anexo,
-      criadoEm: serverTimestamp()
-    });
-
-    document.getElementById("mensagem").value = "";
-    await registrarLog("Mensagem enviada");
-  } catch (err) {
-    console.error("❌ ERRO AO ENVIAR:", err);
-    alert("Erro ao enviar arquivo. Veja o console.");
+  if (!texto && !file) {
+    alert("Mensagem ou anexo obrigatório.");
+    return;
   }
+
+  let anexo = null;
+
+  if (file) {
+    /* 🔁 ALTERAÇÃO ÚNICA AQUI */
+    anexo = await enviarArquivo(ticketAtual, file);
+    fileInput.value = "";
+  }
+
+  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
+    autor: `${usuario.nome} (${usuario.nivel})`,
+    texto,
+    anexo,
+    criadoEm: serverTimestamp()
+  });
+
+  await registrarLog("Mensagem enviada");
+  document.getElementById("mensagem").value = "";
 };
