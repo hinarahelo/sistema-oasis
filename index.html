@@ -6,33 +6,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="dark">
+<body class="bg-paper">
 
-<header class="topo">
-  <img src="logo-oasis.png" alt="Tribunal de Justiça de Oasis">
-  <h1>Tribunal de Justiça de Oasis</h1>
-  <span>Sistema Oficial de Atendimento</span>
+<header class="header official">
+  <img src="logo-oasis.png" class="logo">
+  <div>
+    <h1>Tribunal de Justiça de Oasis</h1>
+    <span>Sistema Oficial de Atendimento</span>
+  </div>
 </header>
 
-<main class="login">
-  <h2>🔐 Autenticação Oficial</h2>
+<main class="login-container">
+  <div class="login-card">
+    <h2>🔐 Autenticação Oficial</h2>
+    <p>Selecione o tipo de acesso:</p>
 
-  <!-- CIDADÃO -->
-  <a class="btn cidadao"
-     href="https://discord.com/oauth2/authorize?client_id=1450920482479145195&response_type=code&scope=identify+guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=cidadao">
-    👤 Entrar como Cidadão
-  </a>
+    <a class="btn-primary"
+       href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify+guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=cidadao">
+      👤 Entrar como Cidadão
+    </a>
 
-  <!-- STAFF -->
-  <a class="btn staff"
-     href="https://discord.com/oauth2/authorize?client_id=1450920482479145195&response_type=code&scope=identify+guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=staff">
-    👮 Entrar como Staff
-  </a>
-
-  <footer>
-    Uso Institucional • Tribunal de Justiça de Oasis © 2025
-  </footer>
+    <a class="btn-secondary"
+       href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify+guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=staff">
+      👮 Entrar como Staff
+    </a>
+  </div>
 </main>
 
+<footer class="footer">
+  Tribunal de Justiça de Oasis © 2025
+</footer>
+
+<script src="index.js"></script>
 </body>
 </html>
