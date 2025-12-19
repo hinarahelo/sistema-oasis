@@ -5,6 +5,7 @@
   <title>Autenticando — Supremo Tribunal de Oasis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
 
 <p>🔐 Finalizando autenticação, aguarde...</p>
@@ -12,43 +13,48 @@
 <script>
 (function () {
   try {
-    // Remove o #
-    const hash = window.location.hash.replace("#", "");
+    /*
+      Worker redireciona assim:
+      auth.html#user=JSON_URL_ENCODED
+    */
 
-    if (!hash.startsWith("user=")) {
-      throw "Payload ausente";
+    const hash = window.location.hash;
+
+    if (!hash || !hash.startsWith("#user=")) {
+      throw "Payload não recebido";
     }
 
-    // Recupera JSON
-    const payload = decodeURIComponent(hash.replace("user=", ""));
-    const usuario = JSON.parse(payload);
+    // Remove "#user="
+    const payloadEncoded = hash.replace("#user=", "");
 
-    if (!usuario || !usuario.nivel || !usuario.cid) {
+    // Decodifica o JSON
+    const usuario = JSON.parse(decodeURIComponent(payloadEncoded));
+
+    // Validação mínima (SEM rigidez excessiva)
+    if (!usuario || !usuario.cid || !usuario.nivel) {
       throw "Usuário inválido";
     }
 
-    // Normaliza estrutura
+    // Estrutura PADRÃO do sistema
     const usuarioFinal = {
-      nome: usuario.nome,
+      nome: usuario.nome || "Usuário",
       cid: usuario.cid,
       nivel: usuario.nivel
     };
 
-    localStorage.setItem("usuario", JSON.stringify(usuarioFinal));
+    // Salva sessão
+    localStorage.setItem(
+      "usuario",
+      JSON.stringify(usuarioFinal)
+    );
 
-    // Redirecionamento FINAL
-    if (usuarioFinal.nivel === "coordenacao") {
-      window.location.href = "staff/coordenacao.html";
-    } else if (usuarioFinal.nivel === "juridico") {
-      window.location.href = "staff/dashboard.html";
-    } else {
-      window.location.href = "tickets.html";
-    }
+    // Redireciona SEM lógica extra
+    window.location.replace("welcome.html");
 
-  } catch (e) {
-    console.error("Erro no auth:", e);
+  } catch (erro) {
+    console.error("Erro na autenticação:", erro);
     localStorage.clear();
-    window.location.href = "index.html";
+    window.location.replace("index.html");
   }
 })();
 </script>
