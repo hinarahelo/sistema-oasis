@@ -2,52 +2,75 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Tribunal de Justiça de Oasis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tribunal de Justiça de Oasis • Acesso ao Sistema</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="bg-paper">
 
+<!-- HEADER -->
 <header class="header official">
-  <img src="logo-oasis.png" class="logo" alt="Tribunal de Justiça de Oasis" />
+  <img src="logo-oasis.png" class="logo" />
   <div class="header-text">
     <h1>Tribunal de Justiça de Oasis</h1>
     <span>Sistema Oficial de Atendimento ao Cidadão</span>
   </div>
 </header>
 
+<!-- CONTEÚDO -->
 <main class="login-container">
+
   <div class="login-card official">
-    <h2>🎫 Central de Atendimento</h2>
+    <h2>🔐 Acesso ao Sistema</h2>
 
-    <p class="section-desc">
-      Para abrir solicitações, acompanhar atendimentos e acessar serviços
-      oficiais do Tribunal de Justiça de Oasis, é necessário realizar a
-      autenticação.
+    <p class="login-desc">
+      Para acessar os serviços oficiais do Tribunal de Justiça de Oasis,
+      é necessário realizar autenticação via Discord.
     </p>
 
-    <a class="btn-primary official" href="login.html">
-      🔐 Entrar com Discord
-    </a>
+    <div class="login-actions">
 
-    <p class="info-small">
-      O acesso é restrito a usuários autorizados.<br />
+      <!-- LOGIN CIDADÃO / JURÍDICO -->
+      <a
+        class="btn-primary"
+        href="https://discord.com/oauth2/authorize
+          ?client_id=1450905109083979785
+          &redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback
+          &response_type=code
+          &scope=identify%20guilds
+          &state=cidadao"
+      >
+        👤 Entrar como Cidadão / Jurídico
+      </a>
+
+      <!-- LOGIN STAFF -->
+      <a
+        class="btn-secondary"
+        href="https://discord.com/oauth2/authorize
+          ?client_id=1450905109083979785
+          &redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback
+          &response_type=code
+          &scope=identify%20guilds
+          &state=staff"
+      >
+        👮 Entrar como Staff
+      </a>
+
+    </div>
+
+    <div class="login-warning">
+      <b>Aviso:</b> O acesso é restrito a usuários autorizados.<br />
       Todas as ações são registradas.
-    </p>
+    </div>
   </div>
+
 </main>
 
-<footer class="footer official">
-  <p>
-    Tribunal de Justiça de Oasis © <span id="ano"></span><br />
-    Sistema Oficial • Uso Institucional
-  </p>
+<!-- FOOTER -->
+<footer class="footer">
+  Tribunal de Justiça de Oasis © 2025<br />
+  Sistema Oficial • Uso Institucional
 </footer>
-
-<script>
-  document.getElementById("ano").innerText = new Date().getFullYear();
-</script>
 
 </body>
 </html>
