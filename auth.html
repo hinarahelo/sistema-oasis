@@ -13,47 +13,48 @@
 <script>
 (function () {
   try {
-    /*
-      Worker redireciona assim:
-      auth.html#user=JSON_URL_ENCODED
-    */
-
     const hash = window.location.hash;
-
     if (!hash || !hash.startsWith("#user=")) {
-      throw "Payload não recebido";
+      throw "Payload ausente";
     }
 
-    // Remove "#user="
-    const payloadEncoded = hash.replace("#user=", "");
+    let raw = hash.replace("#user=", "");
+    let usuario = null;
 
-    // Decodifica o JSON
-    const usuario = JSON.parse(decodeURIComponent(payloadEncoded));
-
-    // Validação mínima (SEM rigidez excessiva)
-    if (!usuario || !usuario.cid || !usuario.nivel) {
-      throw "Usuário inválido";
+    /* 🔐 TENTA URL ENCODED */
+    try {
+      usuario = JSON.parse(decodeURIComponent(raw));
+    } catch (e) {
+      /* 🔐 TENTA BASE64 */
+      try {
+        usuario = JSON.parse(atob(raw));
+      } catch (e2) {
+        throw "Payload inválido";
+      }
     }
 
-    // Estrutura PADRÃO do sistema
+    if (!usuario || !usuario.id || !usuario.nivel) {
+      throw "Estrutura inválida";
+    }
+
+    /* NORMALIZA */
     const usuarioFinal = {
-      nome: usuario.nome || "Usuário",
-      cid: usuario.cid,
+      nome: usuario.nome || usuario.username || "Usuário",
+      cid: usuario.cid || usuario.id,
       nivel: usuario.nivel
     };
 
-    // Salva sessão
     localStorage.setItem(
       "usuario",
       JSON.stringify(usuarioFinal)
     );
 
-    // Redireciona SEM lógica extra
+    /* REDIRECIONA SEM LOOP */
     window.location.replace("welcome.html");
 
-  } catch (erro) {
-    console.error("Erro na autenticação:", erro);
-    localStorage.clear();
+  } catch (e) {
+    console.error("AUTH ERROR:", e);
+    localStorage.removeItem("usuario");
     window.location.replace("index.html");
   }
 })();
