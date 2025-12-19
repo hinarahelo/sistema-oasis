@@ -1,72 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sistema Oasis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Supremo Tribunal de Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .box {
-      background: #020617;
-      padding: 30px;
-      border-radius: 8px;
-      text-align: center;
-      width: 100%;
-      max-width: 360px;
-    }
-    button {
-      background: #5865F2;
-      border: none;
-      color: #fff;
-      padding: 14px;
-      width: 100%;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="login-bg">
 
-<div class="box">
-  <h2>🔐 Sistema Oasis</h2>
-  <p>Escolha como deseja entrar</p>
+  <div class="login-card official">
+    <img src="logo-oasis.png" class="login-logo">
 
-  <button onclick="loginDiscord('cidadao')">
-    👤 Entrar como Cidadão
-  </button>
+    <h1>SUPREMO TRIBUNAL DE OASIS</h1>
+    <p class="subtitle">
+      Portal Oficial de Serviços Judiciários
+    </p>
 
-  <button onclick="loginDiscord('juridico')">
-    ⚖️ Entrar como Jurídico
-  </button>
+    <div class="login-buttons">
+      <button onclick="loginDiscord('cidadao')">
+        👤 Acesso do Cidadão
+      </button>
 
-  <button onclick="loginDiscord('coordenacao')">
-    👑 Entrar como Coordenação
-  </button>
-</div>
+      <button onclick="loginDiscord('juridico')">
+        ⚖️ Acesso Jurídico
+      </button>
+
+      <button onclick="loginDiscord('coordenacao')">
+        👑 Coordenação
+      </button>
+    </div>
+
+    <span class="gov-note">
+      Sistema institucional — acesso monitorado
+    </span>
+  </div>
 
 <script>
-  function loginDiscord(nivel) {
-    const base =
-      "https://discord.com/oauth2/authorize" +
-      "?client_id=1450920482479145195" +
-      "&response_type=code" +
-      "&scope=identify" +
-      "&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback";
+function loginDiscord(nivel) {
+  const url =
+    "https://discord.com/oauth2/authorize" +
+    "?client_id=1450920482479145195" +
+    "&response_type=code" +
+    "&scope=identify" +
+    "&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback" +
+    "&state=" + nivel;
 
-    window.location.href = base + "&state=" + nivel;
-  }
+  window.location.href = url;
+}
 </script>
 
 </body>
