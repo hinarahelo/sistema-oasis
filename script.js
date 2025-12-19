@@ -14,52 +14,35 @@ import {
 
 import { enviarArquivo } from "./storage.js";
 
-/* ===============================
-   🔥 FIREBASE
-================================ */
-const firebaseConfig = {
+/* 🔥 FIREBASE */
+const app = initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
-};
-
-const app = initializeApp(firebaseConfig);
+});
 const db = getFirestore(app);
 
-/* ===============================
-   🔐 USUÁRIO
-================================ */
+/* 🔐 USUÁRIO */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario) {
-  location.href = "index.html";
-}
+if (!usuario) location.href = "index.html";
 
-/* ===============================
-   🧭 ESTADO GLOBAL
-================================ */
+/* ESTADO */
 let ticketAtual = null;
-let unsubscribeMensagens = null;
+let unsubscribe = null;
 
-/* ===============================
-   🗂️ ABAS
-================================ */
+/* ABAS */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  const aba = document.getElementById(id);
-  if (aba) aba.classList.add("active");
+  document.getElementById(id)?.classList.add("active");
 };
 
-/* ===============================
-   🚪 LOGOUT
-================================ */
+/* LOGOUT */
 window.sair = () => {
   localStorage.clear();
   location.href = "index.html";
 };
 
-/* ===============================
-   📂 ABRIR / CRIAR TICKET
-================================ */
+/* ABRIR CATEGORIA */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
   document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
@@ -68,7 +51,7 @@ window.abrirCategoria = async categoria => {
     collection(db, "tickets"),
     where("cid", "==", usuario.cid),
     where("categoria", "==", categoria),
-    where("status", "in", ["aberto", "em_atendimento"])
+    where("status", "!=", "fechado")
   );
 
   const snap = await getDocs(q);
@@ -86,59 +69,51 @@ window.abrirCategoria = async categoria => {
     ticketAtual = ref.id;
   }
 
-  iniciarChat();
+  iniciarChat(false);
 };
 
-/* ===============================
-   💬 CHAT REALTIME
-================================ */
-function iniciarChat() {
-  if (!ticketAtual) return;
-
+/* CHAT */
+function iniciarChat(somenteLeitura = false) {
   const box = document.getElementById("mensagens");
   box.innerHTML = "";
 
-  if (unsubscribeMensagens) unsubscribeMensagens();
+  if (unsubscribe) unsubscribe();
 
-  unsubscribeMensagens = onSnapshot(
+  unsubscribe = onSnapshot(
     collection(db, "tickets", ticketAtual, "mensagens"),
     snap => {
       box.innerHTML = "";
-
       snap.forEach(d => {
         const m = d.data();
-        let html = `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
-
+        box.innerHTML += `<p><b>${m.autor}:</b> ${m.texto || ""}</p>`;
         if (m.anexo) {
-          html += `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>`;
+          box.innerHTML += `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>`;
         }
-
-        box.innerHTML += html;
       });
-
       box.scrollTop = box.scrollHeight;
     }
   );
+
+  document.getElementById("mensagem").disabled = somenteLeitura;
 }
 
-/* ===============================
-   ✉️ ENVIAR MENSAGEM
-================================ */
+/* ENVIAR */
 window.enviarMensagem = async () => {
-  const input = document.getElementById("mensagem");
+  const texto = mensagem.value.trim();
   const file = document.getElementById("arquivo")?.files[0];
-  if (!ticketAtual) return;
 
-  let anexo = null;
-  if (file) {
-    anexo = await enviarArquivo(app, ticketAtual, file, usuario);
+  if (!ticketAtual) return;
+  if (!texto && !file) {
+    alert("É obrigatório enviar mensagem ou anexo.");
+    return;
   }
 
-  if (!input.value && !anexo) return;
+  let anexo = null;
+  if (file) anexo = await enviarArquivo(app, ticketAtual, file, usuario);
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} ${usuario.cid}`,
-    texto: input.value || "",
+    texto,
     anexo,
     criadoEm: serverTimestamp()
   });
@@ -147,68 +122,31 @@ window.enviarMensagem = async () => {
     status: "em_atendimento"
   });
 
-  input.value = "";
-  if (document.getElementById("arquivo")) {
-    document.getElementById("arquivo").value = "";
-  }
+  mensagem.value = "";
 };
 
-/* ===============================
-   🕒 SLA
-================================ */
-function calcularSLA(criadoEm) {
-  if (!criadoEm) return "🟢 OK";
-
-  const agora = Date.now();
-  const inicio = criadoEm.toDate().getTime();
-  const horas = (agora - inicio) / (1000 * 60 * 60);
-
-  if (horas <= 3) return "🟢 OK";
-  if (horas <= 18) return "🟡 Atenção";
-  if (horas > 48) return "🔴 Estourado";
-  return "🟡 Atenção";
-}
-
-/* ===============================
-   🕒 TICKETS EM ANDAMENTO
-================================ */
-async function carregarTicketsEmAndamento() {
+/* HISTÓRICO */
+async function carregarHistorico() {
   const lista = document.getElementById("listaTickets");
   if (!lista) return;
 
-  const q = query(
-    collection(db, "tickets"),
-    where("cid", "==", usuario.cid),
-    where("status", "in", ["aberto", "em_atendimento"])
-  );
-
+  const q = query(collection(db, "tickets"), where("cid", "==", usuario.cid));
   const snap = await getDocs(q);
-  lista.innerHTML = "";
 
+  lista.innerHTML = "";
   snap.forEach(d => {
     const t = d.data();
-
     const div = document.createElement("div");
     div.className = "card";
-    div.innerHTML = `
-      <b>${t.categoria}</b><br>
-      Status: ${t.status}<br>
-      SLA: ${calcularSLA(t.criadoEm)}
-    `;
-
+    div.innerHTML = `<b>${t.categoria}</b><br>Status: ${t.status}`;
     div.onclick = () => {
       ticketAtual = d.id;
       mostrarAba("chat");
-      document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
-      iniciarChat();
+      iniciarChat(t.status === "fechado");
     };
-
     lista.appendChild(div);
   });
 }
 
-/* ===============================
-   🚀 INIT
-================================ */
-carregarTicketsEmAndamento();
+carregarHistorico();
 mostrarAba("solicitacoes");
