@@ -3,13 +3,11 @@ import {
   getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
   projectId: "sistema-oasis-75979"
-};
-
-const app = initializeApp(firebaseConfig);
+});
 const db = getFirestore(app);
 
 const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -44,14 +42,14 @@ window.abrirCategoria = async categoria => {
   if (!snap.empty) {
     ticketAtual = snap.docs[0].id;
   } else {
-    const doc = await addDoc(collection(db, "tickets"), {
+    const ref = await addDoc(collection(db, "tickets"), {
       nome: usuario.nome,
       cid: usuario.cid,
       categoria,
       status: "aberto",
       criadoEm: serverTimestamp()
     });
-    ticketAtual = doc.id;
+    ticketAtual = ref.id;
   }
 
   iniciarChat();
@@ -59,8 +57,6 @@ window.abrirCategoria = async categoria => {
 
 function iniciarChat() {
   const box = document.getElementById("mensagens");
-  box.innerHTML = "";
-
   if (unsubscribe) unsubscribe();
 
   unsubscribe = onSnapshot(
