@@ -37,7 +37,7 @@ if (!usuario || usuario.nivel !== "cidadao") {
 }
 
 /* ======================================================
-   ESTADO
+   ESTADO GLOBAL
 ====================================================== */
 let ticketAtual = null;
 let unsubscribeMensagens = null;
@@ -45,6 +45,7 @@ let unsubscribeStatus = null;
 let typingTimeout = null;
 
 let arquivoSelecionado = null;
+let enviando = false;
 
 /* ======================================================
    ABAS
@@ -56,9 +57,7 @@ window.mostrarAba = id => {
 
   document.getElementById(id)?.classList.add("active");
 
-  if (id === "andamento") {
-    carregarTicketsEmAndamento();
-  }
+  if (id === "andamento") carregarTicketsEmAndamento();
 };
 
 const hash = location.hash.replace("#", "");
@@ -86,7 +85,7 @@ async function registrarLog(acao) {
 }
 
 /* ======================================================
-   🕒 EM ANDAMENTO
+   🕒 EM ANDAMENTO — POR CATEGORIA
 ====================================================== */
 function carregarTicketsEmAndamento() {
   const grid = document.getElementById("categoriasTickets");
@@ -185,7 +184,6 @@ window.abrirCategoria = async categoria => {
     });
 
     ticketAtual = ref.id;
-
     await registrarLog("Ticket criado");
 
     await notificarDiscord(
@@ -204,7 +202,6 @@ function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
   const btnEnviar = document.querySelector(".chat-input button");
-  const digitandoBox = document.getElementById("digitando");
 
   box.innerHTML = "";
 
@@ -215,9 +212,6 @@ function iniciarChat() {
     const t = snap.data();
     input.disabled = t.status === "encerrado";
     btnEnviar.disabled = t.status === "encerrado";
-    input.placeholder = t.status === "encerrado"
-      ? "🔒 Ticket encerrado"
-      : "Digite sua mensagem...";
   });
 
   unsubscribeMensagens = onSnapshot(
@@ -227,37 +221,16 @@ function iniciarChat() {
     ),
     snap => {
       box.innerHTML = "";
-
       snap.forEach(d => {
         const m = d.data();
-        const hora = m.criadoEm
-          ? m.criadoEm.toDate().toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit"
-            })
-          : "--:--";
-
-        let classe = "nome-cidadao";
-        if (m.autor?.includes("juridico")) classe = "nome-juridico";
-        if (m.autor?.includes("coordenacao")) classe = "nome-coordenacao";
-
         box.innerHTML += `
           <p>
-            <b class="${classe}">${m.autor}</b>
-            <span class="hora">(${hora})</span><br>
+            <b>${m.autor}</b><br>
             ${m.texto || ""}
           </p>
+          ${m.anexo ? `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>` : ""}
         `;
-
-        if (m.anexo) {
-          box.innerHTML += `
-            <p class="anexo">
-              📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a>
-            </p>
-          `;
-        }
       });
-
       box.scrollTop = box.scrollHeight;
     }
   );
@@ -269,13 +242,15 @@ function iniciarChat() {
 const fileInput = document.getElementById("arquivo");
 
 fileInput.addEventListener("change", () => {
-  arquivoSelecionado = fileInput.files[0];
+  arquivoSelecionado = fileInput.files[0] || null;
+  document.getElementById("arquivoPreview")?.remove();
+
   if (arquivoSelecionado) {
     fileInput.insertAdjacentHTML(
       "afterend",
       `<div id="arquivoPreview">
         📎 ${arquivoSelecionado.name}
-        <button onclick="removerArquivo()">❌</button>
+        <button type="button" onclick="removerArquivo()">❌</button>
       </div>`
     );
   }
@@ -297,51 +272,61 @@ async function uploadCloudinary(file) {
 
   const res = await fetch(
     "https://api.cloudinary.com/v1_1/dnd90frwv/auto/upload",
-    {
-      method: "POST",
-      body: formData
-    }
+    { method: "POST", body: formData }
   );
 
   const data = await res.json();
 
-  return {
-    nome: file.name,
-    url: data.secure_url
-  };
+  return { nome: file.name, url: data.secure_url };
 }
 
 /* ======================================================
-   📤 ENVIAR
+   📤 ENVIAR MENSAGEM (ANTI DUPLICAÇÃO)
 ====================================================== */
 window.enviarMensagem = async () => {
-  const texto = document.getElementById("mensagem").value.trim();
+  if (enviando) return;
+  enviando = true;
 
-  if (!texto && !arquivoSelecionado) {
-    alert("Mensagem ou anexo obrigatório.");
-    return;
+  const btn = document.querySelector(".chat-input button");
+  btn.disabled = true;
+  btn.innerText = "Enviando...";
+
+  try {
+    const texto = document.getElementById("mensagem").value.trim();
+
+    if (!texto && !arquivoSelecionado) {
+      alert("Mensagem ou anexo obrigatório.");
+      return;
+    }
+
+    const ticketSnap = await getDoc(doc(db, "tickets", ticketAtual));
+    if (ticketSnap.data().status === "encerrado") {
+      alert("Este ticket está encerrado.");
+      return;
+    }
+
+    let anexo = null;
+    if (arquivoSelecionado) {
+      anexo = await uploadCloudinary(arquivoSelecionado);
+      removerArquivo();
+    }
+
+    await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
+      autor: `${usuario.nome} (${usuario.nivel})`,
+      texto,
+      anexo,
+      criadoEm: serverTimestamp()
+    });
+
+    await registrarLog("Mensagem enviada");
+    document.getElementById("mensagem").value = "";
+
+  } catch (e) {
+    alert("Erro ao enviar mensagem.");
+    console.error(e);
+  } finally {
+    enviando = false;
+    btn.disabled = false;
+    btn.innerText = "Enviar";
   }
-
-  const ticketSnap = await getDoc(doc(db, "tickets", ticketAtual));
-  if (ticketSnap.data().status === "encerrado") {
-    alert("Este ticket está encerrado.");
-    return;
-  }
-
-  let anexo = null;
-  if (arquivoSelecionado) {
-    anexo = await uploadCloudinary(arquivoSelecionado);
-    removerArquivo();
-  }
-
-  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: `${usuario.nome} (${usuario.nivel})`,
-    texto,
-    anexo,
-    criadoEm: serverTimestamp()
-  });
-
-  await registrarLog("Mensagem enviada");
-
-  document.getElementById("mensagem").value = "";
 };
