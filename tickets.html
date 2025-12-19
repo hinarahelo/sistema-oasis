@@ -1,67 +1,85 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sistema de Atendimento — Tribunal de Justiça de Oasis</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Sistema de Atendimento • Tribunal de Justiça de Oasis</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="bg-paper">
 
 <header class="header small official">
-  <img src="logo-oasis.png" class="logo small" />
+  <img src="logo-oasis.png" class="logo small">
   <div>
     <h1>Tribunal de Justiça de Oasis</h1>
     <span>Sistema Oficial de Atendimento</span>
   </div>
 </header>
 
-<nav class="nav-bar official">
+<nav class="nav-bar">
   <button onclick="mostrarAba('solicitacoes')">📂 Solicitações</button>
   <button onclick="mostrarAba('andamento')">🕒 Em andamento</button>
-  <button onclick="mostrarAba('precos')">💰 Serviços</button>
+  <button onclick="mostrarAba('precos')">💰 Preços</button>
   <button onclick="sair()">🚪 Sair</button>
 </nav>
 
-<main class="content official">
+<main class="content">
 
 <section id="solicitacoes" class="aba active">
-  <h2>Abertura de Solicitação</h2>
-  <div class="category-grid official">
-    <button onclick="abrirCategoria('Troca de Nome')">Troca de Nome</button>
-    <button onclick="abrirCategoria('Adoção')">Adoção</button>
-    <button onclick="abrirCategoria('Jovem Aprendiz')">Jovem Aprendiz</button>
-    <button onclick="abrirCategoria('Divórcio')">Divórcio</button>
-    <button onclick="abrirCategoria('Casamento')">Casamento</button>
-    <button onclick="abrirCategoria('Nascimento')">Nascimento</button>
-    <button onclick="abrirCategoria('Limpeza de Ficha')">Limpeza de Ficha</button>
-    <button onclick="abrirCategoria('Porte de Arma')">Porte de Arma</button>
+  <h2>🎫 Sistema de Tickets</h2>
+  <p class="info-box">
+    Selecione a categoria correspondente à sua solicitação.
+    Apenas 1 ticket ativo por categoria.
+  </p>
+
+  <div class="category-grid">
+    <button onclick="abrirCategoria('Troca de Nome')">📜 Troca de Nome</button>
+    <button onclick="abrirCategoria('Adoção')">👶 Adoção</button>
+    <button onclick="abrirCategoria('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+    <button onclick="abrirCategoria('Divórcio')">💔 Divórcio</button>
+    <button onclick="abrirCategoria('Casamento')">💍 Casamento</button>
+    <button onclick="abrirCategoria('Nascimento')">👼 Nascimento</button>
+    <button onclick="abrirCategoria('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
+    <button onclick="abrirCategoria('Porte de Arma')">🔫 Porte de Arma</button>
   </div>
 </section>
 
 <section id="andamento" class="aba">
-  <h2>Tickets em Andamento</h2>
-  <div id="listaTickets" class="card-list official"></div>
+  <h2>🕒 Tickets em Andamento</h2>
+  <div id="listaTickets" class="card-list"></div>
 </section>
 
 <section id="chat" class="aba">
-  <h2 id="chatTitulo">Atendimento</h2>
-  <div id="mensagens" class="chat-box official"></div>
-  <div class="chat-input official">
-    <input id="mensagem" placeholder="Digite sua mensagem..." />
+  <h2 id="chatTitulo">💬 Atendimento</h2>
+  <div id="mensagens" class="chat-box"></div>
+
+  <div class="chat-input">
+    <input id="mensagem" placeholder="Digite sua mensagem...">
     <button onclick="enviarMensagem()">Enviar</button>
-    <button onclick="mostrarAba('andamento')">⬅ Voltar</button>
+    <button class="btn-secondary" onclick="mostrarAba('solicitacoes')">⬅ Voltar</button>
   </div>
 </section>
 
 <section id="precos" class="aba">
-  <h2>Tabela Oficial de Serviços</h2>
-  <!-- valores mantidos conforme enviado -->
-  <div class="price-card official">
-    <h3>Atendimentos Jurídicos</h3>
+  <h2>💰 Tabela de Serviços</h2>
+
+  <div class="price-card">
+    <h3>⚖️ Serviços Jurídicos</h3>
     <ul>
       <li>Delegacia Sul — $20.000</li>
       <li>Delegacia PRF — $30.000</li>
+    </ul>
+  </div>
+
+  <div class="price-card">
+    <h3>💍 Certidões Civis</h3>
+    <ul>
+      <li>Casamento — $150.000</li>
+      <li>Divórcio — $200.000</li>
+      <li>Troca de Nome — $250.000</li>
+      <li>Adoção — $50.000</li>
+      <li>Nascimento — $50.000</li>
+      <li>Jovem Aprendiz — $30.000</li>
     </ul>
   </div>
 </section>
