@@ -1,31 +1,35 @@
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
 /**
- * Envia arquivo para o Firebase Storage
- * @param {object} app Firebase app
- * @param {string} ticketId ID do ticket
- * @param {File} file Arquivo selecionado
- * @param {object} usuario Dados do usuário
+ * Upload de arquivos via Cloudinary (PLANO FREE)
+ * Integrado ao SITE OASIS
  */
 export async function enviarArquivo(app, ticketId, file, usuario) {
   if (!file) return null;
 
-  const storage = getStorage(app);
+  const cloudName = "dnd90frw";
+  const uploadPreset = "oasis_upload";
 
-  const caminho = `tickets/${ticketId}/${Date.now()}_${file.name}`;
-  const storageRef = ref(storage, caminho);
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", uploadPreset);
+  formData.append("folder", `tickets/${ticketId}`);
 
-  await uploadBytes(storageRef, file);
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
+    {
+      method: "POST",
+      body: formData
+    }
+  );
 
-  const url = await getDownloadURL(storageRef);
+  const data = await response.json();
+
+  if (!data.secure_url) {
+    console.error("Erro Cloudinary:", data);
+    throw new Error("Falha ao enviar arquivo para o Cloudinary");
+  }
 
   return {
     nome: file.name,
-    url
+    url: data.secure_url
   };
 }
