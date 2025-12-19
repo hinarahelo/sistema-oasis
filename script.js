@@ -8,7 +8,6 @@ import {
   getDocs,
   onSnapshot,
   serverTimestamp,
-  updateDoc,
   doc,
   getDoc,
   orderBy
@@ -191,7 +190,7 @@ window.abrirCategoria = async categoria => {
 };
 
 /* ======================================================
-   💬 CHAT (COM DATA/HORA BRASILIA)
+   💬 CHAT — HTML ALINHADO AO CSS
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
@@ -220,6 +219,10 @@ function iniciarChat() {
       snap.forEach(d => {
         const m = d.data();
 
+        let tipo = "cidadao";
+        if (m.autor?.includes("juridico")) tipo = "juridico";
+        if (m.autor?.includes("coordenacao")) tipo = "coordenacao";
+
         const dataHora = m.criadoEm
           ? m.criadoEm.toDate().toLocaleString("pt-BR", {
               timeZone: "America/Sao_Paulo",
@@ -232,15 +235,13 @@ function iniciarChat() {
           : "";
 
         box.innerHTML += `
-          <div style="margin-bottom:10px;">
-            <p>
-              <b>${m.autor}</b><br>
+          <div class="mensagem ${tipo}">
+            <div class="conteudo">
+              <span class="autor">${m.autor}</span>
               ${m.texto || ""}
-            </p>
-            ${m.anexo ? `<p>📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></p>` : ""}
-            <div style="text-align:right;font-size:11px;color:#666;">
-              ${dataHora}
+              ${m.anexo ? `<div class="anexo">📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></div>` : ""}
             </div>
+            <div class="hora">${dataHora}</div>
           </div>
         `;
       });
