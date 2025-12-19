@@ -9,35 +9,50 @@ import {
 
 import { db } from "../firebase.js";
 
-/* 🔐 Usuário */
+/* =====================================================
+   🔐 CONTROLE DE ACESSO
+===================================================== */
+
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
   location.href = "../index.html";
 }
 
-/* ⏱ SLA */
-function calcularSLA(ticket) {
-  if (!ticket.criadoEm) return "🟢 OK";
+/* =====================================================
+   📜 LOGS / AUDITORIA
+===================================================== */
 
-  const horas = (Date.now() - ticket.criadoEm.toDate().getTime()) / 36e5;
-  if (horas <= 3) return "🟢 OK";
-  if (horas <= 18) return "🟡 Atenção";
-  return "🔴 Estourado";
-}
-
-/* 📜 LOG */
-async function registrarLog(ticketId, acao) {
+async function registrarLog(ticketId, acao, detalhes = "") {
   await addDoc(collection(db, "logs"), {
     ticket: ticketId,
     acao,
+    detalhes,
     usuario: usuario.nome,
     nivel: usuario.nivel,
     data: serverTimestamp()
   });
 }
 
-/* 🎫 TICKETS */
+/* =====================================================
+   ⏱ SLA
+===================================================== */
+
+function calcularSLA(ticket) {
+  if (!ticket.criadoEm) return "🟢 OK";
+
+  const horas =
+    (Date.now() - ticket.criadoEm.toDate().getTime()) / 36e5;
+
+  if (horas <= 3) return "🟢 OK";
+  if (horas <= 18) return "🟡 Atenção";
+  return "🔴 Estourado";
+}
+
+/* =====================================================
+   🎫 LISTAGEM DE TICKETS
+===================================================== */
+
 onSnapshot(collection(db, "tickets"), snap => {
   const box = document.getElementById("lista-tickets");
   if (!box) return;
@@ -45,50 +60,132 @@ onSnapshot(collection(db, "tickets"), snap => {
   box.innerHTML = "";
 
   snap.forEach(d => {
-    const t = d.data();
-    const id = d.id;
+    const ticket = d.data();
+    const ticketId = d.id;
 
-    const div = document.createElement("div");
-    div.className = "card";
+    const card = document.createElement("div");
+    card.className = "card";
 
-    div.innerHTML = `
-      <b>${t.categoria}</b><br>
-      Usuário: ${t.nome}<br>
-      Status: ${t.status}<br>
-      SLA: <b>${calcularSLA(t)}</b><br><br>
+    card.innerHTML = `
+      <b>${ticket.categoria}</b><br>
+      👤 Cidadão: <b>${ticket.nome}</b><br>
+      🆔 CID: ${ticket.cid}<br>
+      ⚖️ Jurídico: ${ticket.atendente || "—"}<br>
+      📌 Status: <b>${ticket.status}</b><br>
+      ⏱ SLA: <b>${calcularSLA(ticket)}</b><br><br>
     `;
 
-    /* ⚖️ ENCERRAR — jurídico e coordenação */
-    if (t.status !== "encerrado") {
+    /* =====================================================
+       ✏️ ALTERAR NOME DO CIDADÃO
+       (Jurídico e Coordenação)
+    ===================================================== */
+
+    const btnCidadao = document.createElement("button");
+    btnCidadao.textContent = "✏️ Alterar nome do cidadão";
+    btnCidadao.onclick = async () => {
+      const novoNome = prompt(
+        "Novo nome do cidadão:",
+        ticket.nome
+      );
+      if (!novoNome) return;
+
+      await updateDoc(doc(db, "tickets", ticketId), {
+        nome: novoNome
+      });
+
+      await registrarLog(
+        ticketId,
+        "Alteração de nome do cidadão",
+        `De "${ticket.nome}" para "${novoNome}"`
+      );
+    };
+    card.appendChild(btnCidadao);
+
+    /* =====================================================
+       ✏️ ALTERAR NOME DO JURÍDICO
+       (Somente Coordenação)
+    ===================================================== */
+
+    if (usuario.nivel === "coordenacao" && ticket.atendente) {
+      const btnJuridico = document.createElement("button");
+      btnJuridico.textContent = "✏️ Alterar nome do jurídico";
+      btnJuridico.onclick = async () => {
+        const novoNome = prompt(
+          "Novo nome do jurídico:",
+          ticket.atendente
+        );
+        if (!novoNome) return;
+
+        await updateDoc(doc(db, "tickets", ticketId), {
+          atendente: novoNome
+        });
+
+        await registrarLog(
+          ticketId,
+          "Alteração de nome do jurídico",
+          `De "${ticket.atendente}" para "${novoNome}"`
+        );
+      };
+      card.appendChild(btnJuridico);
+    }
+
+    /* =====================================================
+       👑 ALTERAR NOME DA COORDENAÇÃO
+       (Somente Coordenação)
+    ===================================================== */
+
+    if (usuario.nivel === "coordenacao") {
+      const btnCoord = document.createElement("button");
+      btnCoord.textContent = "👑 Alterar nome da coordenação";
+      btnCoord.onclick = async () => {
+        const novoNome = prompt(
+          "Novo nome da coordenação:",
+          usuario.nome
+        );
+        if (!novoNome) return;
+
+        usuario.nome = novoNome;
+        localStorage.setItem("usuario", JSON.stringify(usuario));
+
+        await updateDoc(doc(db, "tickets", ticketId), {
+          atendente: novoNome
+        });
+
+        await registrarLog(
+          ticketId,
+          "Alteração de nome da coordenação",
+          `Coordenação alterou o próprio nome para "${novoNome}"`
+        );
+
+        alert("Nome da coordenação atualizado com sucesso.");
+      };
+      card.appendChild(btnCoord);
+    }
+
+    /* =====================================================
+       ⚖️ ENCERRAR TICKET
+       (Jurídico e Coordenação)
+    ===================================================== */
+
+    if (ticket.status !== "encerrado") {
       const btnEncerrar = document.createElement("button");
       btnEncerrar.textContent = "⚖️ Encerrar Ticket";
       btnEncerrar.onclick = async () => {
-        await updateDoc(doc(db, "tickets", id), {
+        await updateDoc(doc(db, "tickets", ticketId), {
           status: "encerrado",
           encerradoPor: usuario.nome,
           encerradoEm: serverTimestamp()
         });
 
-        await registrarLog(id, "Ticket encerrado");
+        await registrarLog(
+          ticketId,
+          "Ticket encerrado",
+          `Encerrado por ${usuario.nome}`
+        );
       };
-      div.appendChild(btnEncerrar);
+      card.appendChild(btnEncerrar);
     }
 
-    /* 👑 COORDENAÇÃO — reabrir */
-    if (usuario.nivel === "coordenacao" && t.status === "encerrado") {
-      const btnReabrir = document.createElement("button");
-      btnReabrir.textContent = "🔓 Reabrir Ticket";
-      btnReabrir.onclick = async () => {
-        await updateDoc(doc(db, "tickets", id), {
-          status: "aberto",
-          atendente: null
-        });
-
-        await registrarLog(id, "Ticket reaberto");
-      };
-      div.appendChild(btnReabrir);
-    }
-
-    box.appendChild(div);
+    box.appendChild(card);
   });
 });
