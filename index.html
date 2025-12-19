@@ -2,53 +2,42 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Tribunal de Justiça de Oasis</title>
+  <title>Central de Atendimento • Tribunal de Justiça de Oasis</title>
   <link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body class="bg-paper">
-
-<header class="header">
-  <img src="logo-oasis.png" class="logo">
-  <div>
-    <h1>Tribunal de Justiça de Oasis</h1>
-    <span>Sistema Oficial de Atendimento ao Cidadão</span>
-  </div>
+<header class="topo">
+  <img src="logo-oasis.png" alt="Tribunal de Justiça de Oasis" class="logo">
+  <h1>Tribunal de Justiça de Oasis</h1>
+  <p>Central Oficial de Atendimento</p>
 </header>
 
 <main class="login-container">
-  <div class="login-card">
-    <h2>🔐 Acesso ao Sistema</h2>
-    <p>Escolha o tipo de acesso para autenticação via Discord.</p>
+  <h2>🔐 Acesso ao Sistema</h2>
+  <p>Escolha o tipo de acesso para autenticação via Discord.</p>
 
-    <!-- CIDADÃO / JURÍDICO -->
-    <a class="btn-primary"
-       href="https://discord.com/oauth2/authorize
-?client_id=1450905109083979785
-&response_type=code
-&scope=identify
-&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback
-&state=cidadao">
-      👤 Entrar como Cidadão / Jurídico
-    </a>
+  <!-- CIDADÃO -->
+  <a class="btn cidadao"
+     href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=cidadao">
+     👤 Entrar como Cidadão
+  </a>
 
-    <br><br>
+  <!-- STAFF -->
+  <a class="btn staff"
+     href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=staff">
+     🛡️ Entrar como Staff
+  </a>
 
-    <!-- STAFF -->
-    <a class="btn-secondary"
-       href="https://discord.com/oauth2/authorize
-?client_id=1450905109083979785
-&response_type=code
-&scope=identify
-&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback
-&state=staff">
-      👮 Entrar como Staff
-    </a>
-  </div>
+  <p class="aviso">
+    O acesso é restrito a usuários autorizados.<br>
+    Todas as ações são registradas.
+  </p>
 </main>
 
-<footer class="footer">
-  Tribunal de Justiça de Oasis © 2025 • Uso Institucional
+<footer>
+  Tribunal de Justiça de Oasis © 2025<br>
+  Sistema Oficial • Uso Institucional
 </footer>
 
 </body>
