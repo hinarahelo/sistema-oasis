@@ -9,46 +9,30 @@
 <body class="dark">
 
 <header class="topo">
-  <img src="logo-oasis.png" alt="Tribunal de Justiça de Oasis" class="logo">
-  <div>
-    <h1>Tribunal de Justiça de Oasis</h1>
-    <span>Sistema Oficial de Atendimento ao Cidadão</span>
-  </div>
+  <img src="logo-oasis.png" alt="Tribunal de Justiça de Oasis">
+  <h1>Tribunal de Justiça de Oasis</h1>
+  <span>Sistema Oficial de Atendimento</span>
 </header>
 
-<main class="login-container">
+<main class="login">
+  <h2>🔐 Autenticação Oficial</h2>
 
-  <div class="login-card">
-    <h2>🔐 Acesso ao Sistema</h2>
-    <p>
-      Para utilizar os serviços oficiais do Tribunal de Justiça de Oasis,
-      é necessário autenticar-se via Discord.
-    </p>
+  <!-- CIDADÃO -->
+  <a class="btn cidadao"
+     href="https://discord.com/oauth2/authorize?client_id=1450920482479145195&response_type=code&scope=identify+guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=cidadao">
+    👤 Entrar como Cidadão
+  </a>
 
-    <!-- BOTÃO CIDADÃO -->
-    <a class="btn-login cidadao"
-       href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify%20guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=cidadao">
-      👤 Entrar como Cidadão
-    </a>
+  <!-- STAFF -->
+  <a class="btn staff"
+     href="https://discord.com/oauth2/authorize?client_id=1450920482479145195&response_type=code&scope=identify+guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=staff">
+    👮 Entrar como Staff
+  </a>
 
-    <!-- BOTÃO STAFF -->
-    <a class="btn-login staff"
-       href="https://discord.com/oauth2/authorize?client_id=1450905109083979785&response_type=code&scope=identify%20guilds.members.read&redirect_uri=https%3A%2F%2Fsistema-oasis-auth.hinarahelo.workers.dev%2Fcallback&state=staff">
-      👮 Entrar como Staff
-    </a>
-
-    <small class="aviso">
-      O acesso é restrito a usuários autorizados.<br>
-      Todas as ações são registradas.
-    </small>
-  </div>
-
+  <footer>
+    Uso Institucional • Tribunal de Justiça de Oasis © 2025
+  </footer>
 </main>
-
-<footer class="rodape">
-  Tribunal de Justiça de Oasis © 2025<br>
-  Sistema Oficial • Uso Institucional
-</footer>
 
 </body>
 </html>
