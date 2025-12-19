@@ -9,11 +9,8 @@ import {
   serverTimestamp,
   doc,
   getDoc,
-  orderBy,
-  updateDoc
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import { notificarDiscord } from "../discord.js";
 
 /* ======================================================
    🔥 FIREBASE
@@ -26,170 +23,186 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 /* ======================================================
-   🔐 USUÁRIO
+   🔐 USUÁRIO — JURÍDICO
 ====================================================== */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario || usuario.nivel !== "juridico") {
-  location.href = "../index.html";
+  location.href = "index.html";
 }
 
 /* ======================================================
    ESTADO
 ====================================================== */
 let ticketAtual = null;
-let ticketsCache = [];
-let unsubscribeMensagens = null;
 let arquivoSelecionado = null;
+let ticketsCache = [];
 
 /* ======================================================
-   📂 CARREGAR TICKETS + FILTRO
+   LOGOUT
 ====================================================== */
-function carregarTickets() {
-  const lista = document.getElementById("listaTickets");
-  const filtro = document.getElementById("filtroCategoria");
+window.sair = () => {
+  localStorage.clear();
+  location.href = "index.html";
+};
 
-  const q = query(collection(db, "tickets"), where("status", "==", "aberto"));
+/* ======================================================
+   ABAS
+====================================================== */
+window.mostrarAba = id => {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.getElementById(id)?.classList.add("active");
+};
 
-  onSnapshot(q, snap => {
+/* ======================================================
+   🕒 CARREGAR TICKETS (TODOS)
+====================================================== */
+const filtro = document.getElementById("filtroCategoria");
+const lista = document.getElementById("ticketsCategoria");
+
+onSnapshot(
+  query(collection(db, "tickets"), where("status", "==", "aberto")),
+  snap => {
     ticketsCache = [];
-    lista.innerHTML = "";
     filtro.innerHTML = `<option value="">Todas as categorias</option>`;
+    const categorias = new Set();
 
     snap.forEach(d => {
       const t = { id: d.id, ...d.data() };
       ticketsCache.push(t);
-
-      if (![...filtro.options].some(o => o.value === t.categoria)) {
-        filtro.innerHTML += `<option value="${t.categoria}">${t.categoria}</option>`;
-      }
+      categorias.add(t.categoria);
     });
+
+    categorias.forEach(c =>
+      filtro.insertAdjacentHTML("beforeend", `<option value="${c}">${c}</option>`)
+    );
 
     renderTickets();
-  });
-}
+  }
+);
 
-window.filtrarCategoria = () => {
-  const cat = document.getElementById("filtroCategoria").value;
-  renderTickets(cat);
-};
+window.aplicarFiltro = () => renderTickets();
 
-function prioridadeBadge(p = "media") {
-  if (p === "alta") return `<span class="badge badge-alta">ALTA</span>`;
-  if (p === "baixa") return `<span class="badge badge-baixa">BAIXA</span>`;
-  return `<span class="badge badge-media">MÉDIA</span>`;
-}
-
-function renderTickets(filtro = "") {
-  const lista = document.getElementById("listaTickets");
+function renderTickets() {
   lista.innerHTML = "";
+  const cat = filtro.value;
 
   ticketsCache
-    .filter(t => !filtro || t.categoria === filtro)
+    .filter(t => !cat || t.categoria === cat)
     .forEach(t => {
-      const card = document.createElement("div");
-      card.className = "card-ticket official";
-      card.innerHTML = `
-        <h4>${t.categoria} ${prioridadeBadge(t.prioridade)}</h4>
-        <small>${t.nome}</small>
+      lista.innerHTML += `
+        <div class="card-ticket official" onclick="abrirTicket('${t.id}','${t.categoria}')">
+          <h5>${t.categoria}</h5>
+          <span class="badge prioridade-media">NORMAL</span>
+        </div>
       `;
-
-      card.onclick = () => {
-        ticketAtual = t.id;
-        document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
-        document.getElementById("painel").classList.remove("active");
-        document.getElementById("chat").classList.add("active");
-        iniciarChat();
-      };
-
-      lista.appendChild(card);
     });
 }
 
-carregarTickets();
+/* ======================================================
+   ABRIR CHAT
+====================================================== */
+window.abrirTicket = (id, categoria) => {
+  ticketAtual = id;
+  document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
+  mostrarAba("chat");
+  iniciarChat();
+};
 
 /* ======================================================
-   💬 CHAT
+   CHAT
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
   box.innerHTML = "";
 
-  if (unsubscribeMensagens) unsubscribeMensagens();
-
-  unsubscribeMensagens = onSnapshot(
+  onSnapshot(
     query(collection(db, "tickets", ticketAtual, "mensagens"), orderBy("criadoEm")),
     snap => {
       box.innerHTML = "";
-
       snap.forEach(d => {
         const m = d.data();
 
-        let tipo = "juridico", classe = "nome-juridico";
-        if (m.autor?.includes("cidadao")) (tipo = "cidadao"), (classe = "nome-cidadao");
-        if (m.autor?.includes("coordenacao")) (tipo = "coordenacao"), (classe = "nome-coordenacao");
+        let tipo = "cidadao";
+        if (m.autor?.includes("jurídico")) tipo = "juridico";
+        if (m.autor?.includes("coordenação")) tipo = "coordenacao";
 
         const dh = m.criadoEm
           ? m.criadoEm.toDate().toLocaleString("pt-BR", {
-              timeZone: "America/Sao_Paulo",
-              hour: "2-digit",
-              minute: "2-digit",
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric"
+              timeZone: "America/Sao_Paulo"
             })
           : "";
 
-        let anexo = "";
+        let preview = "";
         if (m.anexo) {
-          anexo = `
-            <div class="anexo">
-              📎 <a href="${m.anexo.url}" target="_blank" download>${m.anexo.nome}</a>
-            </div>`;
+          const u = m.anexo.url;
+          if (u.match(/\.(jpg|png|jpeg|webp)$/i)) {
+            preview = `<img src="${u}" class="preview-img">`;
+          } else if (u.endsWith(".pdf")) {
+            preview = `<a href="${u}" target="_blank" download>📄 Baixar PDF</a>`;
+          } else {
+            preview = `<a href="${u}" target="_blank" download>⬇️ ${m.anexo.nome}</a>`;
+          }
         }
 
         box.innerHTML += `
           <div class="mensagem ${tipo}">
-            <span class="autor ${classe}">${m.autor}</span>
-            ${m.texto || ""}
-            ${anexo}
+            <div class="conteudo">
+              <b>${m.autor}</b><br>
+              ${m.texto || ""}
+              ${preview}
+            </div>
             <div class="hora">${dh}</div>
           </div>
         `;
       });
-
       box.scrollTop = box.scrollHeight;
     }
   );
 }
 
 /* ======================================================
-   📤 ENVIAR
+   ARQUIVO
+====================================================== */
+document.getElementById("arquivo").addEventListener("change", e => {
+  arquivoSelecionado = e.target.files[0];
+});
+
+/* ======================================================
+   CLOUDINARY
+====================================================== */
+async function uploadCloudinary(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", "oasis_upload");
+
+  const r = await fetch("https://api.cloudinary.com/v1_1/dnd90frwv/auto/upload", {
+    method: "POST",
+    body: fd
+  });
+  const d = await r.json();
+  return { nome: file.name, url: d.secure_url };
+}
+
+/* ======================================================
+   ENVIAR
 ====================================================== */
 window.enviarMensagem = async () => {
   const texto = document.getElementById("mensagem").value.trim();
-  if (!texto) return;
+  if (!texto && !arquivoSelecionado) return;
+
+  let anexo = null;
+  if (arquivoSelecionado) {
+    anexo = await uploadCloudinary(arquivoSelecionado);
+    arquivoSelecionado = null;
+    document.getElementById("arquivo").value = "";
+  }
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: `${usuario.nome} (juridico)`,
+    autor: `${usuario.nome} (jurídico)`,
     texto,
+    anexo,
     criadoEm: serverTimestamp()
   });
 
   document.getElementById("mensagem").value = "";
-};
-
-/* ======================================================
-   🔒 ENCERRAR
-====================================================== */
-window.encerrarTicket = async () => {
-  if (!confirm("Encerrar este ticket?")) return;
-
-  await updateDoc(doc(db, "tickets", ticketAtual), { status: "encerrado" });
-
-  await notificarDiscord(
-    `🔒 Ticket encerrado\nID: ${ticketAtual}`,
-    "WEBHOOK_COORDENACAO_AQUI"
-  );
-
-  voltarPainel();
 };
