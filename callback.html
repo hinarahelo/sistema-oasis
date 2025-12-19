@@ -1,20 +1,52 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Login concluído</title>
+  <meta charset="UTF-8" />
+  <title>Autenticação Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Georgia, serif;
+      background: #f4f1ec;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
-<script>
-  const hash = new URLSearchParams(window.location.hash.substring(1));
-  const user = hash.get("user");
+<h2>🔐 Finalizando autenticação...</h2>
 
-  if (!user) {
-    document.body.innerHTML = "<h2>Erro no login</h2>";
-  } else {
-    localStorage.setItem("usuario", decodeURIComponent(user));
-    window.location.href = "tickets.html";
+<script>
+  try {
+    const hash = window.location.hash;
+    if (!hash.includes("user=")) {
+      throw new Error("Dados não recebidos");
+    }
+
+    const encoded = hash.split("user=")[1];
+    const user = JSON.parse(decodeURIComponent(encoded));
+
+    // salva sessão
+    localStorage.setItem("usuario", JSON.stringify(user));
+
+    // redirecionamento por nível
+    if (user.nivel === "juridico" || user.nivel === "coordenacao") {
+      window.location.href = "staff/dashboard.html";
+    } else {
+      window.location.href = "tickets.html";
+    }
+
+  } catch (e) {
+    document.body.innerHTML = `
+      <h2>❌ Erro ao autenticar</h2>
+      <p>Por favor, tente novamente.</p>
+      <a href="index.html">Voltar</a>
+    `;
+    console.error(e);
   }
 </script>
 
