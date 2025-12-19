@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Autenticando...</title>
+  <meta charset="UTF-8" />
+  <title>Autenticando — Sistema Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
 <body>
-<p>🔐 Finalizando autenticação, aguarde...</p>
+  <p>🔐 Finalizando autenticação, aguarde...</p>
 
-<script>
-try {
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const payload = params.get("user");
+  <script>
+    try {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const payload = params.get("user");
 
-  if (!payload) throw "Payload não recebido";
+      if (!payload) {
+        throw new Error("Payload ausente");
+      }
 
-  const usuario = JSON.parse(decodeURIComponent(payload));
+      const usuario = JSON.parse(decodeURIComponent(payload));
 
-  const usuarioFinal = {
-    nome: usuario.nome,
-    cid: usuario.id,
-    nivel: usuario.nivel
-  };
+      // 🔒 Estrutura ÚNICA usada no sistema inteiro
+      const usuarioFinal = {
+        nome: usuario.nome,
+        cid: usuario.id,
+        nivel: usuario.nivel || "cidadao"
+      };
 
-  localStorage.setItem("usuario", JSON.stringify(usuarioFinal));
+      localStorage.setItem("usuario", JSON.stringify(usuarioFinal));
 
-  if (usuarioFinal.nivel === "cidadao") {
-    location.href = "tickets.html";
-  } else {
-    location.href = "staff/dashboard.html";
-  }
+      // 🔁 Redirecionamento por nível
+      if (usuarioFinal.nivel === "staff" || usuarioFinal.nivel === "coordenacao") {
+        window.location.href = "staff/dashboard.html";
+      } else {
+        window.location.href = "tickets.html";
+      }
 
-} catch (e) {
-  console.error("Erro auth:", e);
-  localStorage.clear();
-  location.href = "index.html";
-}
-</script>
+    } catch (e) {
+      console.error("Erro de autenticação:", e);
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>
