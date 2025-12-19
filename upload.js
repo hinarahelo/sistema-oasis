@@ -1,26 +1,39 @@
+/**
+ * Upload de arquivo via Cloudinary (Unsigned)
+ * SITE OASIS
+ */
 export async function enviarArquivo(ticketId, file) {
   if (!file) return null;
 
-  const cloudName = "dnd90frw";
-  const uploadPreset = "oasis_upload";
+  const CLOUD_NAME = "dnd90frw";
+  const UPLOAD_PRESET = "oasis_upload"; // precisa existir e ser UNSIGNED
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", uploadPreset);
+  formData.append("upload_preset", UPLOAD_PRESET);
   formData.append("folder", `tickets/${ticketId}`);
 
-  const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
-    {
-      method: "POST",
-      body: formData
-    }
-  );
+  let response;
+  try {
+    response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+  } catch (e) {
+    console.error("Erro de rede Cloudinary:", e);
+    alert("Erro de conexão ao enviar arquivo.");
+    return null;
+  }
 
   const data = await response.json();
 
   if (!data.secure_url) {
-    throw new Error("Falha no upload");
+    console.error("Resposta Cloudinary:", data);
+    alert("Falha no upload do arquivo.");
+    return null;
   }
 
   return {
