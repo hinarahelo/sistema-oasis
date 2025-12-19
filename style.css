@@ -1,4 +1,4 @@
-/* ================= RESET BÁSICO ================= */
+/* ================= RESET ================= */
 * {
   box-sizing: border-box;
 }
@@ -19,15 +19,27 @@ body {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 25px 30px;
+  padding: 24px 30px;
   background: #f8f4ee;
   border-bottom: 3px solid #d4af37;
 }
 
 .header.small {
-  padding: 20px 30px;
+  padding: 18px 30px;
 }
 
+.header h1,
+.header h2 {
+  margin: 0;
+  color: #5b0f0f;
+}
+
+.header span {
+  font-size: 13px;
+  color: #444;
+}
+
+/* ================= LOGOS ================= */
 .logo {
   width: 70px;
 }
@@ -39,18 +51,6 @@ body {
 .logo-grande {
   width: 140px;
   margin-bottom: 15px;
-}
-
-.header-text h1 {
-  margin: 0;
-  color: #5b0f0f;
-  font-size: 22px;
-  letter-spacing: 0.5px;
-}
-
-.header-text span {
-  font-size: 13px;
-  color: #444;
 }
 
 /* ================= NAVBAR ================= */
@@ -101,7 +101,7 @@ body {
   font-size: 14px;
 }
 
-/* ================= SOLICITAÇÕES (NOVA ORGANIZAÇÃO) ================= */
+/* ================= SOLICITAÇÕES (CIDADÃO) ================= */
 .solicitacoes-clean {
   background: #f8f4ee;
   padding: 30px;
@@ -158,16 +158,62 @@ body {
   background: #8c1d1d;
 }
 
-/* ================= ANDAMENTO ================= */
-.section-desc {
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
+/* ================= LISTAS / CARDS ================= */
 .card-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.price-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 18px;
+  border: 1px solid #d4af37;
+}
+
+.price-card b {
+  color: #5b0f0f;
+}
+
+.price-card h3 {
+  margin-top: 0;
+  color: #5b0f0f;
+}
+
+.price-card h4 {
+  margin-top: 15px;
+  color: #6b0f0f;
+}
+
+.price-card ul {
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.price-card li {
+  margin-bottom: 6px;
+}
+
+/* ================= BOTÕES DE AÇÃO ================= */
+.price-card button {
+  margin-top: 12px;
+  background: #7a1c1c;
+  color: #fff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.price-card button:hover {
+  background: #9a2a2a;
+}
+
+/* ================= ANDAMENTO ================= */
+.section-desc {
+  font-size: 14px;
+  margin-bottom: 20px;
 }
 
 /* ================= CHAT ================= */
@@ -175,7 +221,7 @@ body {
   background: #ffffff;
   border-radius: 14px;
   padding: 15px;
-  height: 300px;
+  height: 320px;
   overflow-y: auto;
   border: 1px solid #d4af37;
   margin-bottom: 15px;
@@ -212,40 +258,19 @@ body {
   background: #999 !important;
 }
 
-/* ================= PREÇOS / SERVIÇOS ================= */
-.price-card {
-  background: #ffffff;
-  padding: 25px;
-  margin-bottom: 25px;
-  border-radius: 18px;
-  border: 1px solid #d4af37;
-}
-
-.price-card h3 {
-  margin-top: 0;
-  color: #5b0f0f;
-}
-
-.price-card h4 {
-  margin-top: 15px;
-  color: #6b0f0f;
-}
-
-.price-card ul {
-  padding-left: 20px;
-  font-size: 14px;
-}
-
-.price-card li {
-  margin-bottom: 6px;
-}
-
-.sub-list {
-  margin-top: 10px;
+/* ================= PAINEL STAFF / COORD ================= */
+#listaTickets,
+#listaProcessos,
+#listaCoord,
+#lista-tickets,
+#lista-logs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 /* ================= RESPONSIVO ================= */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .header {
     flex-direction: column;
     text-align: center;
