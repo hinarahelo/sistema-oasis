@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Autenticação</title>
+  <meta charset="UTF-8" />
+  <title>Autenticação Discord</title>
 </head>
 <body>
-  <h2>Processando autenticação...</h2>
+  <h3>Processando autenticação…</h3>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
     if (!code) {
-      document.body.innerHTML = "<h3>Falha na autenticação.</h3>";
+      document.body.innerHTML = "<h3>Erro na autenticação.</h3>";
     } else {
-      // Encaminha para seu backend (mantido)
       window.location.href =
-        "https://13b4a7c8-ef9d-497c-9f6b-481e6dcfaa0b-00-2noz7t8kac8b2.riker.replit.dev/callback?code=" + code;
+        "https://13b4a7c8-ef9d-497c-9f6b-481e6dcfaa0b-00-2noz7t8kac8b2.riker.replit.dev/callback?code=" +
+        code;
     }
   </script>
 </body>
