@@ -1,7 +1,3 @@
-/**
- * Upload de arquivos via Cloudinary (FREE)
- * SITE OASIS
- */
 export async function enviarArquivo(ticketId, file) {
   if (!file) return null;
 
@@ -24,8 +20,7 @@ export async function enviarArquivo(ticketId, file) {
   const data = await response.json();
 
   if (!data.secure_url) {
-    console.error("Erro Cloudinary:", data);
-    throw new Error("Upload falhou");
+    throw new Error("Falha no upload");
   }
 
   return {
