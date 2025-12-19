@@ -25,57 +25,25 @@
       padding: 40px 30px;
       border: 2px solid #d4af37;
       box-shadow: 0 25px 60px rgba(0,0,0,.4);
+      text-align: center;
     }
 
     .logo {
       width: 150px;
-      display: block;
-      margin: 0 auto 20px;
+      margin-bottom: 20px;
     }
 
     h1 {
-      text-align: center;
       font-size: 22px;
       color: #5b0f0f;
-      margin-bottom: 10px;
       letter-spacing: 1px;
     }
 
     p {
-      text-align: center;
       font-size: 14px;
       color: #333;
       line-height: 1.6;
-      margin-bottom: 25px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .tabs button {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      background: #6b0f0f;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .tabs button.active {
-      background: #8c1d1d;
-    }
-
-    .aba {
-      display: none;
-    }
-
-    .aba.active {
-      display: block;
+      margin: 18px 0 28px;
     }
 
     .btn {
@@ -88,21 +56,15 @@
       font-size: 15px;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 10px;
+      margin-bottom: 12px;
     }
 
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 10px;
-      border-left: 4px solid #6b0f0f;
-      font-size: 13px;
+    .btn:hover {
+      background: #8c1d1d;
     }
 
     .footer {
-      text-align: center;
-      margin-top: 25px;
+      margin-top: 20px;
       font-size: 11px;
       color: #555;
       letter-spacing: .4px;
@@ -116,57 +78,30 @@
   <img src="logo-oasis.png" class="logo">
 
   <h1>SUPREMO TRIBUNAL DE OASIS ⚖️</h1>
-  <p id="textoBoasVindas"></p>
+  <p id="texto"></p>
 
-  <div class="tabs">
-    <button class="active" onclick="mostrarAba('principal')">
-      🏛️ Acesso
-    </button>
-    <button onclick="mostrarAba('abertas')">
-      📂 Solicitações Abertas
-    </button>
-  </div>
-
-  <!-- ABA PRINCIPAL -->
-  <div id="principal" class="aba active">
-    <button class="btn" id="btnAcessar"></button>
-  </div>
-
-  <!-- ABA SOLICITAÇÕES -->
-  <div id="abertas" class="aba">
-    <div id="listaAbertas"></div>
-  </div>
+  <button class="btn" id="btnPrincipal"></button>
 
   <div class="footer">
     Sistema institucional • acesso monitorado
   </div>
 </div>
 
-<script type="module">
-  import {
-    getFirestore,
-    collection,
-    query,
-    where,
-    onSnapshot
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  import { app } from "./firebase.js";
-
-  const db = getFirestore(app);
-
+<script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario) location.href = "index.html";
 
-  const texto = document.getElementById("textoBoasVindas");
-  const btn = document.getElementById("btnAcessar");
-  const lista = document.getElementById("listaAbertas");
+  if (!usuario || !usuario.nivel) {
+    location.href = "index.html";
+  }
+
+  const texto = document.getElementById("texto");
+  const btn = document.getElementById("btnPrincipal");
 
   if (usuario.nivel === "cidadao") {
     texto.innerText =
       `Bem-vindo(a), ${usuario.nome}.
-       Utilize o portal oficial do Supremo Tribunal de Oasis para acompanhar e abrir solicitações.`;
-    btn.innerText = "➕ Abrir nova solicitação";
+       Utilize o portal oficial do Supremo Tribunal de Oasis para abrir e acompanhar solicitações.`;
+    btn.innerText = "📂 Acessar minhas solicitações";
     btn.onclick = () => location.href = "tickets.html";
   }
 
@@ -174,7 +109,7 @@
     texto.innerText =
       `Bem-vindo(a), ${usuario.nome}.
        Você está acessando o painel jurídico institucional.`;
-    btn.innerText = "⚖️ Ir para painel jurídico";
+    btn.innerText = "⚖️ Ir para o painel jurídico";
     btn.onclick = () => location.href = "staff/dashboard.html";
   }
 
@@ -182,54 +117,9 @@
     texto.innerText =
       `Bem-vindo(a), ${usuario.nome}.
        Painel administrativo do Supremo Tribunal de Oasis.`;
-    btn.innerText = "👑 Painel da coordenação";
+    btn.innerText = "👑 Ir para o painel da coordenação";
     btn.onclick = () => location.href = "staff/coordenacao.html";
   }
-
-  /* SOLICITAÇÕES ABERTAS */
-  let q;
-
-  if (usuario.nivel === "cidadao") {
-    q = query(
-      collection(db, "tickets"),
-      where("cid", "==", usuario.cid),
-      where("status", "!=", "encerrado")
-    );
-  } else {
-    q = query(
-      collection(db, "tickets"),
-      where("status", "!=", "encerrado")
-    );
-  }
-
-  onSnapshot(q, snap => {
-    lista.innerHTML = "";
-    if (snap.empty) {
-      lista.innerHTML = "<p>Nenhuma solicitação em andamento.</p>";
-      return;
-    }
-
-    snap.forEach(d => {
-      const t = d.data();
-      lista.innerHTML += `
-        <div class="card">
-          <b>${t.categoria}</b><br>
-          ${t.nome || ""}<br>
-          Status: ${t.status}
-        </div>
-      `;
-    });
-  });
-
-  window.mostrarAba = id => {
-    document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-
-    document.querySelectorAll(".tabs button")
-      .forEach(b => b.classList.remove("active"));
-
-    event.target.classList.add("active");
-  };
 </script>
 
 </body>
