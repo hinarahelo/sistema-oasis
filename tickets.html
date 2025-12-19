@@ -27,10 +27,10 @@
 
 <!-- ================= NAVBAR ================= -->
 <nav class="nav-bar official">
-  <button onclick="irAba('solicitacoes')">📂 Solicitações</button>
-  <button onclick="irAba('andamento')">🕒 Em andamento</button>
-  <button onclick="irAba('precos')">💰 Tabela de Serviços</button>
-  <button onclick="sair()">🚪 Encerrar Sessão</button>
+  <button type="button" onclick="irAba('solicitacoes')">📂 Solicitações</button>
+  <button type="button" onclick="irAba('andamento')">🕒 Em andamento</button>
+  <button type="button" onclick="irAba('precos')">💰 Tabela de Serviços</button>
+  <button type="button" onclick="sair()">🚪 Encerrar Sessão</button>
 </nav>
 
 <!-- ================= CONTEÚDO ================= -->
@@ -49,11 +49,11 @@
     <div class="bloco-servicos">
       <h3>💍 Serviços Civis</h3>
       <div class="grid-servicos">
-        <button onclick="abrirCategoria('Casamento')">💍 Casamento</button>
-        <button onclick="abrirCategoria('Divórcio')">💔 Divórcio</button>
-        <button onclick="abrirCategoria('Nascimento')">👼 Nascimento</button>
-        <button onclick="abrirCategoria('Adoção')">👶 Adoção</button>
-        <button onclick="abrirCategoria('Troca de Nome')">📜 Troca de Nome</button>
+        <button type="button" onclick="abrirCategoria('Casamento')">💍 Casamento</button>
+        <button type="button" onclick="abrirCategoria('Divórcio')">💔 Divórcio</button>
+        <button type="button" onclick="abrirCategoria('Nascimento')">👼 Nascimento</button>
+        <button type="button" onclick="abrirCategoria('Adoção')">👶 Adoção</button>
+        <button type="button" onclick="abrirCategoria('Troca de Nome')">📜 Troca de Nome</button>
       </div>
     </div>
 
@@ -61,20 +61,20 @@
     <div class="bloco-servicos">
       <h3>⚖️ Serviços Jurídicos</h3>
       <div class="grid-servicos">
-        <button onclick="abrirCategoria('Porte de Arma')">🔫 Porte de Arma</button>
-        <button onclick="abrirCategoria('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
-        <button onclick="abrirCategoria('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+        <button type="button" onclick="abrirCategoria('Porte de Arma')">🔫 Porte de Arma</button>
+        <button type="button" onclick="abrirCategoria('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
+        <button type="button" onclick="abrirCategoria('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
       </div>
     </div>
 
-    <!-- ADMINISTRATIVOS (permitidos apenas como solicitação, não como painel) -->
+    <!-- DEMANDAS ADMINISTRATIVAS -->
     <div class="bloco-servicos">
       <h3>🏛️ Demandas Administrativas</h3>
       <div class="grid-servicos">
-        <button onclick="abrirCategoria('Denúncia')">⚠ Denúncia</button>
-        <button onclick="abrirCategoria('Falar com o Juiz')">⚖️ Falar com o Juiz</button>
-        <button onclick="abrirCategoria('Processos')">📁 Processos</button>
-        <button onclick="abrirCategoria('Suporte')">🛠 Suporte</button>
+        <button type="button" onclick="abrirCategoria('Denúncia')">⚠ Denúncia</button>
+        <button type="button" onclick="abrirCategoria('Falar com o Juiz')">⚖️ Falar com o Juiz</button>
+        <button type="button" onclick="abrirCategoria('Processos')">📁 Processos</button>
+        <button type="button" onclick="abrirCategoria('Suporte')">🛠 Suporte</button>
       </div>
     </div>
 
@@ -87,12 +87,10 @@
       Selecione uma categoria para visualizar seus atendimentos ativos.
     </p>
 
-    <!-- CATEGORIAS -->
     <div id="categoriasTickets" class="categoria-grid"></div>
 
-    <!-- LISTA POR CATEGORIA -->
     <div id="listaPorCategoria" class="lista-categoria hidden">
-      <button class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
+      <button type="button" class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
       <h3 id="tituloCategoria"></h3>
       <div id="ticketsCategoria" class="card-list official"></div>
     </div>
@@ -106,8 +104,8 @@
     <div class="chat-input official">
       <input id="mensagem" placeholder="Digite sua mensagem..." />
       <input type="file" id="arquivo" />
-      <button onclick="enviarMensagem()">Enviar</button>
-      <button class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
+      <button type="button" onclick="enviarMensagem()">Enviar</button>
+      <button type="button" class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
     </div>
   </section>
 
