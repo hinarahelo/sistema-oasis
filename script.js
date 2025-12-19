@@ -15,7 +15,6 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔁 ALTERAÇÃO ÚNICA: agora usa Cloudinary */
 import { enviarArquivo } from "./upload.js";
 import { notificarDiscord } from "./discord.js";
 
@@ -45,9 +44,10 @@ let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
 let typingTimeout = null;
+let arquivoSelecionado = null;
 
 /* ======================================================
-   ABAS (ORIGINAL)
+   ABAS
 ====================================================== */
 window.mostrarAba = id => {
   document.querySelectorAll(".aba").forEach(a =>
@@ -62,7 +62,7 @@ window.mostrarAba = id => {
 };
 
 /* ======================================================
-   HASH INICIAL (ORIGINAL)
+   HASH INICIAL
 ====================================================== */
 const hash = location.hash.replace("#", "");
 mostrarAba(hash || "solicitacoes");
@@ -158,9 +158,7 @@ function carregarTicketsEmAndamento() {
   });
 }
 
-window.voltarCategorias = () => {
-  carregarTicketsEmAndamento();
-};
+window.voltarCategorias = () => carregarTicketsEmAndamento();
 
 /* ======================================================
    📂 ABRIR / CRIAR TICKET
@@ -209,7 +207,6 @@ function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
   const btnEnviar = document.querySelector(".chat-input button");
-  const digitandoBox = document.getElementById("digitando");
 
   box.innerHTML = "";
 
@@ -267,56 +264,43 @@ function iniciarChat() {
       box.scrollTop = box.scrollHeight;
     }
   );
-
-  input.oninput = () => {
-    setDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid), {
-      nome: usuario.nome,
-      nivel: usuario.nivel,
-      em: serverTimestamp()
-    });
-
-    clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(() => {
-      updateDoc(
-        doc(db, "tickets", ticketAtual, "digitando", usuario.cid),
-        { em: null }
-      );
-    }, 2000);
-  };
-
-  onSnapshot(
-    collection(db, "tickets", ticketAtual, "digitando"),
-    snap => {
-      digitandoBox.innerHTML = "";
-      snap.forEach(d => {
-        const t = d.data();
-        if (t.nome && t.nome !== usuario.nome) {
-          digitandoBox.innerHTML = `🟢 ${t.nome} está digitando...`;
-        }
-      });
-    }
-  );
 }
 
 /* ======================================================
-   📤 ENVIAR MENSAGEM / ARQUIVO (CORRIGIDO)
+   📎 ARQUIVO — SELEÇÃO / REMOÇÃO
+====================================================== */
+const inputArquivo = document.getElementById("arquivo");
+
+inputArquivo.addEventListener("change", e => {
+  arquivoSelecionado = e.target.files[0];
+  if (!arquivoSelecionado) return;
+
+  document.getElementById("arquivoNome").innerText = arquivoSelecionado.name;
+  document.getElementById("arquivoPreview").style.display = "block";
+});
+
+window.removerArquivo = () => {
+  arquivoSelecionado = null;
+  inputArquivo.value = "";
+  document.getElementById("arquivoPreview").style.display = "none";
+};
+
+/* ======================================================
+   📤 ENVIAR MENSAGEM / ARQUIVO
 ====================================================== */
 window.enviarMensagem = async () => {
   const texto = document.getElementById("mensagem").value.trim();
-  const fileInput = document.getElementById("arquivo");
-  const file = fileInput.files[0];
 
-  if (!texto && !file) {
+  if (!texto && !arquivoSelecionado) {
     alert("Mensagem ou anexo obrigatório.");
     return;
   }
 
   let anexo = null;
 
-  if (file) {
-    /* 🔁 ALTERAÇÃO ÚNICA AQUI */
-    anexo = await enviarArquivo(ticketAtual, file);
-    fileInput.value = "";
+  if (arquivoSelecionado) {
+    anexo = await enviarArquivo(ticketAtual, arquivoSelecionado);
+    removerArquivo();
   }
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
