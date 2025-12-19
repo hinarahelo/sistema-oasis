@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Staff • Tribunal de Justiça de Oasis</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body class="bg-paper">
+
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || usuario.nivel !== "staff") {
+    location.href = "../index.html";
+  }
+</script>
+
+<header class="header small official">
+  <img src="../logo-oasis.png" class="logo small">
+  <div>
+    <h1>Tribunal de Justiça de Oasis</h1>
+    <span>Painel Administrativo • Staff</span>
+  </div>
+</header>
+
+<nav class="nav-bar">
+  <button onclick="mostrarAba('abertos')">📂 Abertos</button>
+  <button onclick="mostrarAba('fechados')">🧾 Fechados</button>
+  <button onclick="location.href='dashboard.html'">📊 SLA</button>
+  <button onclick="sair()">🚪 Sair</button>
+</nav>
+
+<main class="content">
+
+<section id="abertos" class="aba active">
+  <h2>📂 Tickets Abertos</h2>
+  <div id="lista-abertos" class="card-list"></div>
+</section>
+
+<section id="fechados" class="aba">
+  <h2>🧾 Tickets Fechados</h2>
+  <div id="lista-fechados" class="card-list"></div>
+</section>
+
+</main>
+
+<script type="module" src="staff.js"></script>
+</body>
+</html>
