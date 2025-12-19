@@ -8,9 +8,11 @@ import {
   getDocs,
   onSnapshot,
   serverTimestamp,
+  updateDoc,
   doc,
   getDoc,
-  orderBy
+  orderBy,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { notificarDiscord } from "./discord.js";
@@ -40,18 +42,22 @@ if (!usuario || usuario.nivel !== "cidadao") {
 let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
-
+let typingTimeout = null;
 let arquivoSelecionado = null;
-let enviando = false;
 
 /* ======================================================
    ABAS
 ====================================================== */
 window.mostrarAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.querySelectorAll(".aba").forEach(a =>
+    a.classList.remove("active")
+  );
+
   document.getElementById(id)?.classList.add("active");
 
-  if (id === "andamento") carregarTicketsEmAndamento();
+  if (id === "andamento") {
+    carregarTicketsEmAndamento();
+  }
 };
 
 const hash = location.hash.replace("#", "");
@@ -178,6 +184,7 @@ window.abrirCategoria = async categoria => {
     });
 
     ticketAtual = ref.id;
+
     await registrarLog("Ticket criado");
 
     await notificarDiscord(
@@ -190,7 +197,7 @@ window.abrirCategoria = async categoria => {
 };
 
 /* ======================================================
-   💬 CHAT — HTML ALINHADO AO CSS
+   💬 CHAT
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
@@ -206,6 +213,10 @@ function iniciarChat() {
     const t = snap.data();
     input.disabled = t.status === "encerrado";
     btnEnviar.disabled = t.status === "encerrado";
+    input.placeholder =
+      t.status === "encerrado"
+        ? "🔒 Ticket encerrado"
+        : "Digite sua mensagem...";
   });
 
   unsubscribeMensagens = onSnapshot(
@@ -220,8 +231,17 @@ function iniciarChat() {
         const m = d.data();
 
         let tipo = "cidadao";
-        if (m.autor?.includes("juridico")) tipo = "juridico";
-        if (m.autor?.includes("coordenacao")) tipo = "coordenacao";
+        let classeNome = "nome-cidadao";
+
+        if (m.autor?.includes("juridico")) {
+          tipo = "juridico";
+          classeNome = "nome-juridico";
+        }
+
+        if (m.autor?.includes("coordenacao")) {
+          tipo = "coordenacao";
+          classeNome = "nome-coordenacao";
+        }
 
         const dataHora = m.criadoEm
           ? m.criadoEm.toDate().toLocaleString("pt-BR", {
@@ -237,9 +257,13 @@ function iniciarChat() {
         box.innerHTML += `
           <div class="mensagem ${tipo}">
             <div class="conteudo">
-              <span class="autor">${m.autor}</span>
+              <span class="autor ${classeNome}">${m.autor}</span><br>
               ${m.texto || ""}
-              ${m.anexo ? `<div class="anexo">📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></div>` : ""}
+              ${
+                m.anexo
+                  ? `<div class="anexo">📎 <a href="${m.anexo.url}" target="_blank">${m.anexo.nome}</a></div>`
+                  : ""
+              }
             </div>
             <div class="hora">${dataHora}</div>
           </div>
@@ -252,12 +276,12 @@ function iniciarChat() {
 }
 
 /* ======================================================
-   📎 ARQUIVO
+   📎 ARQUIVO — SELEÇÃO / REMOVER
 ====================================================== */
 const fileInput = document.getElementById("arquivo");
 
 fileInput.addEventListener("change", () => {
-  arquivoSelecionado = fileInput.files[0] || null;
+  arquivoSelecionado = fileInput.files[0];
   document.getElementById("arquivoPreview")?.remove();
 
   if (arquivoSelecionado) {
@@ -287,54 +311,51 @@ async function uploadCloudinary(file) {
 
   const res = await fetch(
     "https://api.cloudinary.com/v1_1/dnd90frwv/auto/upload",
-    { method: "POST", body: formData }
+    {
+      method: "POST",
+      body: formData
+    }
   );
 
   const data = await res.json();
-  return { nome: file.name, url: data.secure_url };
+
+  return {
+    nome: file.name,
+    url: data.secure_url
+  };
 }
 
 /* ======================================================
-   📤 ENVIAR
+   📤 ENVIAR MENSAGEM
 ====================================================== */
 window.enviarMensagem = async () => {
-  if (enviando) return;
-  enviando = true;
+  const texto = document.getElementById("mensagem").value.trim();
 
-  const btn = document.querySelector(".chat-input button");
-  btn.disabled = true;
-  btn.innerText = "Enviando...";
-
-  try {
-    const texto = document.getElementById("mensagem").value.trim();
-
-    if (!texto && !arquivoSelecionado) {
-      alert("Mensagem ou anexo obrigatório.");
-      return;
-    }
-
-    let anexo = null;
-    if (arquivoSelecionado) {
-      anexo = await uploadCloudinary(arquivoSelecionado);
-      removerArquivo();
-    }
-
-    await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-      autor: `${usuario.nome} (${usuario.nivel})`,
-      texto,
-      anexo,
-      criadoEm: serverTimestamp()
-    });
-
-    await registrarLog("Mensagem enviada");
-    document.getElementById("mensagem").value = "";
-
-  } catch (e) {
-    alert("Erro ao enviar mensagem.");
-    console.error(e);
-  } finally {
-    enviando = false;
-    btn.disabled = false;
-    btn.innerText = "Enviar";
+  if (!texto && !arquivoSelecionado) {
+    alert("Mensagem ou anexo obrigatório.");
+    return;
   }
+
+  const ticketSnap = await getDoc(doc(db, "tickets", ticketAtual));
+  if (ticketSnap.data().status === "encerrado") {
+    alert("Este ticket está encerrado.");
+    return;
+  }
+
+  let anexo = null;
+  if (arquivoSelecionado) {
+    anexo = await uploadCloudinary(arquivoSelecionado);
+    removerArquivo();
+  }
+
+  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
+    autor: `${usuario.nome} (${usuario.nivel})`,
+    texto,
+    anexo,
+    criadoEm: serverTimestamp()
+  });
+
+  await registrarLog("Mensagem enviada");
+
+  document.getElementById("mensagem").value = "";
 };
