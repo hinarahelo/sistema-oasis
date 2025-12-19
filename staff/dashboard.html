@@ -2,36 +2,41 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard • Oasis</title>
+  <title>Dashboard • Tribunal de Justiça de Oasis</title>
   <link rel="stylesheet" href="../style.css">
   <style>
-    .sla-ok { color:#2e7d32; }
-    .sla-alerta { color:#f9a825; }
-    .sla-estourado { color:#c62828; }
+    .sla-ok { color: #2e7d32; }
+    .sla-alerta { color: #f9a825; }
+    .sla-estourado { color: #c62828; }
   </style>
 </head>
-<body class="dark">
+
+<body class="bg-paper">
 
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || (usuario.nivel !== "juridico" && usuario.nivel !== "coordenacao")) {
+  if (!usuario || usuario.nivel !== "staff") {
     location.href = "../index.html";
   }
 </script>
 
-<div class="layout">
-  <aside class="sidebar">
-    <h2>👮 Staff</h2>
-    <button onclick="abrirAba('tickets')">🎫 Tickets</button>
-  </aside>
+<header class="header small official">
+  <img src="../logo-oasis.png" class="logo small">
+  <div>
+    <h1>Tribunal de Justiça de Oasis</h1>
+    <span>Dashboard de SLA</span>
+  </div>
+</header>
 
-  <main class="content">
-    <section id="tickets" class="aba active">
-      <h2>🎫 Tickets com SLA</h2>
-      <div id="lista-tickets"></div>
-    </section>
-  </main>
-</div>
+<nav class="nav-bar">
+  <button onclick="location.href='staff.html'">⬅ Voltar</button>
+  <button onclick="sair()">🚪 Sair</button>
+</nav>
+
+<main class="content">
+  <h2>📊 Monitoramento de Tickets</h2>
+  <div id="lista-tickets" class="card-list"></div>
+</main>
 
 <script type="module" src="staff.js"></script>
 </body>
