@@ -13,8 +13,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { enviarArquivo } from "./storage.js";
+import { notificarDiscord } from "./discord.js";
 
-/* 🔥 FIREBASE */
+/* 🔥 Firebase */
 const app = initializeApp({
   apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
   authDomain: "sistema-oasis-75979.firebaseapp.com",
@@ -22,7 +23,7 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-/* 🔐 USUÁRIO */
+/* 🔐 Usuário */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario) location.href = "index.html";
 
@@ -42,7 +43,7 @@ window.sair = () => {
   location.href = "index.html";
 };
 
-/* ABRIR CATEGORIA */
+/* ABRIR / CRIAR */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
   document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
@@ -66,14 +67,20 @@ window.abrirCategoria = async categoria => {
       status: "aberto",
       criadoEm: serverTimestamp()
     });
+
     ticketAtual = ref.id;
+
+    await notificarDiscord(
+      `📩 NOVO TICKET\nCategoria: ${categoria}\nCidadão: ${usuario.nome}`,
+      "WEBHOOK_JURIDICO_AQUI"
+    );
   }
 
-  iniciarChat(false);
+  iniciarChat();
 };
 
 /* CHAT */
-function iniciarChat(somenteLeitura = false) {
+function iniciarChat() {
   const box = document.getElementById("mensagens");
   box.innerHTML = "";
 
@@ -93,18 +100,15 @@ function iniciarChat(somenteLeitura = false) {
       box.scrollTop = box.scrollHeight;
     }
   );
-
-  document.getElementById("mensagem").disabled = somenteLeitura;
 }
 
 /* ENVIAR */
 window.enviarMensagem = async () => {
   const texto = mensagem.value.trim();
-  const file = document.getElementById("arquivo")?.files[0];
+  const file = arquivo?.files[0];
 
-  if (!ticketAtual) return;
   if (!texto && !file) {
-    alert("É obrigatório enviar mensagem ou anexo.");
+    alert("Mensagem ou anexo obrigatório.");
     return;
   }
 
@@ -118,35 +122,12 @@ window.enviarMensagem = async () => {
     criadoEm: serverTimestamp()
   });
 
-  await updateDoc(doc(db, "tickets", ticketAtual), {
-    status: "em_atendimento"
-  });
+  await notificarDiscord(
+    `💬 NOVA RESPOSTA\nTicket: ${ticketAtual}\nPor: ${usuario.nome}`,
+    "WEBHOOK_STAFF_AQUI"
+  );
 
   mensagem.value = "";
 };
 
-/* HISTÓRICO */
-async function carregarHistorico() {
-  const lista = document.getElementById("listaTickets");
-  if (!lista) return;
-
-  const q = query(collection(db, "tickets"), where("cid", "==", usuario.cid));
-  const snap = await getDocs(q);
-
-  lista.innerHTML = "";
-  snap.forEach(d => {
-    const t = d.data();
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `<b>${t.categoria}</b><br>Status: ${t.status}`;
-    div.onclick = () => {
-      ticketAtual = d.id;
-      mostrarAba("chat");
-      iniciarChat(t.status === "fechado");
-    };
-    lista.appendChild(div);
-  });
-}
-
-carregarHistorico();
 mostrarAba("solicitacoes");
