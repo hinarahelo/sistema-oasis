@@ -2,40 +2,52 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard • Tribunal de Justiça de Oasis</title>
+  <title>Painel Staff — Tribunal de Justiça de Oasis</title>
   <link rel="stylesheet" href="../style.css">
-  <style>
-    .sla-ok { color: #2e7d32; }
-    .sla-alerta { color: #f9a825; }
-    .sla-estourado { color: #c62828; }
-  </style>
 </head>
 
 <body class="bg-paper">
-
-<script>
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "staff") {
-    location.href = "../index.html";
-  }
-</script>
 
 <header class="header small official">
   <img src="../logo-oasis.png" class="logo small">
   <div>
     <h1>Tribunal de Justiça de Oasis</h1>
-    <span>Dashboard de SLA</span>
+    <span>Painel Administrativo • Staff</span>
   </div>
 </header>
 
-<nav class="nav-bar">
-  <button onclick="location.href='staff.html'">⬅ Voltar</button>
+<nav class="nav-bar official">
+  <button onclick="mostrarAba('lista')">🎫 Tickets</button>
   <button onclick="sair()">🚪 Sair</button>
 </nav>
 
-<main class="content">
-  <h2>📊 Monitoramento de Tickets</h2>
-  <div id="lista-tickets" class="card-list"></div>
+<main class="content official">
+
+<!-- LISTA -->
+<section id="lista" class="aba active">
+  <h2>🎫 Tickets Abertos</h2>
+  <div id="listaTickets" class="card-list"></div>
+</section>
+
+<!-- CHAT -->
+<section id="chat" class="aba">
+  <h2 id="chatTitulo">💬 Atendimento</h2>
+
+  <div id="mensagens" class="chat-box official"></div>
+
+  <div class="chat-input official">
+    <input id="mensagem" placeholder="Resposta oficial da staff..." />
+    <button onclick="enviarMensagemStaff()">Responder</button>
+  </div>
+
+  <div style="margin-top:10px; display:flex; gap:10px;">
+    <button onclick="alterarStatus('em_atendimento')">🟡 Em atendimento</button>
+    <button onclick="alterarStatus('aguardando_cidadao')">⏳ Aguardando cidadão</button>
+    <button onclick="alterarStatus('fechado')">🔒 Fechar ticket</button>
+    <button class="btn-secondary" onclick="mostrarAba('lista')">⬅ Voltar</button>
+  </div>
+</section>
+
 </main>
 
 <script type="module" src="staff.js"></script>
