@@ -1,5 +1,5 @@
 /**
- * Upload de arquivos via Cloudinary (PLANO FREE)
+ * Upload de arquivos via Cloudinary (FREE)
  * SITE OASIS
  */
 export async function enviarArquivo(ticketId, file) {
