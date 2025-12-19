@@ -73,8 +73,12 @@ async function registrarLog(acao) {
 
 /* ================= EM ANDAMENTO ================= */
 function carregarTicketsEmAndamento() {
-  const lista = document.getElementById("listaTickets");
-  lista.innerHTML = "";
+  const grid = document.getElementById("categoriasTickets");
+  const listaCategoria = document.getElementById("listaPorCategoria");
+  const ticketsBox = document.getElementById("ticketsCategoria");
+
+  grid.innerHTML = "";
+  listaCategoria.classList.add("hidden");
 
   const q = query(
     collection(db, "tickets"),
@@ -83,35 +87,62 @@ function carregarTicketsEmAndamento() {
   );
 
   onSnapshot(q, snap => {
-    lista.innerHTML = "";
-
-    if (snap.empty) {
-      lista.innerHTML = "<p>Nenhum ticket em andamento.</p>";
-      return;
-    }
+    const categorias = {};
 
     snap.forEach(d => {
       const t = d.data();
+      if (!categorias[t.categoria]) categorias[t.categoria] = [];
+      categorias[t.categoria].push({ id: d.id, ...t });
+    });
 
+    grid.innerHTML = "";
+
+    if (Object.keys(categorias).length === 0) {
+      grid.innerHTML = "<p>Nenhum ticket em andamento.</p>";
+      return;
+    }
+
+    Object.keys(categorias).forEach(cat => {
       const card = document.createElement("div");
-      card.className = "card-ticket official";
+      card.className = "categoria-card official";
       card.innerHTML = `
-        <h4>${t.categoria}</h4>
-        <p>Status: <b>Em andamento</b></p>
-        <small>${t.criadoEm?.toDate().toLocaleString("pt-BR")}</small>
+        <h4>${cat}</h4>
+        <span>${categorias[cat].length} em andamento</span>
       `;
 
       card.onclick = () => {
-        ticketAtual = d.id;
-        document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
-        mostrarAba("chat");
-        iniciarChat();
+        document.getElementById("tituloCategoria").innerText = cat;
+        grid.innerHTML = "";
+        listaCategoria.classList.remove("hidden");
+        ticketsBox.innerHTML = "";
+
+        categorias[cat].forEach(t => {
+          const item = document.createElement("div");
+          item.className = "card-ticket official";
+          item.innerHTML = `
+            <h5>${t.categoria}</h5>
+            <small>${t.criadoEm?.toDate().toLocaleString("pt-BR")}</small>
+          `;
+
+          item.onclick = () => {
+            ticketAtual = t.id;
+            document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
+            mostrarAba("chat");
+            iniciarChat();
+          };
+
+          ticketsBox.appendChild(item);
+        });
       };
 
-      lista.appendChild(card);
+      grid.appendChild(card);
     });
   });
 }
+
+window.voltarCategorias = () => {
+  carregarTicketsEmAndamento();
+};
 
 /* ================= ABRIR / CRIAR TICKET ================= */
 window.abrirCategoria = async categoria => {
