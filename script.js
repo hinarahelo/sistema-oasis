@@ -31,7 +31,7 @@ if (!usuario || usuario.nivel !== "cidadao") {
 }
 
 /* ======================================================
-   ESTADO
+   ESTADO GLOBAL
 ====================================================== */
 let ticketAtual = null;
 let unsubscribeMensagens = null;
@@ -39,11 +39,10 @@ let unsubscribeStatus = null;
 let arquivoSelecionado = null;
 
 /* ======================================================
-   DOM READY (🔥 CORREÇÃO CRÍTICA)
+   DOM READY
 ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= ABAS ================= */
   window.mostrarAba = id => {
     document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
     document.getElementById(id)?.classList.add("active");
@@ -181,28 +180,72 @@ function carregarTicketsEmAndamento() {
 window.voltarCategorias = () => carregarTicketsEmAndamento();
 
 /* ======================================================
-   💬 CHAT
+   💬 CHAT — COM CORES, DATA, HORA E PREVIEW
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
   box.innerHTML = "";
 
+  let ultimoAutor = null;
+  let ultimaData = null;
+
   unsubscribeMensagens?.();
   unsubscribeStatus?.();
 
   unsubscribeMensagens = onSnapshot(
-    query(collection(db, "tickets", ticketAtual, "mensagens"), orderBy("criadoEm")),
+    query(
+      collection(db, "tickets", ticketAtual, "mensagens"),
+      orderBy("criadoEm")
+    ),
     snap => {
       box.innerHTML = "";
+      ultimoAutor = null;
+      ultimaData = null;
+
       snap.forEach(d => {
         const m = d.data();
+        if (!m.criadoEm) return;
+
+        const dataObj = m.criadoEm.toDate();
+        const dataStr = dataObj.toLocaleDateString("pt-BR");
+        const horaStr = dataObj.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        if (dataStr !== ultimaData) {
+          box.innerHTML += `<div class="chat-data">${dataStr}</div>`;
+          ultimaData = dataStr;
+          ultimoAutor = null;
+        }
+
+        let tipo = "cidadao";
+        if (m.autor?.includes("juridico")) tipo = "juridico";
+        if (m.autor?.includes("coordenacao")) tipo = "coordenacao";
+
+        const mostrarAutor = m.autor !== ultimoAutor;
+
+        let anexoHtml = "";
+        if (m.anexo) {
+          if (m.anexo.tipo?.startsWith("image/")) {
+            anexoHtml = `<img src="${m.anexo.url}" style="max-width:220px;border-radius:10px;">`;
+          } else {
+            anexoHtml = `<a href="${m.anexo.url}" target="_blank">📎 ${m.anexo.nome}</a>`;
+          }
+        }
+
         box.innerHTML += `
-          <div class="mensagem">
-            <b>${m.autor}</b><br>
+          <div class="mensagem ${tipo}">
+            ${mostrarAutor ? `<span class="autor">${m.autor}</span>` : ""}
             ${m.texto || ""}
-            ${m.anexo ? `<br><a href="${m.anexo.url}" target="_blank">📎 ${m.anexo.nome}</a>` : ""}
-          </div>`;
+            ${anexoHtml}
+            <div class="hora">${horaStr}</div>
+          </div>
+        `;
+
+        ultimoAutor = m.autor;
       });
+
       box.scrollTop = box.scrollHeight;
     }
   );
@@ -216,8 +259,8 @@ window.enviarMensagem = async () => {
   if (!texto && !arquivoSelecionado) return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: `${usuario.nome} (cidadão)`,
-    texto,
+    autor: `${usuario.nome} (cidadao)`,
+    texto: texto || "",
     criadoEm: serverTimestamp()
   });
 
