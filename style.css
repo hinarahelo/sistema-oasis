@@ -68,10 +68,10 @@ body {
 }
 
 .header-text h1 {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: bold;
-  letter-spacing: 1px;
-  margin-bottom: 2px;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
 }
 
 .header-text span {
@@ -92,7 +92,7 @@ body {
    SIDEBAR (MENU À ESQUERDA)
 ====================================================== */
 .nav-bar.sidebar {
-  background: linear-gradient(to bottom, #3b0d0d, #2a0808);
+  background: linear-gradient(to bottom, #3b0d0d, #220606);
   padding: 26px 16px;
   display: flex;
   flex-direction: column;
@@ -114,7 +114,7 @@ body {
 
 .nav-bar.sidebar button:hover {
   transform: translateX(6px);
-  box-shadow: 0 8px 16px rgba(0,0,0,.35);
+  box-shadow: 0 8px 18px rgba(0,0,0,.4);
 }
 
 /* ======================================================
@@ -130,22 +130,28 @@ body {
   background: #fbf9f5;
   border: 2px solid #d4af37;
   border-radius: 22px;
-  padding: 36px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.08);
+  padding: 38px;
+  box-shadow: 0 14px 30px rgba(0,0,0,.08);
 }
 
 @keyframes fadeSlide {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .hidden { display: none !important; }
+
+.aba h2 {
+  font-size: 24px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 22px;
+}
 
 /* ======================================================
    SOLICITAÇÕES
@@ -176,11 +182,11 @@ body {
    EM ANDAMENTO
 ====================================================== */
 .categoria-grid {
-  max-width: 880px;
-  margin: 20px auto;
+  max-width: 900px;
+  margin: 24px auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  gap: 22px;
 }
 
 .categoria-card,
@@ -188,7 +194,7 @@ body {
   background: #fff;
   border: 2px solid #d4af37;
   border-radius: 20px;
-  padding: 18px;
+  padding: 20px;
   cursor: pointer;
   transition: all .25s ease;
   box-shadow: 0 6px 14px rgba(0,0,0,.12);
@@ -197,7 +203,7 @@ body {
 .categoria-card:hover,
 .card-ticket:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0,0,0,.25);
+  box-shadow: 0 14px 26px rgba(0,0,0,.25);
   background: #fffdf6;
 }
 
@@ -236,7 +242,7 @@ body {
 }
 
 .chat-data::before { left: 0; }
-.chat-data::after { right: 0; }
+.chat-data::after  { right: 0; }
 
 /* ======================================================
    MENSAGENS
@@ -256,25 +262,26 @@ body {
 .mensagem.cidadao {
   background: #e8f0ff;
   margin-left: auto;
-  border-left: 5px solid #1e5eff;
+  border-left: 6px solid #1e5eff;
 }
 
 .mensagem.juridico {
   background: #fff6d8;
   margin-right: auto;
-  border-left: 5px solid #c9a227;
+  border-left: 6px solid #c9a227;
 }
 
 .mensagem.coordenacao {
   background: #ffe5e5;
   margin-right: auto;
-  border-left: 5px solid #b00000;
+  border-left: 6px solid #8b0000;
 }
 
 .autor {
   font-weight: bold;
   font-size: 12px;
   margin-bottom: 4px;
+  letter-spacing: .6px;
 }
 
 .hora {
@@ -324,22 +331,21 @@ body {
 }
 
 /* ======================================================
-   TABELA DE SERVIÇOS — REFINAMENTO INSTITUCIONAL
+   TABELA DE SERVIÇOS — INSTITUCIONAL
 ====================================================== */
-
 .documento-oficial {
-  max-width: 880px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .documento-oficial .doc-header {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 }
 
 .documento-oficial .doc-header h2 {
-  font-size: 22px;
-  letter-spacing: 1px;
+  font-size: 24px;
+  letter-spacing: 1.5px;
   margin-bottom: 6px;
 }
 
@@ -351,22 +357,22 @@ body {
 .selo-oficial {
   margin-top: 10px;
   font-size: 11px;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   color: #7a1c1c;
 }
 
 .price-card {
   background: #fff;
   border: 2px solid #d4af37;
-  border-radius: 20px;
-  padding: 22px 26px;
-  margin-bottom: 26px;
-  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+  border-radius: 22px;
+  padding: 26px 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.08);
 }
 
 .price-card h3 {
-  font-size: 16px;
-  margin-bottom: 14px;
+  font-size: 17px;
+  margin-bottom: 16px;
   border-bottom: 1px solid #e5d6a3;
   padding-bottom: 8px;
 }
