@@ -1,41 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Autenticando</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body style="
-  margin:0;
-  font-family: Georgia, serif;
-  background: radial-gradient(circle, #7a1c1c, #3b0d0d);
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#2b2b2b;
-">
-
-<div style="
-  background:#f8f4ee;
-  border-radius:18px;
-  padding:30px;
-  width:320px;
-  text-align:center;
-  border:2px solid #d4af37;
-">
-
-  <p style="margin-bottom:12px;">
-    🔐 Autenticando, aguarde…
-  </p>
-
-  <p style="font-size:11px; color:#555;">
-    Sistema institucional — acesso monitorado
-  </p>
-
-</div>
-
 <script>
 (function () {
   try {
@@ -45,32 +7,36 @@
     }
 
     let raw = hash.replace("#user=", "");
-    let usuario;
+    let payload;
 
     try {
-      usuario = JSON.parse(decodeURIComponent(raw));
+      payload = JSON.parse(decodeURIComponent(raw));
     } catch {
-      usuario = JSON.parse(atob(raw));
+      payload = JSON.parse(atob(raw));
     }
 
-    if (!usuario || !usuario.id || !usuario.nivel) {
+    if (!payload || !payload.id || !payload.nivel) {
       throw "Usuário inválido";
     }
 
-    localStorage.setItem("usuario", JSON.stringify({
-      nome: usuario.nome || usuario.username || "Usuário",
-      cid: usuario.id,
-      nivel: usuario.nivel
-    }));
+    // 🔥 LIMPA QUALQUER LOGIN ANTERIOR
+    localStorage.clear();
+
+    // 🔒 PADRÃO ÚNICO DE USUÁRIO
+    const usuario = {
+      nome: payload.nome || payload.username || "Usuário",
+      cid: payload.id,
+      nivel: payload.nivel // cidadao | juridico | coordenacao
+    };
+
+    localStorage.setItem("usuario", JSON.stringify(usuario));
 
     location.replace("welcome.html");
 
   } catch (e) {
     console.error(e);
+    localStorage.clear();
     location.replace("index.html");
   }
 })();
 </script>
-
-</body>
-</html>
