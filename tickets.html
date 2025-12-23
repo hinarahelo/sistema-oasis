@@ -17,7 +17,7 @@
   }
 </script>
 
-<!-- ================= HEADER (MANTIDO) ================= -->
+<!-- ================= HEADER ================= -->
 <header class="header small official">
   <img src="logo-oasis.png" class="logo" />
   <div class="header-text">
@@ -42,7 +42,6 @@
 
     <!-- ================= SOLICITAÇÕES ================= -->
     <section id="solicitacoes" class="aba active">
-
       <div class="solicitacoes-header">
         <h2>Solicitações ao Supremo Tribunal de Oasis</h2>
         <p>Selecione abaixo o tipo de serviço desejado.</p>
@@ -77,14 +76,12 @@
           <button onclick="abrirCategoria('Suporte')">Suporte</button>
         </div>
       </div>
-
     </section>
 
     <!-- ================= EM ANDAMENTO ================= -->
     <section id="andamento" class="aba">
       <h2>🕒 Tickets em Andamento</h2>
       <p class="section-desc">Selecione uma categoria.</p>
-
       <div id="categoriasTickets" class="categoria-grid"></div>
 
       <div id="listaPorCategoria" class="lista-categoria hidden">
@@ -97,7 +94,6 @@
     <!-- ================= CHAT ================= -->
     <section id="chat" class="aba">
       <h2 id="chatTitulo">💬 Atendimento</h2>
-
       <div id="mensagens" class="chat-box"></div>
 
       <div class="chat-input">
@@ -108,61 +104,61 @@
       </div>
     </section>
 
-    <!-- ================= TABELA DE SERVIÇOS ================= -->
+    <!-- ================= TABELA DE SERVIÇOS (REFINADA) ================= -->
     <section id="precos" class="aba">
-      <div class="documento-oficial">
+      <article class="documento-oficial">
 
-        <div class="doc-header">
-          <h2>⚖️ Serviços Disponíveis ao Público</h2>
+        <header class="doc-header">
+          <h2>⚖️ Tabela Oficial de Serviços</h2>
           <span>Supremo Tribunal de Oasis</span>
           <div class="selo-oficial">DOCUMENTO OFICIAL • USO INSTITUCIONAL</div>
-        </div>
+        </header>
 
-        <div class="price-card">
+        <section class="price-card">
           <h3>🏛️ Atendimentos Jurídicos</h3>
           <ul>
-            <li>Delegacia Sul — <strong>$ 20.000</strong></li>
-            <li>Delegacia PRF — <strong>$ 30.000</strong></li>
+            <li><span>Delegacia Sul</span><strong>$ 20.000</strong></li>
+            <li><span>Delegacia PRF</span><strong>$ 30.000</strong></li>
           </ul>
-        </div>
+        </section>
 
-        <div class="price-card">
+        <section class="price-card">
           <h3>🔫 Porte de Arma</h3>
           <ul>
-            <li>Emissão de porte legal — <strong>$ 20.000</strong></li>
+            <li><span>Emissão de porte legal</span><strong>$ 20.000</strong></li>
           </ul>
-        </div>
+        </section>
 
-        <div class="price-card">
+        <section class="price-card">
           <h3>💍 Certidões Civis</h3>
           <ul>
-            <li>Casamento — <strong>$ 150.000</strong></li>
-            <li>Divórcio — <strong>$ 200.000</strong></li>
-            <li>Troca de Nome — <strong>$ 250.000</strong></li>
-            <li>Adoção — <strong>$ 50.000</strong></li>
-            <li>Nascimento — <strong>$ 50.000</strong></li>
-            <li>Jovem Aprendiz — <strong>$ 30.000</strong></li>
+            <li><span>Casamento</span><strong>$ 150.000</strong></li>
+            <li><span>Divórcio</span><strong>$ 200.000</strong></li>
+            <li><span>Troca de Nome</span><strong>$ 250.000</strong></li>
+            <li><span>Adoção</span><strong>$ 50.000</strong></li>
+            <li><span>Nascimento</span><strong>$ 50.000</strong></li>
+            <li><span>Jovem Aprendiz</span><strong>$ 30.000</strong></li>
           </ul>
-        </div>
+        </section>
 
-        <div class="price-card">
+        <section class="price-card">
           <h3>🏢 Alvará de Funcionamento</h3>
           <ul>
-            <li>Abertura — <strong>$ 150.000</strong></li>
-            <li>Renovação — <strong>$ 60.000</strong></li>
+            <li><span>Abertura</span><strong>$ 150.000</strong></li>
+            <li><span>Renovação</span><strong>$ 60.000</strong></li>
           </ul>
-        </div>
+        </section>
 
-        <div class="price-card">
+        <section class="price-card">
           <h3>🧾 Ações Jurídicas</h3>
           <ul>
-            <li>Ação Judicial — <strong>$ 50.000</strong></li>
-            <li>Limpeza de Ficha Criminal — <strong>$ 50.000</strong></li>
-            <li>A partir da 4ª ocorrência — <strong>$ 10.000</strong></li>
+            <li><span>Ação Judicial</span><strong>$ 50.000</strong></li>
+            <li><span>Limpeza de Ficha Criminal</span><strong>$ 50.000</strong></li>
+            <li><span>A partir da 4ª ocorrência</span><strong>$ 10.000</strong></li>
           </ul>
-        </div>
+        </section>
 
-      </div>
+      </article>
     </section>
 
     <!-- ================= RODAPÉ ================= -->
@@ -181,17 +177,14 @@ function mostrarAba(id) {
   const alvo = document.getElementById(id);
   if (alvo) alvo.classList.add("active");
 }
-
 function irAba(id) {
   location.hash = id;
   mostrarAba(id);
 }
-
 function sair() {
   localStorage.clear();
   location.href = "index.html";
 }
-
 const hash = location.hash.replace("#", "");
 mostrarAba(hash || "solicitacoes");
 </script>
