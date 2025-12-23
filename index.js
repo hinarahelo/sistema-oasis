@@ -1,13 +1,41 @@
-const params = new URLSearchParams(window.location.search);
-const session = params.get("session");
+/* ======================================================
+   🔐 CONTROLE DE SESSÃO — INDEX
+   Supremo Tribunal de Oasis
+====================================================== */
 
-if (session) {
+(function () {
   try {
-    const usuario = JSON.parse(atob(session));
-    localStorage.setItem("usuario", JSON.stringify(usuario));
-    window.history.replaceState({}, document.title, "/sistema-oasis/");
-    location.href = "tickets.html";
-  } catch {
+    const raw = localStorage.getItem("usuario");
+    if (!raw) return;
+
+    const usuario = JSON.parse(raw);
+
+    if (!usuario || !usuario.nivel) {
+      localStorage.removeItem("usuario");
+      return;
+    }
+
+    /* 🔁 REDIRECIONAMENTO POR NÍVEL */
+    if (usuario.nivel === "cidadao") {
+      location.replace("welcome.html");
+      return;
+    }
+
+    if (usuario.nivel === "juridico") {
+      location.replace("welcome.html");
+      return;
+    }
+
+    if (usuario.nivel === "coordenacao") {
+      location.replace("welcome.html");
+      return;
+    }
+
+    // Qualquer coisa fora do padrão
+    localStorage.removeItem("usuario");
+
+  } catch (e) {
+    console.error("Erro ao validar sessão:", e);
     localStorage.removeItem("usuario");
   }
-}
+})();
