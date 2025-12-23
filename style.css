@@ -32,6 +32,22 @@ body {
 }
 
 /* ======================================================
+   CONTROLE DE ABAS (CORREÇÃO CRÍTICA)
+====================================================== */
+.aba {
+  display: none;
+}
+
+.aba.active {
+  display: block;
+}
+
+/* utilitário já usado no HTML */
+.hidden {
+  display: none !important;
+}
+
+/* ======================================================
    HEADER
 ====================================================== */
 .header {
