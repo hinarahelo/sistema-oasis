@@ -6,9 +6,9 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body class="bg-paper">
+<body class="bg-paper official">
 
-<!-- 🔐 PROTEÇÃO DE ACESSO -->
+<!-- 🔐 PROTEÇÃO -->
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
   if (!usuario || usuario.nivel !== "cidadao") {
@@ -27,145 +27,120 @@
 
 <!-- ================= NAVBAR ================= -->
 <nav class="nav-bar official">
-  <button type="button" onclick="irAba('solicitacoes')">📂 Solicitações</button>
-  <button type="button" onclick="irAba('andamento')">🕒 Em andamento</button>
-  <button type="button" onclick="irAba('precos')">💰 Tabela de Serviços</button>
-  <button type="button" onclick="sair()">🚪 Encerrar Sessão</button>
+  <button onclick="irAba('solicitacoes')">📂 Solicitações</button>
+  <button onclick="irAba('andamento')">🕒 Em andamento</button>
+  <button onclick="irAba('precos')">💰 Tabela de Serviços</button>
+  <button onclick="sair()">🚪 Encerrar Sessão</button>
 </nav>
 
 <!-- ================= CONTEÚDO ================= -->
 <main class="content official">
 
   <!-- ================= SOLICITAÇÕES ================= -->
-  <section id="solicitacoes" class="aba solicitacoes-clean">
-
+  <section id="solicitacoes" class="aba">
     <div class="solicitacoes-header">
       <img src="logo-oasis.png" class="logo-grande">
       <h2>Solicitações ao Supremo Tribunal de Oasis</h2>
-      <p>Selecione abaixo o tipo de serviço desejado para iniciar um atendimento oficial.</p>
+      <p>Selecione abaixo o tipo de serviço desejado.</p>
     </div>
 
-    <!-- SERVIÇOS CIVIS -->
     <div class="bloco-servicos">
       <h3>💍 Serviços Civis</h3>
       <div class="grid-servicos">
-        <button type="button" onclick="abrirCategoria('Casamento')">💍 Casamento</button>
-        <button type="button" onclick="abrirCategoria('Divórcio')">💔 Divórcio</button>
-        <button type="button" onclick="abrirCategoria('Nascimento')">👼 Nascimento</button>
-        <button type="button" onclick="abrirCategoria('Adoção')">👶 Adoção</button>
-        <button type="button" onclick="abrirCategoria('Troca de Nome')">📜 Troca de Nome</button>
+        <button onclick="abrirCategoria('Casamento')">Casamento</button>
+        <button onclick="abrirCategoria('Divórcio')">Divórcio</button>
+        <button onclick="abrirCategoria('Nascimento')">Nascimento</button>
+        <button onclick="abrirCategoria('Adoção')">Adoção</button>
+        <button onclick="abrirCategoria('Troca de Nome')">Troca de Nome</button>
       </div>
     </div>
 
-    <!-- SERVIÇOS JURÍDICOS -->
     <div class="bloco-servicos">
       <h3>⚖️ Serviços Jurídicos</h3>
       <div class="grid-servicos">
-        <button type="button" onclick="abrirCategoria('Porte de Arma')">🔫 Porte de Arma</button>
-        <button type="button" onclick="abrirCategoria('Limpeza de Ficha')">🧹 Limpeza de Ficha</button>
-        <button type="button" onclick="abrirCategoria('Jovem Aprendiz')">🧑‍🎓 Jovem Aprendiz</button>
+        <button onclick="abrirCategoria('Porte de Arma')">Porte de Arma</button>
+        <button onclick="abrirCategoria('Limpeza de Ficha')">Limpeza de Ficha</button>
+        <button onclick="abrirCategoria('Jovem Aprendiz')">Jovem Aprendiz</button>
       </div>
     </div>
 
-    <!-- DEMANDAS ADMINISTRATIVAS -->
     <div class="bloco-servicos">
       <h3>🏛️ Demandas Administrativas</h3>
       <div class="grid-servicos">
-        <button type="button" onclick="abrirCategoria('Denúncia')">⚠ Denúncia</button>
-        <button type="button" onclick="abrirCategoria('Falar com o Juiz')">⚖️ Falar com o Juiz</button>
-        <button type="button" onclick="abrirCategoria('Processos')">📁 Processos</button>
-        <button type="button" onclick="abrirCategoria('Suporte')">🛠 Suporte</button>
+        <button onclick="abrirCategoria('Denúncia')">Denúncia</button>
+        <button onclick="abrirCategoria('Falar com o Juiz')">Falar com o Juiz</button>
+        <button onclick="abrirCategoria('Processos')">Processos</button>
+        <button onclick="abrirCategoria('Suporte')">Suporte</button>
       </div>
     </div>
-
   </section>
 
   <!-- ================= EM ANDAMENTO ================= -->
   <section id="andamento" class="aba">
     <h2>🕒 Tickets em Andamento</h2>
-    <p class="section-desc">
-      Selecione uma categoria para visualizar seus atendimentos ativos.
-    </p>
+    <p class="section-desc">Selecione uma categoria.</p>
 
     <div id="categoriasTickets" class="categoria-grid"></div>
 
     <div id="listaPorCategoria" class="lista-categoria hidden">
-      <button type="button" class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
+      <button class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
       <h3 id="tituloCategoria"></h3>
-      <div id="ticketsCategoria" class="card-list official"></div>
+      <div id="ticketsCategoria" class="card-list"></div>
     </div>
   </section>
 
   <!-- ================= CHAT ================= -->
   <section id="chat" class="aba">
     <h2 id="chatTitulo">💬 Atendimento</h2>
-    <div id="mensagens" class="chat-box official"></div>
+    <div id="mensagens" class="chat-box"></div>
 
-    <!-- PREVIEW DO ARQUIVO -->
-    <div id="arquivoPreview" style="display:none; margin:8px 0;">
-      📎 <span id="arquivoNome"></span>
-      <button type="button" class="btn-secondary" onclick="removerArquivo()">❌ Remover</button>
-    </div>
-
-    <div class="chat-input official">
+    <div class="chat-input">
       <input id="mensagem" placeholder="Digite sua mensagem..." />
       <input type="file" id="arquivo" />
-      <button type="button" onclick="enviarMensagem()">Enviar</button>
-      <button type="button" class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
+      <button onclick="enviarMensagem()">Enviar</button>
+      <button class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
     </div>
   </section>
 
   <!-- ================= PREÇOS ================= -->
   <section id="precos" class="aba">
-    <h2>⚖️ Serviços Disponíveis ao Público – Supremo Tribunal de Oasis</h2>
+    <h2>💰 Tabela de Serviços</h2>
 
-    <div class="price-card official">
-      <h3>🏛️ Atendimentos Jurídicos</h3>
+    <div class="price-card">
+      <h3>Certidões Civis</h3>
       <ul>
-        <li>Delegacia Sul — <b>$20.000</b></li>
-        <li>Delegacia PRF — <b>$30.000</b></li>
-      </ul>
-    </div>
-
-    <div class="price-card official">
-      <h3>🔫 Porte de Arma</h3>
-      <ul>
-        <li>Emissão de porte legal — <b>$20.000</b></li>
-      </ul>
-    </div>
-
-    <div class="price-card official">
-      <h3>💍 Certidões Civis</h3>
-      <ul>
-        <li>Casamento — <b>$150.000</b></li>
-        <li>Divórcio — <b>$200.000</b></li>
-        <li>Troca de Nome — <b>$250.000</b></li>
-        <li>Adoção — <b>$50.000</b></li>
-        <li>Nascimento — <b>$50.000</b></li>
-        <li>Jovem Aprendiz — <b>$30.000</b></li>
+        <li>Casamento — $150.000</li>
+        <li>Divórcio — $200.000</li>
+        <li>Troca de Nome — $250.000</li>
       </ul>
     </div>
   </section>
 
 </main>
 
-<!-- ================= SCRIPTS ================= -->
-<script type="module" src="script.js"></script>
-
+<!-- ================= CONTROLE DE ABAS ================= -->
 <script>
-  function sair() {
-    localStorage.clear();
-    location.href = "index.html";
-  }
+function mostrarAba(id) {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  const alvo = document.getElementById(id);
+  if (alvo) alvo.classList.add("active");
+  else document.getElementById("solicitacoes").classList.add("active");
+}
 
-  function irAba(id) {
-    location.hash = id;
-    mostrarAba(id);
-  }
+function irAba(id) {
+  location.hash = id;
+  mostrarAba(id);
+}
 
-  const hash = location.hash.replace("#", "");
-  mostrarAba(hash || "solicitacoes");
+const hash = location.hash.replace("#", "");
+mostrarAba(hash || "solicitacoes");
+
+function sair() {
+  localStorage.clear();
+  location.href = "index.html";
+}
 </script>
 
+<script type="module" src="script.js"></script>
 </body>
 </html>
