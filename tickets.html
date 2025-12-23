@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Sistema de Atendimento — Supremo Tribunal de Oasis</title>
   <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body class="bg-paper official">
@@ -16,180 +17,167 @@
   }
 </script>
 
-<!-- ================= HEADER ================= -->
-<header class="header small official">
-  <img src="logo-oasis.png" class="logo small" />
-  <div class="header-text">
-    <h1>Supremo Tribunal de Oasis</h1>
-    <span>Sistema Oficial de Atendimento ao Cidadão</span>
-  </div>
-</header>
+<div class="layout-app">
 
-<!-- ================= NAVBAR ================= -->
-<nav class="nav-bar official">
-  <button onclick="irAba('solicitacoes')">📂 Solicitações</button>
-  <button onclick="irAba('andamento')">🕒 Em andamento</button>
-  <button onclick="irAba('precos')">💰 Tabela de Serviços</button>
-  <button onclick="sair()">🚪 Encerrar Sessão</button>
-</nav>
-
-<!-- ================= CONTEÚDO ================= -->
-<main class="content official">
-
-<!-- ================= SOLICITAÇÕES ================= -->
-<section id="solicitacoes" class="aba active">
-
-  <div class="solicitacoes-header">
-    <img src="logo-oasis.png" class="logo">
-    <h2>Solicitações ao Supremo Tribunal de Oasis</h2>
-    <p>Selecione abaixo o tipo de serviço desejado.</p>
-  </div>
-
-  <div class="bloco-servicos">
-    <h3>💍 Serviços Civis</h3>
-    <div class="grid-servicos">
-      <button onclick="abrirCategoria('Casamento')">Casamento</button>
-      <button onclick="abrirCategoria('Divórcio')">Divórcio</button>
-      <button onclick="abrirCategoria('Nascimento')">Nascimento</button>
-      <button onclick="abrirCategoria('Adoção')">Adoção</button>
-      <button onclick="abrirCategoria('Troca de Nome')">Troca de Nome</button>
-    </div>
-  </div>
-
-  <div class="bloco-servicos">
-    <h3>⚖️ Serviços Jurídicos</h3>
-    <div class="grid-servicos">
-      <button onclick="abrirCategoria('Porte de Arma')">Porte de Arma</button>
-      <button onclick="abrirCategoria('Limpeza de Ficha')">Limpeza de Ficha</button>
-      <button onclick="abrirCategoria('Jovem Aprendiz')">Jovem Aprendiz</button>
-    </div>
-  </div>
-
-  <div class="bloco-servicos">
-    <h3>🏛️ Demandas Administrativas</h3>
-    <div class="grid-servicos">
-      <button onclick="abrirCategoria('Denúncia')">Denúncia</button>
-      <button onclick="abrirCategoria('Falar com o Juiz')">Falar com o Juiz</button>
-      <button onclick="abrirCategoria('Processos')">Processos</button>
-      <button onclick="abrirCategoria('Suporte')">Suporte</button>
-    </div>
-  </div>
-
-</section>
-
-<!-- ================= EM ANDAMENTO ================= -->
-<section id="andamento" class="aba">
-
-  <h2>🕒 Tickets em Andamento</h2>
-  <p class="section-desc">Selecione uma categoria.</p>
-
-  <div id="categoriasTickets" class="categoria-grid"></div>
-
-  <div id="listaPorCategoria" class="lista-categoria hidden">
-    <button class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
-    <h3 id="tituloCategoria"></h3>
-    <div id="ticketsCategoria" class="card-list"></div>
-  </div>
-
-</section>
-
-<!-- ================= CHAT ================= -->
-<section id="chat" class="aba">
-
-  <h2 id="chatTitulo">💬 Atendimento</h2>
-
-  <div id="mensagens" class="chat-box"></div>
-
-  <div class="chat-input">
-    <input id="mensagem" placeholder="Digite sua mensagem..." />
-    <input type="file" id="arquivo" />
-    <button onclick="enviarMensagem()">Enviar</button>
-    <button class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
-  </div>
-
-</section>
-
-<!-- ================= TABELA DE SERVIÇOS ================= -->
-<section id="precos" class="aba">
-  <div class="documento-oficial">
-    <div class="doc-header">
-      <h2>⚖️ Serviços Disponíveis ao Público</h2>
-      <span>Supremo Tribunal de Oasis</span>
-      <div class="selo-oficial">DOCUMENTO OFICIAL • USO INSTITUCIONAL</div>
+  <!-- ================= MENU LATERAL ================= -->
+  <aside class="sidebar official">
+    <div class="sidebar-header">
+      <img src="logo-oasis.png" class="logo small">
+      <h2>Supremo Tribunal de Oasis</h2>
     </div>
 
-    <div class="price-card">
-      <h3>🏛️ Atendimentos Jurídicos</h3>
-      <ul>
-        <li>Delegacia Sul — <strong>$ 20.000</strong></li>
-        <li>Delegacia PRF — <strong>$ 30.000</strong></li>
-      </ul>
-    </div>
+    <button onclick="irAba('solicitacoes')">📂 Solicitações</button>
+    <button onclick="irAba('andamento')">🕒 Em andamento</button>
+    <button onclick="irAba('precos')">💰 Tabela de Serviços</button>
+    <button onclick="sair()">🚪 Encerrar Sessão</button>
+  </aside>
 
-    <div class="price-card">
-      <h3>🔫 Porte de Arma</h3>
-      <ul>
-        <li>Emissão de porte legal — <strong>$ 20.000</strong></li>
-      </ul>
-    </div>
+  <!-- ================= CONTEÚDO ================= -->
+  <main class="content official">
 
-    <div class="price-card">
-      <h3>💍 Certidões Civis</h3>
-      <ul>
-        <li>Casamento — <strong>$ 150.000</strong></li>
-        <li>Divórcio — <strong>$ 200.000</strong></li>
-        <li>Troca de Nome — <strong>$ 250.000</strong></li>
-        <li>Adoção — <strong>$ 50.000</strong></li>
-        <li>Nascimento — <strong>$ 50.000</strong></li>
-        <li>Jovem Aprendiz — <strong>$ 30.000</strong></li>
-      </ul>
-    </div>
+    <!-- ================= SOLICITAÇÕES ================= -->
+    <section id="solicitacoes" class="aba active">
+      <h1 class="titulo-central">Supremo Tribunal de Oasis</h1>
+      <p class="subtitulo">Selecione abaixo o tipo de serviço desejado.</p>
 
-    <div class="price-card">
-      <h3>🏢 Alvará de Funcionamento</h3>
-      <ul>
-        <li>Abertura — <strong>$ 150.000</strong></li>
-        <li>Renovação — <strong>$ 60.000</strong></li>
-      </ul>
-    </div>
+      <div class="bloco-servicos">
+        <h3>💍 Serviços Civis</h3>
+        <div class="grid-servicos">
+          <button onclick="abrirCategoria('Casamento')">Casamento</button>
+          <button onclick="abrirCategoria('Divórcio')">Divórcio</button>
+          <button onclick="abrirCategoria('Nascimento')">Nascimento</button>
+          <button onclick="abrirCategoria('Adoção')">Adoção</button>
+          <button onclick="abrirCategoria('Troca de Nome')">Troca de Nome</button>
+        </div>
+      </div>
 
-    <div class="price-card">
-      <h3>🧾 Ações Jurídicas</h3>
-      <ul>
-        <li>Ação Judicial — <strong>$ 50.000</strong></li>
-        <li>Limpeza de Ficha Criminal — <strong>$ 50.000</strong></li>
-        <li>A partir da 4ª ocorrência — <strong>$ 10.000</strong></li>
-      </ul>
-    </div>
-  </div>
-</section>
+      <div class="bloco-servicos">
+        <h3>⚖️ Serviços Jurídicos</h3>
+        <div class="grid-servicos">
+          <button onclick="abrirCategoria('Porte de Arma')">Porte de Arma</button>
+          <button onclick="abrirCategoria('Limpeza de Ficha')">Limpeza de Ficha</button>
+          <button onclick="abrirCategoria('Jovem Aprendiz')">Jovem Aprendiz</button>
+        </div>
+      </div>
 
-<!-- ================= RODAPÉ ================= -->
-<footer class="footer">
-  <div>Sistema institucional — acesso monitorado</div>
-  <div>Site desenvolvido por <strong>Hinara Heloar</strong> — direitos reservados</div>
-</footer>
+      <div class="bloco-servicos">
+        <h3>🏛️ Demandas Administrativas</h3>
+        <div class="grid-servicos">
+          <button onclick="abrirCategoria('Denúncia')">Denúncia</button>
+          <button onclick="abrirCategoria('Falar com o Juiz')">Falar com o Juiz</button>
+          <button onclick="abrirCategoria('Processos')">Processos</button>
+          <button onclick="abrirCategoria('Suporte')">Suporte</button>
+        </div>
+      </div>
+    </section>
 
-</main>
+    <!-- ================= EM ANDAMENTO ================= -->
+    <section id="andamento" class="aba">
+      <h1 class="titulo-central">Tickets em Andamento</h1>
+      <p class="subtitulo">Selecione uma categoria.</p>
+
+      <div id="categoriasTickets" class="categoria-grid"></div>
+
+      <div id="listaPorCategoria" class="lista-categoria hidden">
+        <button class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
+        <h3 id="tituloCategoria"></h3>
+        <div id="ticketsCategoria" class="card-list"></div>
+      </div>
+    </section>
+
+    <!-- ================= CHAT ================= -->
+    <section id="chat" class="aba">
+      <h1 id="chatTitulo" class="titulo-central">💬 Atendimento</h1>
+
+      <div id="mensagens" class="chat-box"></div>
+
+      <div class="chat-input">
+        <input id="mensagem" placeholder="Digite sua mensagem..." />
+        <input type="file" id="arquivo" />
+        <button onclick="enviarMensagem()">Enviar</button>
+        <button class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
+      </div>
+    </section>
+
+    <!-- ================= TABELA DE SERVIÇOS ================= -->
+    <section id="precos" class="aba">
+      <h1 class="titulo-central">Tabela de Serviços</h1>
+
+      <div class="documento-oficial">
+        <div class="doc-header">
+          <h2>⚖️ Serviços Disponíveis ao Público</h2>
+          <span>Supremo Tribunal de Oasis</span>
+          <div class="selo-oficial">DOCUMENTO OFICIAL • USO INSTITUCIONAL</div>
+        </div>
+
+        <div class="price-card">
+          <h3>🏛️ Atendimentos Jurídicos</h3>
+          <ul>
+            <li>Delegacia Sul — <strong>$ 20.000</strong></li>
+            <li>Delegacia PRF — <strong>$ 30.000</strong></li>
+          </ul>
+        </div>
+
+        <div class="price-card">
+          <h3>🔫 Porte de Arma</h3>
+          <ul>
+            <li>Emissão de porte legal — <strong>$ 20.000</strong></li>
+          </ul>
+        </div>
+
+        <div class="price-card">
+          <h3>💍 Certidões Civis</h3>
+          <ul>
+            <li>Casamento — <strong>$ 150.000</strong></li>
+            <li>Divórcio — <strong>$ 200.000</strong></li>
+            <li>Troca de Nome — <strong>$ 250.000</strong></li>
+            <li>Adoção — <strong>$ 50.000</strong></li>
+            <li>Nascimento — <strong>$ 50.000</strong></li>
+            <li>Jovem Aprendiz — <strong>$ 30.000</strong></li>
+          </ul>
+        </div>
+
+        <div class="price-card">
+          <h3>🏢 Alvará de Funcionamento</h3>
+          <ul>
+            <li>Abertura — <strong>$ 150.000</strong></li>
+            <li>Renovação — <strong>$ 60.000</strong></li>
+          </ul>
+        </div>
+
+        <div class="price-card">
+          <h3>🧾 Ações Jurídicas</h3>
+          <ul>
+            <li>Ação Judicial — <strong>$ 50.000</strong></li>
+            <li>Limpeza de Ficha Criminal — <strong>$ 50.000</strong></li>
+            <li>A partir da 4ª ocorrência — <strong>$ 10.000</strong></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RODAPÉ ================= -->
+    <footer class="footer">
+      Site desenvolvido por <strong>Hinara Heloar</strong> — direitos reservados
+    </footer>
+
+  </main>
+</div>
 
 <!-- ================= CONTROLE DE ABAS ================= -->
 <script>
 function mostrarAba(id) {
   document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  const alvo = document.getElementById(id);
-  if (alvo) alvo.classList.add("active");
+  document.getElementById(id)?.classList.add("active");
 }
-
 function irAba(id) {
   location.hash = id;
   mostrarAba(id);
 }
-
 function sair() {
   localStorage.clear();
   location.href = "index.html";
 }
-
 const hash = location.hash.replace("#", "");
 mostrarAba(hash || "solicitacoes");
 </script>
