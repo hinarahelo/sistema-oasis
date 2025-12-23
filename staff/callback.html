@@ -2,36 +2,64 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Autenticação — Supremo Tribunal de Oasis</title>
+  <title>Autenticando — Supremo Tribunal de Oasis</title>
 </head>
 <body>
+
 <script>
-const params = new URLSearchParams(window.location.search);
-const session = params.get("session");
-const nivel = params.get("state"); // cidadao | juridico | coordenacao
-
-if (session && nivel) {
+(function () {
   try {
-    const usuario = JSON.parse(atob(session));
+    const params = new URLSearchParams(window.location.search);
+    const session = params.get("session");
+    const nivel = params.get("state"); // cidadao | juridico | coordenacao
 
-    // 🔒 FIXA O NÍVEL REAL
-    usuario.nivel = nivel;
+    if (!session || !nivel) {
+      throw "Parâmetros inválidos";
+    }
+
+    let payload;
+    try {
+      payload = JSON.parse(atob(session));
+    } catch {
+      payload = JSON.parse(decodeURIComponent(session));
+    }
+
+    if (!payload) {
+      throw "Payload inválido";
+    }
+
+    /* ======================================================
+       🔐 FORMATO FINAL PADRONIZADO DO USUÁRIO
+    ====================================================== */
+    const usuario = {
+      nome: payload.nome || payload.username || "Usuário",
+      cid: payload.cid || payload.id || "0000",
+      nivel: nivel
+    };
 
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
-    window.history.replaceState({}, document.title, "/staff/");
+    /* ======================================================
+       🔁 LIMPA URL (SEM QUEBRAR CAMINHO)
+    ====================================================== */
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
 
-    if (nivel === "cidadao") location.href = "tickets.html";
-    if (nivel === "juridico") location.href = "juridico.html";
-    if (nivel === "coordenacao") location.href = "coordenacao.html";
+    /* ======================================================
+       ➡️ REDIRECIONA PARA O FLUXO CORRETO
+    ====================================================== */
+    location.replace("../welcome.html");
+
   } catch (e) {
-    console.error(e);
+    console.error("Erro de autenticação:", e);
     localStorage.removeItem("usuario");
-    location.href = "index.html";
+    location.replace("../index.html");
   }
-} else {
-  location.href = "index.html";
-}
+})();
 </script>
+
 </body>
 </html>
