@@ -231,7 +231,7 @@ function iniciarChat() {
         const horaStr = dataObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
         if (dataStr !== ultimaData) {
-          box.innerHTML += `<div class="data-separador">──────── ${dataStr} ────────</div>`;
+          box.innerHTML += `<div class="chat-data">${dataStr}</div>`;
           ultimaData = dataStr;
           ultimoAutor = null;
         }
