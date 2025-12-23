@@ -6,11 +6,19 @@
   <link rel="stylesheet" href="../style.css">
 </head>
 
-<body class="bg-paper">
+<body class="bg-paper official">
+
+<!-- 🔐 PROTEÇÃO -->
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
+    location.replace("../index.html");
+  }
+</script>
 
 <header class="header small official">
   <img src="../logo-oasis.png" class="logo small">
-  <div>
+  <div class="header-text">
     <h1>Tribunal de Justiça de Oasis</h1>
     <span>Painel Operacional da Staff</span>
   </div>
@@ -20,18 +28,18 @@
   <button onclick="abrirAba('abertos')">📂 Abertos</button>
   <button onclick="abrirAba('fechados')">🧾 Fechados</button>
   <button onclick="location.href='dashboard.html'">⚖️ Coordenação</button>
-  <button onclick="localStorage.clear();location.href='../index.html'">🚪 Sair</button>
+  <button onclick="localStorage.clear();location.replace('../index.html')">🚪 Sair</button>
 </nav>
 
 <main class="content official">
 
-<!-- TICKETS ABERTOS -->
+<!-- ================= TICKETS ABERTOS ================= -->
 <section id="abertos" class="aba active">
   <h2>📂 Tickets Abertos / Em Atendimento</h2>
   <div id="lista-abertos" class="card-list"></div>
 </section>
 
-<!-- CHAT -->
+<!-- ================= CHAT ================= -->
 <section id="chat" class="aba">
   <h2 id="chatTitulo">💬 Atendimento</h2>
 
@@ -39,13 +47,14 @@
 
   <div class="chat-input official">
     <input id="mensagem" placeholder="Digite a resposta oficial..." />
-    <button onclick="enviarMensagem()">Enviar</button>
+    <input type="file" id="arquivo" />
+    <button class="btn-primary">Enviar</button>
     <button onclick="fecharTicket()" class="btn-secondary">Encerrar Ticket</button>
     <button onclick="abrirAba('abertos')" class="btn-secondary">⬅ Voltar</button>
   </div>
 </section>
 
-<!-- TICKETS FECHADOS -->
+<!-- ================= TICKETS FECHADOS ================= -->
 <section id="fechados" class="aba">
   <h2>🧾 Tickets Encerrados</h2>
   <div id="lista-fechados" class="card-list"></div>
@@ -53,6 +62,24 @@
 
 </main>
 
+<!-- ================= CONTROLE DE ABAS ================= -->
+<script>
+function abrirAba(id) {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.getElementById(id)?.classList.add("active");
+}
+</script>
+
+<!-- LISTAGEM DE TICKETS -->
 <script type="module" src="staff.js"></script>
+
+<!-- CHAT (CORRIGIDO) -->
+<script type="module">
+  import { abrirChat } from "./chat.js";
+
+  // expõe para staff.js poder chamar
+  window.abrirChat = abrirChat;
+</script>
+
 </body>
 </html>
