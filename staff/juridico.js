@@ -1,5 +1,4 @@
 import {
-  getFirestore,
   collection,
   addDoc,
   query,
@@ -26,6 +25,7 @@ if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
 ====================================================== */
 let ticketAtual = null;
 let unsubscribeMensagens = null;
+let unsubscribeStatus = null;
 
 /* ======================================================
    ABRIR CHAT (EXPORTADO)
@@ -41,7 +41,7 @@ export function abrirChat(ticketId) {
 async function uploadArquivo(file) {
   const form = new FormData();
   form.append("file", file);
-  form.append("upload_preset", "oasis"); // ✅ mesmo preset do cidadão
+  form.append("upload_preset", "oasis"); // mesmo preset do cidadão
 
   const res = await fetch(
     "https://api.cloudinary.com/v1_1/SEU_CLOUD_NAME/auto/upload",
@@ -63,27 +63,30 @@ async function uploadArquivo(file) {
 function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
-  const btn = document.getElementById("btnEnviar");
   const inputArquivo = document.getElementById("arquivo");
 
-  if (!box || !input || !btn) return;
+  if (!box || !input) return;
 
   box.innerHTML = "";
 
   unsubscribeMensagens?.();
+  unsubscribeStatus?.();
 
   /* 🔒 STATUS DO TICKET */
-  onSnapshot(doc(db, "tickets", ticketAtual), snap => {
-    const t = snap.data();
-    const fechado = t.status === "encerrado";
+  unsubscribeStatus = onSnapshot(
+    doc(db, "tickets", ticketAtual),
+    snap => {
+      const t = snap.data();
+      const fechado = t.status === "encerrado";
 
-    input.disabled = btn.disabled = fechado;
-    if (inputArquivo) inputArquivo.disabled = fechado;
+      input.disabled = fechado;
+      if (inputArquivo) inputArquivo.disabled = fechado;
 
-    input.placeholder = fechado
-      ? "🔒 Ticket encerrado — somente leitura"
-      : "Digite sua resposta...";
-  });
+      input.placeholder = fechado
+        ? "🔒 Ticket encerrado — somente leitura"
+        : "Digite sua resposta...";
+    }
+  );
 
   /* 💬 MENSAGENS */
   unsubscribeMensagens = onSnapshot(
@@ -137,33 +140,40 @@ function iniciarChat() {
       box.scrollTop = box.scrollHeight;
     }
   );
-
-  /* 📤 ENVIAR */
-  btn.onclick = async () => {
-    const texto = input.value.trim();
-    const file = inputArquivo?.files?.[0] || null;
-
-    if (!texto && !file) return;
-
-    const snap = await getDoc(doc(db, "tickets", ticketAtual));
-    if (snap.data().status === "encerrado") {
-      alert("Ticket encerrado.");
-      return;
-    }
-
-    let anexo = null;
-    if (file) {
-      anexo = await uploadArquivo(file);
-    }
-
-    await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-      autor: `${usuario.nome} (${usuario.nivel})`,
-      texto: texto || "",
-      anexo,
-      criadoEm: serverTimestamp()
-    });
-
-    input.value = "";
-    if (inputArquivo) inputArquivo.value = "";
-  };
 }
+
+/* ======================================================
+   📤 ENVIAR (GLOBAL — COMPATÍVEL COM HTML)
+====================================================== */
+window.enviarMensagem = async () => {
+  const input = document.getElementById("mensagem");
+  const inputArquivo = document.getElementById("arquivo");
+
+  if (!ticketAtual || !input) return;
+
+  const texto = input.value.trim();
+  const file = inputArquivo?.files?.[0] || null;
+
+  if (!texto && !file) return;
+
+  const snap = await getDoc(doc(db, "tickets", ticketAtual));
+  if (snap.data().status === "encerrado") {
+    alert("Ticket encerrado.");
+    return;
+  }
+
+  let anexo = null;
+  if (file) {
+    anexo = await uploadArquivo(file);
+  }
+
+  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
+    autor: `${usuario.nome} (${usuario.nivel})`,
+    texto: texto || "",
+    anexo,
+    criadoEm: serverTimestamp()
+  });
+
+  input.value = "";
+  if (inputArquivo) inputArquivo.value = "";
+};
