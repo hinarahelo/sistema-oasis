@@ -9,10 +9,7 @@ import {
   onSnapshot,
   serverTimestamp,
   doc,
-  getDoc,
-  orderBy,
-  setDoc,
-  deleteDoc
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ======================================================
@@ -42,49 +39,58 @@ let unsubscribeStatus = null;
 let arquivoSelecionado = null;
 
 /* ======================================================
-   ABAS
+   DOM READY (🔥 CORREÇÃO CRÍTICA)
 ====================================================== */
-window.mostrarAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
-  if (id === "andamento") carregarTicketsEmAndamento();
-};
+document.addEventListener("DOMContentLoaded", () => {
 
-window.irAba = id => {
-  location.hash = id;
-  mostrarAba(id);
-};
+  /* ================= ABAS ================= */
+  window.mostrarAba = id => {
+    document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+    document.getElementById(id)?.classList.add("active");
+    if (id === "andamento") carregarTicketsEmAndamento();
+  };
 
-mostrarAba(location.hash.replace("#", "") || "solicitacoes");
+  window.irAba = id => {
+    location.hash = id;
+    mostrarAba(id);
+  };
 
-/* ======================================================
-   SAIR
-====================================================== */
-window.sair = () => {
-  localStorage.clear();
-  location.replace("index.html");
-};
+  window.sair = () => {
+    localStorage.clear();
+    location.replace("index.html");
+  };
 
-/* ======================================================
-   LOG
-====================================================== */
-async function registrarLog(acao) {
-  await addDoc(collection(db, "logs"), {
-    ticket: ticketAtual,
-    cid: usuario.cid,
-    usuario: usuario.nome,
-    acao,
-    data: serverTimestamp()
-  });
-}
+  mostrarAba(location.hash.replace("#", "") || "solicitacoes");
+
+  /* ================= ARQUIVO ================= */
+  const inputArquivo = document.getElementById("arquivo");
+  const btnRemover = document.createElement("button");
+
+  if (inputArquivo) {
+    btnRemover.innerText = "❌ Remover arquivo";
+    btnRemover.type = "button";
+    btnRemover.className = "btn-secondary";
+    btnRemover.style.display = "none";
+    inputArquivo.after(btnRemover);
+
+    inputArquivo.addEventListener("change", e => {
+      arquivoSelecionado = e.target.files[0] || null;
+      btnRemover.style.display = arquivoSelecionado ? "inline-block" : "none";
+    });
+
+    btnRemover.onclick = () => {
+      arquivoSelecionado = null;
+      inputArquivo.value = "";
+      btnRemover.style.display = "none";
+    };
+  }
+});
 
 /* ======================================================
    📂 ABRIR / CRIAR TICKET (1 POR CATEGORIA)
 ====================================================== */
 window.abrirCategoria = async categoria => {
   mostrarAba("chat");
-  document.getElementById("chatTitulo").innerText =
-    `💬 ${categoria} — ${usuario.nome} ${usuario.cid}`;
 
   const q = query(
     collection(db, "tickets"),
@@ -106,7 +112,6 @@ window.abrirCategoria = async categoria => {
       criadoEm: serverTimestamp()
     });
     ticketAtual = ref.id;
-    await registrarLog("Ticket criado");
   }
 
   iniciarChat();
@@ -146,22 +151,19 @@ function carregarTicketsEmAndamento() {
 
     Object.keys(cats).forEach(cat => {
       const card = document.createElement("div");
-      card.className = "categoria-card official";
+      card.className = "categoria-card";
       card.innerHTML = `<h4>${cat}</h4><span>${cats[cat].length} ativo</span>`;
 
       card.onclick = () => {
-        document.getElementById("tituloCategoria").innerText = cat;
         grid.innerHTML = "";
         lista.classList.remove("hidden");
+        document.getElementById("tituloCategoria").innerText = cat;
         box.innerHTML = "";
 
         cats[cat].forEach(t => {
           const item = document.createElement("div");
-          item.className = "card-ticket official";
-          item.innerHTML = `
-            <strong>${t.categoria}</strong><br>
-            <small>${t.criadoEm?.toDate().toLocaleString("pt-BR")}</small>
-          `;
+          item.className = "card-ticket";
+          item.innerHTML = `<strong>${t.categoria}</strong>`;
           item.onclick = () => {
             ticketAtual = t.id;
             mostrarAba("chat");
@@ -179,64 +181,14 @@ function carregarTicketsEmAndamento() {
 window.voltarCategorias = () => carregarTicketsEmAndamento();
 
 /* ======================================================
-   📎 ARQUIVO
-====================================================== */
-const inputArquivo = document.getElementById("arquivo");
-const btnRemover = document.createElement("button");
-
-if (inputArquivo) {
-  btnRemover.innerText = "❌ Remover arquivo";
-  btnRemover.type = "button";
-  btnRemover.className = "btn-secondary";
-  btnRemover.style.display = "none";
-  inputArquivo.after(btnRemover);
-
-  inputArquivo.onchange = e => {
-    arquivoSelecionado = e.target.files[0] || null;
-    btnRemover.style.display = arquivoSelecionado ? "inline-block" : "none";
-  };
-
-  btnRemover.onclick = () => {
-    arquivoSelecionado = null;
-    inputArquivo.value = "";
-    btnRemover.style.display = "none";
-  };
-}
-
-/* ======================================================
-   ☁️ CLOUDINARY (SUBSTITUA O CLOUD NAME)
-====================================================== */
-async function uploadArquivo(file) {
-  const form = new FormData();
-  form.append("file", file);
-  form.append("upload_preset", "oasis");
-
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/SEU_CLOUD_NAME/auto/upload",
-    { method: "POST", body: form }
-  );
-
-  const data = await res.json();
-  return { url: data.secure_url, nome: file.name };
-}
-
-/* ======================================================
    💬 CHAT
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
-  const input = document.getElementById("mensagem");
-  const btn = document.querySelector(".chat-input button");
-
   box.innerHTML = "";
 
   unsubscribeMensagens?.();
   unsubscribeStatus?.();
-
-  unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), snap => {
-    const fechado = snap.data().status === "encerrado";
-    input.disabled = btn.disabled = fechado;
-  });
 
   unsubscribeMensagens = onSnapshot(
     query(collection(db, "tickets", ticketAtual, "mensagens"), orderBy("criadoEm")),
@@ -245,10 +197,10 @@ function iniciarChat() {
       snap.forEach(d => {
         const m = d.data();
         box.innerHTML += `
-          <div class="mensagem cidadao">
-            <span class="autor">${m.autor}</span>
+          <div class="mensagem">
+            <b>${m.autor}</b><br>
             ${m.texto || ""}
-            ${m.anexo ? `<a href="${m.anexo.url}" target="_blank">📎 ${m.anexo.nome}</a>` : ""}
+            ${m.anexo ? `<br><a href="${m.anexo.url}" target="_blank">📎 ${m.anexo.nome}</a>` : ""}
           </div>`;
       });
       box.scrollTop = box.scrollHeight;
@@ -263,20 +215,11 @@ window.enviarMensagem = async () => {
   const texto = document.getElementById("mensagem").value.trim();
   if (!texto && !arquivoSelecionado) return;
 
-  let anexo = null;
-  if (arquivoSelecionado) anexo = await uploadArquivo(arquivoSelecionado);
-
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} (cidadão)`,
     texto,
-    anexo,
     criadoEm: serverTimestamp()
   });
 
-  await registrarLog("Mensagem enviada");
-
   document.getElementById("mensagem").value = "";
-  if (inputArquivo) inputArquivo.value = "";
-  arquivoSelecionado = null;
-  btnRemover.style.display = "none";
 };
