@@ -17,44 +17,57 @@
   position:relative;
 ">
 
-<!-- MARCA D’ÁGUA -->
+<!-- MARCA D’ÁGUA GLOBAL -->
 <div style="
   position:fixed;
   inset:0;
   background:url('logo-oasis.png') no-repeat center;
-  background-size:520px;
-  opacity:0.05;
+  background-size:680px;
+  opacity:0.06;
   pointer-events:none;
 "></div>
 
 <div style="
   background:#f8f4ee;
   border-radius:18px;
-  padding:40px 30px;
+  padding:42px 32px;
   width:360px;
   text-align:center;
   border:2px solid #d4af37;
   position:relative;
   z-index:1;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
 ">
 
-  <h1 style="color:#5b0f0f; margin-bottom:6px;">
+  <!-- ORDEM CORRETA -->
+  <p style="
+    font-size:13px;
+    letter-spacing:.5px;
+    margin-bottom:6px;
+    color:#444;
+  ">
+    Portal Oficial de Acesso
+  </p>
+
+  <h1 style="
+    color:#5b0f0f;
+    margin-bottom:24px;
+    font-size:22px;
+  ">
     SUPREMO TRIBUNAL DE OASIS ⚖️
   </h1>
 
-  <p style="font-size:13px; margin-bottom:20px;">
-    Portal Oficial de Acesso Institucional
-  </p>
-
+  <!-- BOTÕES -->
   <button onclick="login('cidadao')" style="
     width:100%;
     padding:14px;
     margin:10px 0;
-    border-radius:14px;
+    border-radius:16px;
     border:none;
     background:linear-gradient(to bottom,#7a1c1c,#5b0f0f);
     color:#fff;
     cursor:pointer;
+    font-size:14px;
   ">
     👤 Acesso do Cidadão
   </button>
@@ -63,11 +76,12 @@
     width:100%;
     padding:14px;
     margin:10px 0;
-    border-radius:14px;
+    border-radius:16px;
     border:none;
     background:linear-gradient(to bottom,#7a1c1c,#5b0f0f);
     color:#fff;
     cursor:pointer;
+    font-size:14px;
   ">
     ⚖️ Acesso Jurídico
   </button>
@@ -76,21 +90,34 @@
     width:100%;
     padding:14px;
     margin:10px 0;
-    border-radius:14px;
+    border-radius:16px;
     border:none;
     background:linear-gradient(to bottom,#7a1c1c,#5b0f0f);
     color:#fff;
     cursor:pointer;
+    font-size:14px;
   ">
     👑 Coordenação
   </button>
 
-  <p style="font-size:11px; margin-top:16px; color:#555;">
+  <!-- ACESSO MONITORADO (APENAS AQUI) -->
+  <p style="
+    font-size:11px;
+    margin-top:16px;
+    color:#555;
+  ">
     Sistema institucional — acesso monitorado
   </p>
 
-  <footer style="margin-top:20px; font-size:11px; color:#555;">
-    Site desenvolvido por <strong style="color:#7a1c1c;">Hinara Heloar</strong> — direitos reservados
+  <!-- RODAPÉ -->
+  <footer style="
+    margin-top:22px;
+    font-size:11px;
+    color:#555;
+  ">
+    Site desenvolvido por
+    <strong style="color:#7a1c1c;">Hinara Heloar</strong>
+    — direitos reservados
   </footer>
 
 </div>
