@@ -2,42 +2,48 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Atendimento • Staff</title>
+  <title>Atendimento • Supremo Tribunal de Oasis</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 
-<body class="bg-paper">
+<body class="bg-paper official">
 
+<!-- 🔐 PROTEÇÃO CORRETA -->
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "staff") {
-    location.href = "../index.html";
+  if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
+    location.replace("../index.html");
   }
 </script>
 
 <header class="header small official">
   <img src="../logo-oasis.png" class="logo small">
-  <div>
+  <div class="header-text">
     <h1>Atendimento ao Cidadão</h1>
-    <span id="chatCategoria"></span>
+    <span id="chatCategoria">Supremo Tribunal de Oasis</span>
   </div>
 </header>
 
-<nav class="nav-bar">
+<nav class="nav-bar official">
   <button onclick="location.href='staff.html'">⬅ Voltar</button>
   <button onclick="fecharTicket()">🔒 Encerrar Ticket</button>
-  <button onclick="sair()">🚪 Sair</button>
+  <button onclick="localStorage.clear();location.replace('../index.html')">🚪 Sair</button>
 </nav>
 
-<main class="content">
-  <div id="mensagens" class="chat-box"></div>
+<main class="content official">
 
-  <div class="chat-input">
+  <div id="mensagens" class="chat-box official"></div>
+
+  <div class="chat-input official">
     <input id="mensagem" placeholder="Digite sua resposta oficial..." />
-    <button onclick="enviarMensagem()">Enviar</button>
+    <input type="file" id="arquivo" />
+    <button id="btnEnviar" class="btn-primary">Enviar</button>
   </div>
+
 </main>
 
-<script type="module" src="staff.js"></script>
+<!-- CHAT FUNCIONAL -->
+<script type="module" src="./chat.js"></script>
+
 </body>
 </html>
