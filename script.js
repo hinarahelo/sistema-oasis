@@ -1,296 +1,123 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  onSnapshot,
-  serverTimestamp,
-  doc,
-  getDoc,
-  orderBy,
-  setDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sistema de Atendimento — Supremo Tribunal de Oasis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css" />
+</head>
 
-import { notificarDiscord } from "./discord.js";
+<body class="bg-paper official">
 
-/* ======================================================
-   🔥 FIREBASE
-====================================================== */
-const app = initializeApp({
-  apiKey: "AIzaSyC6btKxDjOK6VT17DdCS3FvF36Hf_7_TXo",
-  authDomain: "sistema-oasis-75979.firebaseapp.com",
-  projectId: "sistema-oasis-75979"
-});
-const db = getFirestore(app);
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || usuario.nivel !== "cidadao") location.href = "index.html";
+</script>
 
-/* ======================================================
-   🔐 USUÁRIO
-====================================================== */
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-if (!usuario || usuario.nivel !== "cidadao") location.href = "index.html";
+<header class="header small official">
+  <img src="logo-oasis.png" class="logo" />
+  <div class="header-text">
+    <h1>Supremo Tribunal de Oasis</h1>
+    <span>Sistema Oficial de Atendimento ao Cidadão</span>
+  </div>
+</header>
 
-/* ======================================================
-   ESTADO
-====================================================== */
-let ticketAtual = null;
-let unsubscribeMensagens = null;
-let unsubscribeStatus = null;
-let unsubscribeDigitando = null;
-let arquivoSelecionado = null;
-let ultimoAutor = null;
-let ultimaData = null;
-let typingTimeout = null;
+<div class="layout">
 
-/* ======================================================
-   ABAS
-====================================================== */
-window.mostrarAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  <nav class="nav-bar sidebar official">
+    <button onclick="irAba('solicitacoes')">📂 Solicitações</button>
+    <button onclick="irAba('andamento')">🕒 Em andamento</button>
+    <button onclick="irAba('precos')">💰 Tabela de Serviços</button>
+    <button onclick="sair()">🚪 Encerrar Sessão</button>
+  </nav>
+
+  <main class="content official">
+
+    <!-- SOLICITAÇÕES -->
+    <section id="solicitacoes" class="aba active">
+      <h2>Solicitações</h2>
+
+      <div class="bloco-servicos">
+        <h3>💍 Serviços Civis</h3>
+        <div class="grid-servicos">
+          <button onclick="abrirCategoria('Casamento')">Casamento</button>
+          <button onclick="abrirCategoria('Divórcio')">Divórcio</button>
+          <button onclick="abrirCategoria('Nascimento')">Nascimento</button>
+          <button onclick="abrirCategoria('Adoção')">Adoção</button>
+          <button onclick="abrirCategoria('Troca de Nome')">Troca de Nome</button>
+        </div>
+      </div>
+
+      <div class="bloco-servicos">
+        <h3>⚖️ Serviços Jurídicos</h3>
+        <div class="grid-servicos">
+          <button onclick="abrirCategoria('Porte de Arma')">Porte de Arma</button>
+          <button onclick="abrirCategoria('Limpeza de Ficha')">Limpeza de Ficha</button>
+          <button onclick="abrirCategoria('Jovem Aprendiz')">Jovem Aprendiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANDAMENTO -->
+    <section id="andamento" class="aba">
+      <h2>🕒 Tickets em Andamento</h2>
+      <div id="categoriasTickets" class="categoria-grid"></div>
+
+      <div id="listaPorCategoria" class="hidden">
+        <button class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
+        <h3 id="tituloCategoria"></h3>
+        <div id="ticketsCategoria"></div>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section id="chat" class="aba">
+      <h2 id="chatTitulo"></h2>
+      <div id="mensagens" class="chat-box"></div>
+
+      <div class="chat-input">
+        <input id="mensagem" placeholder="Digite sua mensagem..." />
+        <input type="file" id="arquivo" />
+        <button onclick="enviarMensagem()">Enviar</button>
+        <button class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
+      </div>
+    </section>
+
+    <!-- TABELA -->
+    <section id="precos" class="aba">
+      <article class="documento-oficial">
+        <header class="doc-header">
+          <h2>⚖️ Tabela Oficial de Serviços</h2>
+          <span>Supremo Tribunal de Oasis</span>
+          <div class="selo-oficial">DOCUMENTO OFICIAL • USO INSTITUCIONAL</div>
+        </header>
+      </article>
+    </section>
+
+    <footer class="footer">
+      <div>Sistema institucional — acesso monitorado</div>
+      <div>Site desenvolvido por <strong>Hinara Heloar</strong> — direitos reservados</div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+function mostrarAba(id){
+  document.querySelectorAll(".aba").forEach(a=>a.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
-  if (id === "andamento") carregarTicketsEmAndamento();
-};
-mostrarAba(location.hash.replace("#", "") || "solicitacoes");
-
-/* ======================================================
-   LOGOUT
-====================================================== */
-window.sair = () => {
+}
+function irAba(id){
+  location.hash=id;
+  mostrarAba(id);
+}
+function sair(){
   localStorage.clear();
-  location.href = "index.html";
-};
-
-/* ======================================================
-   LOG
-====================================================== */
-async function registrarLog(acao) {
-  await addDoc(collection(db, "logs"), {
-    ticket: ticketAtual,
-    cid: usuario.cid,
-    usuario: usuario.nome,
-    acao,
-    data: serverTimestamp()
-  });
+  location.href="index.html";
 }
+mostrarAba(location.hash.replace("#","")||"solicitacoes");
+</script>
 
-/* ======================================================
-   🕒 EM ANDAMENTO
-====================================================== */
-function carregarTicketsEmAndamento() {
-  const grid = document.getElementById("categoriasTickets");
-  const lista = document.getElementById("listaPorCategoria");
-  const box = document.getElementById("ticketsCategoria");
-
-  grid.innerHTML = "";
-  lista.classList.add("hidden");
-
-  const q = query(
-    collection(db, "tickets"),
-    where("cid", "==", usuario.cid),
-    where("status", "==", "aberto")
-  );
-
-  onSnapshot(q, snap => {
-    const cats = {};
-    grid.innerHTML = "";
-
-    snap.forEach(d => {
-      const t = d.data();
-      if (!cats[t.categoria]) cats[t.categoria] = [];
-      cats[t.categoria].push({ id: d.id, ...t });
-    });
-
-    if (!Object.keys(cats).length) {
-      grid.innerHTML = "<p>Nenhum ticket em andamento.</p>";
-      return;
-    }
-
-    Object.keys(cats).forEach(cat => {
-      const card = document.createElement("div");
-      card.className = "categoria-card official";
-      card.innerHTML = `<h4>${cat}</h4><span>${cats[cat].length} em andamento</span>`;
-
-      card.onclick = () => {
-        document.getElementById("tituloCategoria").innerText = cat;
-        grid.innerHTML = "";
-        lista.classList.remove("hidden");
-        box.innerHTML = "";
-
-        cats[cat].forEach(t => {
-          const item = document.createElement("div");
-          item.className = "card-ticket official";
-          item.innerHTML = `
-            <h5>${t.categoria}</h5>
-            <small>${t.criadoEm?.toDate().toLocaleString("pt-BR")}</small>
-          `;
-          item.onclick = () => {
-            ticketAtual = t.id;
-            document.getElementById("chatTitulo").innerText = `💬 ${t.categoria}`;
-            mostrarAba("chat");
-            iniciarChat();
-          };
-          box.appendChild(item);
-        });
-      };
-      grid.appendChild(card);
-    });
-  });
-}
-window.voltarCategorias = () => carregarTicketsEmAndamento();
-
-/* ======================================================
-   📂 ABRIR / CRIAR
-====================================================== */
-window.abrirCategoria = async categoria => {
-  mostrarAba("chat");
-  document.getElementById("chatTitulo").innerText = `💬 ${categoria}`;
-
-  const q = query(
-    collection(db, "tickets"),
-    where("cid", "==", usuario.cid),
-    where("categoria", "==", categoria),
-    where("status", "!=", "encerrado")
-  );
-
-  const snap = await getDocs(q);
-  if (!snap.empty) ticketAtual = snap.docs[0].id;
-  else {
-    const ref = await addDoc(collection(db, "tickets"), {
-      nome: usuario.nome,
-      cid: usuario.cid,
-      categoria,
-      status: "aberto",
-      criadoEm: serverTimestamp()
-    });
-    ticketAtual = ref.id;
-    await registrarLog("Ticket criado");
-    await notificarDiscord(
-      `📩 NOVO TICKET\nCategoria: ${categoria}\nCidadão: ${usuario.nome}`,
-      "WEBHOOK_JURIDICO_AQUI"
-    );
-  }
-  iniciarChat();
-};
-
-/* ======================================================
-   💬 CHAT (AGRUPADO + DATA + DIGITANDO)
-====================================================== */
-function iniciarChat() {
-  const box = document.getElementById("mensagens");
-  const input = document.getElementById("mensagem");
-  const btn = document.querySelector(".chat-input button");
-
-  box.innerHTML = "";
-  ultimoAutor = null;
-  ultimaData = null;
-
-  if (unsubscribeMensagens) unsubscribeMensagens();
-  if (unsubscribeStatus) unsubscribeStatus();
-  if (unsubscribeDigitando) unsubscribeDigitando();
-
-  unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), s => {
-    const t = s.data();
-    input.disabled = btn.disabled = t.status === "encerrado";
-    input.placeholder =
-      t.status === "encerrado"
-        ? "🔒 Ticket encerrado — leitura apenas"
-        : "Digite sua mensagem...";
-  });
-
-  unsubscribeDigitando = onSnapshot(
-    collection(db, "tickets", ticketAtual, "digitando"),
-    snap => {
-      document.getElementById("digitando")?.remove();
-      snap.forEach(d => {
-        if (d.id !== usuario.cid) {
-          box.insertAdjacentHTML(
-            "beforeend",
-            `<div id="digitando" class="digitando">✍️ ${d.data().nome} está digitando...</div>`
-          );
-        }
-      });
-    }
-  );
-
-  unsubscribeMensagens = onSnapshot(
-    query(collection(db, "tickets", ticketAtual, "mensagens"), orderBy("criadoEm")),
-    snap => {
-      box.innerHTML = "";
-      ultimoAutor = null;
-      ultimaData = null;
-
-      snap.forEach(d => {
-        const m = d.data();
-        if (!m.criadoEm) return;
-
-        const dataObj = m.criadoEm.toDate();
-        const dataStr = dataObj.toLocaleDateString("pt-BR");
-        const horaStr = dataObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-        if (dataStr !== ultimaData) {
-          box.innerHTML += `<div class="chat-data">${dataStr}</div>`;
-          ultimaData = dataStr;
-          ultimoAutor = null;
-        }
-
-        let tipo = "cidadao", classe = "nome-cidadao";
-        if (m.autor?.includes("juridico")) (tipo = "juridico"), (classe = "nome-juridico");
-        if (m.autor?.includes("coordenacao")) (tipo = "coordenacao"), (classe = "nome-coordenacao");
-
-        const mostrarAutor = m.autor !== ultimoAutor;
-
-        box.innerHTML += `
-          <div class="mensagem ${tipo} nova">
-            ${mostrarAutor ? `<span class="autor ${classe}">${m.autor}</span>` : ""}
-            <div class="texto">${m.texto || ""}</div>
-            <div class="hora">${horaStr}</div>
-          </div>
-        `;
-
-        ultimoAutor = m.autor;
-      });
-
-      box.scrollTop = box.scrollHeight;
-    }
-  );
-}
-
-/* ======================================================
-   DIGITANDO
-====================================================== */
-const inputMensagem = document.getElementById("mensagem");
-inputMensagem?.addEventListener("input", () => {
-  if (!ticketAtual) return;
-  setDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid), {
-    nome: `${usuario.nome} (${usuario.nivel})`,
-    at: serverTimestamp()
-  });
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    deleteDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid));
-  }, 2000);
-});
-
-/* ======================================================
-   📤 ENVIAR
-====================================================== */
-window.enviarMensagem = async () => {
-  const texto = document.getElementById("mensagem").value.trim();
-  if (!texto && !arquivoSelecionado) return;
-
-  const t = await getDoc(doc(db, "tickets", ticketAtual));
-  if (t.data().status === "encerrado") return;
-
-  await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
-    autor: `${usuario.nome} (${usuario.nivel})`,
-    texto,
-    criadoEm: serverTimestamp()
-  });
-
-  await registrarLog("Mensagem enviada");
-  document.getElementById("mensagem").value = "";
-  deleteDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid));
-};
+<script type="module" src="script.js"></script>
+</body>
+</html>
