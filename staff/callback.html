@@ -1,0 +1,29 @@
+<script>
+const params = new URLSearchParams(window.location.search);
+const session = params.get("session");
+const nivel = params.get("state"); // cidadao | juridico | coordenacao
+
+if (session && nivel) {
+  try {
+    const usuario = JSON.parse(atob(session));
+
+    // 🔐 FORÇA O NÍVEL CORRETO
+    usuario.nivel = nivel;
+
+    localStorage.setItem("usuario", JSON.stringify(usuario));
+
+    window.history.replaceState({}, document.title, "/sistema-oasis/");
+
+    if (nivel === "cidadao") location.href = "tickets.html";
+    if (nivel === "juridico") location.href = "juridico.html";
+    if (nivel === "coordenacao") location.href = "coordenacao.html";
+
+  } catch (e) {
+    console.error(e);
+    localStorage.removeItem("usuario");
+    location.href = "index.html";
+  }
+} else {
+  location.href = "index.html";
+}
+</script>
