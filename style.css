@@ -15,7 +15,7 @@ body {
 }
 
 /* ======================================================
-   LAYOUT GERAL
+   LAYOUT GERAL + MARCA D’ÁGUA GLOBAL
 ====================================================== */
 .bg-paper {
   background: #f8f4ee;
@@ -25,6 +25,24 @@ body {
   max-width: 1200px;
   margin: auto;
   padding: 24px;
+  position: relative;
+}
+
+/* marca d’água global */
+.content::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("logo-oasis.png") no-repeat center;
+  background-size: 520px;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content > * {
+  position: relative;
+  z-index: 1;
 }
 
 .official {
@@ -57,7 +75,7 @@ body {
 .logo.small { width: 70px; }
 
 /* ======================================================
-   NAVBAR
+   NAVBAR (BOTÕES REAIS)
 ====================================================== */
 .nav-bar {
   background: #3b0d0d;
@@ -68,12 +86,81 @@ body {
 }
 
 .nav-bar button {
-  background: #6b0f0f;
+  background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
   color: #fff;
   border: none;
   padding: 10px 18px;
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
+  box-shadow: 0 3px 0 #3b0d0d;
+  transition: all .2s ease;
+}
+
+.nav-bar button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,.3);
+}
+
+.nav-bar button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 #3b0d0d;
+}
+
+/* ======================================================
+   BOTÕES DE SOLICITAÇÕES
+====================================================== */
+.grid-servicos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.grid-servicos button {
+  background: #f8f4ee;
+  border: 2px solid #c9a227;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all .2s ease;
+}
+
+.grid-servicos button:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,.15);
+}
+
+/* ======================================================
+   EM ANDAMENTO — CARDS CLICÁVEIS
+====================================================== */
+.categoria-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.categoria-card,
+.card-ticket {
+  background: #fff;
+  border: 2px solid #d4af37;
+  border-radius: 18px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+.categoria-card:hover,
+.card-ticket:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0,0,0,.25);
+  background: #fffdf6;
+}
+
+.categoria-card h4,
+.card-ticket h5 {
+  margin-bottom: 6px;
 }
 
 /* ======================================================
@@ -86,63 +173,6 @@ body {
   padding: 48px;
   margin-top: 20px;
   box-shadow: 0 0 0 6px #f1e6c8;
-}
-
-.documento-oficial::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("logo-oasis.png") no-repeat center;
-  background-size: 420px;
-  opacity: 0.05;
-  pointer-events: none;
-}
-
-.doc-header {
-  text-align: center;
-  margin-bottom: 32px;
-  border-bottom: 1px solid #c9a227;
-  padding-bottom: 20px;
-}
-
-.doc-header h2 {
-  font-size: 22px;
-  margin-bottom: 6px;
-}
-
-.doc-header span {
-  font-size: 13px;
-  color: #555;
-}
-
-.selo-oficial {
-  margin-top: 12px;
-  font-weight: bold;
-  color: #7a1c1c;
-  letter-spacing: 1px;
-}
-
-.price-card {
-  margin-bottom: 28px;
-}
-
-.price-card h3 {
-  border-left: 6px solid #7a1c1c;
-  padding-left: 12px;
-  margin-bottom: 10px;
-}
-
-.price-card ul {
-  margin-left: 18px;
-}
-
-.price-card li {
-  margin-bottom: 6px;
-}
-
-.price-card p {
-  margin-top: 10px;
-  font-size: 13px;
 }
 
 /* ======================================================
@@ -159,7 +189,7 @@ body {
 }
 
 /* ======================================================
-   MENSAGENS (CORRIGIDO)
+   MENSAGENS
 ====================================================== */
 .mensagem {
   max-width: 72%;
@@ -191,9 +221,6 @@ body {
   border-left: 5px solid #b00000;
 }
 
-/* ======================================================
-   AUTOR / TEXTO / HORA
-====================================================== */
 .autor {
   font-weight: bold;
   font-size: 12px;
@@ -203,10 +230,6 @@ body {
 .nome-cidadao { color: #1e5eff; }
 .nome-juridico { color: #c9a227; }
 .nome-coordenacao { color: #b00000; }
-
-.texto {
-  font-size: 13px;
-}
 
 .hora {
   font-size: 10px;
@@ -234,8 +257,9 @@ body {
   padding: 12px 18px;
   border-radius: 14px;
   border: none;
-  background: #6b0f0f;
+  background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
   color: #fff;
+  cursor: pointer;
 }
 
 .btn-secondary {
