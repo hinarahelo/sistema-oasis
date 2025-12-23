@@ -22,9 +22,9 @@ body {
 }
 
 .content {
-  padding: 28px;
-  position: relative;
+  padding: 32px 36px;
   width: 100%;
+  position: relative;
 }
 
 /* marca d’água global */
@@ -33,8 +33,8 @@ body {
   position: fixed;
   inset: 0;
   background: url("logo-oasis.png") no-repeat center;
-  background-size: 640px;
-  opacity: 0.045;
+  background-size: 700px;
+  opacity: 0.035;
   pointer-events: none;
   z-index: 0;
 }
@@ -45,36 +45,38 @@ body {
 }
 
 .official {
-  letter-spacing: 0.3px;
+  letter-spacing: 0.35px;
 }
 
 /* ======================================================
-   HEADER
+   HEADER — MAIS FORTE E INSTITUCIONAL
 ====================================================== */
 .header {
   background: linear-gradient(to right, #5b0f0f, #7a1c1c);
   color: #f8f4ee;
-  padding: 18px 24px;
+  padding: 22px 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 20px;
   border-bottom: 4px solid #d4af37;
   text-align: center;
 }
 
 .logo {
-  width: 68px;
+  width: 76px;
 }
 
 .header-text h1 {
-  font-size: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: 1px;
   margin-bottom: 2px;
 }
 
 .header-text span {
-  font-size: 12px;
-  opacity: .9;
+  font-size: 13px;
+  opacity: .95;
 }
 
 /* ======================================================
@@ -82,41 +84,41 @@ body {
 ====================================================== */
 .layout {
   display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: calc(100vh - 90px);
+  grid-template-columns: 260px 1fr;
+  min-height: calc(100vh - 110px);
 }
 
 /* ======================================================
    SIDEBAR (MENU À ESQUERDA)
 ====================================================== */
 .nav-bar.sidebar {
-  background: #3b0d0d;
-  padding: 22px 14px;
+  background: linear-gradient(to bottom, #3b0d0d, #2a0808);
+  padding: 26px 16px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  border-right: 2px solid #d4af37;
+  border-right: 3px solid #d4af37;
 }
 
 .nav-bar.sidebar button {
   background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
   color: #fff;
   border: none;
-  padding: 12px 16px;
+  padding: 14px 18px;
   border-radius: 14px;
   cursor: pointer;
   text-align: left;
-  font-size: 14px;
-  transition: all .2s ease;
+  font-size: 15px;
+  transition: all .25s ease;
 }
 
 .nav-bar.sidebar button:hover {
-  transform: translateX(4px);
-  box-shadow: 0 6px 14px rgba(0,0,0,.3);
+  transform: translateX(6px);
+  box-shadow: 0 8px 16px rgba(0,0,0,.35);
 }
 
 /* ======================================================
-   ABAS + TRANSIÇÃO
+   CONTEÚDO DAS ABAS (BLOCO INSTITUCIONAL)
 ====================================================== */
 .aba {
   display: none;
@@ -125,12 +127,17 @@ body {
 
 .aba.active {
   display: block;
+  background: #fbf9f5;
+  border: 2px solid #d4af37;
+  border-radius: 22px;
+  padding: 36px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.08);
 }
 
 @keyframes fadeSlide {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -146,49 +153,51 @@ body {
 .grid-servicos {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .grid-servicos button {
   background: #fdfaf3;
   border: 2px solid #c9a227;
-  padding: 10px 16px;
-  border-radius: 14px;
+  padding: 12px 18px;
+  border-radius: 16px;
   cursor: pointer;
-  font-size: 13px;
-  transition: all .2s ease;
+  font-size: 14px;
+  transition: all .25s ease;
 }
 
 .grid-servicos button:hover {
   background: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.18);
 }
 
 /* ======================================================
    EM ANDAMENTO
 ====================================================== */
 .categoria-grid {
+  max-width: 880px;
+  margin: 20px auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .categoria-card,
 .card-ticket {
   background: #fff;
   border: 2px solid #d4af37;
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 20px;
+  padding: 18px;
   cursor: pointer;
   transition: all .25s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
 }
 
 .categoria-card:hover,
 .card-ticket:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(0,0,0,.25);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,.25);
   background: #fffdf6;
 }
 
@@ -197,12 +206,12 @@ body {
 ====================================================== */
 .chat-box {
   background: #fff;
-  border-radius: 18px;
-  padding: 18px;
-  height: 360px;
+  border-radius: 20px;
+  padding: 20px;
+  height: 380px;
   overflow-y: auto;
   border: 1px solid #ddd;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 /* ======================================================
@@ -212,7 +221,7 @@ body {
   text-align: center;
   font-size: 11px;
   color: #555;
-  margin: 26px 0;
+  margin: 30px 0;
   position: relative;
 }
 
@@ -221,7 +230,7 @@ body {
   content: "";
   position: absolute;
   top: 50%;
-  width: 34%;
+  width: 32%;
   height: 1px;
   background: #ccc;
 }
@@ -233,15 +242,15 @@ body {
    MENSAGENS
 ====================================================== */
 .mensagem {
-  max-width: 72%;
-  padding: 12px 14px;
-  border-radius: 16px;
-  margin-bottom: 10px;
-  font-size: 13px;
-  line-height: 1.5;
+  max-width: 70%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.55;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  box-shadow: 0 3px 8px rgba(0,0,0,.1);
 }
 
 .mensagem.cidadao {
@@ -280,20 +289,20 @@ body {
 ====================================================== */
 .chat-input {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .chat-input input {
   flex: 1;
-  padding: 12px;
-  border-radius: 14px;
+  padding: 14px;
+  border-radius: 16px;
   border: 1px solid #ccc;
 }
 
 .chat-input button {
-  padding: 12px 18px;
-  border-radius: 14px;
+  padding: 14px 20px;
+  border-radius: 16px;
   border: none;
   background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
   color: #fff;
@@ -307,7 +316,7 @@ body {
   text-align: center;
   font-size: 11px;
   color: #555;
-  margin: 40px 0 10px;
+  margin: 48px 0 14px;
 }
 
 .footer strong {
@@ -327,7 +336,7 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     border-right: none;
-    border-bottom: 2px solid #d4af37;
+    border-bottom: 3px solid #d4af37;
   }
 
   .nav-bar.sidebar button {
@@ -336,10 +345,10 @@ body {
   }
 
   .mensagem {
-    max-width: 90%;
+    max-width: 92%;
   }
 
   .chat-box {
-    height: 300px;
+    height: 320px;
   }
 }
