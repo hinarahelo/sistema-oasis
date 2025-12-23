@@ -1,5 +1,4 @@
 import {
-  getFirestore,
   collection,
   addDoc,
   query,
@@ -13,10 +12,9 @@ import {
 import { db } from "../firebase.js";
 
 /* ======================================================
-   🔐 USUÁRIO (JURÍDICO / COORDENAÇÃO)
+   🔐 USUÁRIO
 ====================================================== */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-
 if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
   location.replace("../index.html");
 }
@@ -25,10 +23,10 @@ if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
    ESTADO
 ====================================================== */
 let ticketAtual = null;
-let unsubscribeMensagens = null;
+let unsubscribe = null;
 
 /* ======================================================
-   ABRIR CHAT (EXPORTADO)
+   EXPORT
 ====================================================== */
 export function abrirChat(ticketId) {
   ticketAtual = ticketId;
@@ -41,7 +39,7 @@ export function abrirChat(ticketId) {
 async function uploadArquivo(file) {
   const form = new FormData();
   form.append("file", file);
-  form.append("upload_preset", "oasis"); // ✅ mesmo preset do cidadão
+  form.append("upload_preset", "oasis");
 
   const res = await fetch(
     "https://api.cloudinary.com/v1_1/SEU_CLOUD_NAME/auto/upload",
@@ -49,86 +47,58 @@ async function uploadArquivo(file) {
   );
 
   const data = await res.json();
-
-  return {
-    url: data.secure_url,
-    nome: file.name,
-    tipo: file.type
-  };
+  return { url: data.secure_url, nome: file.name, tipo: file.type };
 }
 
 /* ======================================================
-   💬 CHAT
+   CHAT
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
   const input = document.getElementById("mensagem");
-  const btn = document.getElementById("btnEnviar");
-  const inputArquivo = document.getElementById("arquivo");
-
-  if (!box || !input || !btn) return;
+  const btn = document.querySelector(".chat-input button");
+  const fileInput = document.getElementById("arquivo");
 
   box.innerHTML = "";
+  unsubscribe?.();
 
-  unsubscribeMensagens?.();
-
-  /* 🔒 STATUS DO TICKET */
+  /* STATUS */
   onSnapshot(doc(db, "tickets", ticketAtual), snap => {
-    const t = snap.data();
-    const fechado = t.status === "encerrado";
-
+    const fechado = snap.data().status === "encerrado";
     input.disabled = btn.disabled = fechado;
-    if (inputArquivo) inputArquivo.disabled = fechado;
-
-    input.placeholder = fechado
-      ? "🔒 Ticket encerrado — somente leitura"
-      : "Digite sua resposta...";
+    if (fileInput) fileInput.disabled = fechado;
   });
 
-  /* 💬 MENSAGENS */
-  unsubscribeMensagens = onSnapshot(
+  unsubscribe = onSnapshot(
     query(
       collection(db, "tickets", ticketAtual, "mensagens"),
-      orderBy("criadoEm", "asc")
+      orderBy("criadoEm")
     ),
     snap => {
       box.innerHTML = "";
 
       snap.forEach(d => {
         const m = d.data();
+        const hora = m.criadoEm
+          ? m.criadoEm.toDate().toLocaleString("pt-BR")
+          : "";
 
         let tipo = "cidadao";
-        if (m.autor?.includes("juridico")) tipo = "juridico";
-        if (m.autor?.includes("coordenacao")) tipo = "coordenacao";
-
-        const hora = m.criadoEm
-          ? m.criadoEm.toDate().toLocaleString("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit"
-            })
-          : "";
+        if (m.autor.includes("juridico")) tipo = "juridico";
+        if (m.autor.includes("coordenacao")) tipo = "coordenacao";
 
         let anexo = "";
         if (m.anexo) {
-          anexo = `
-            <div class="anexo">
-              📎 <a href="${m.anexo.url}" target="_blank">
-                ${m.anexo.nome}
-              </a>
-            </div>
-          `;
+          anexo = m.anexo.tipo?.startsWith("image/")
+            ? `<img src="${m.anexo.url}" style="max-width:220px;border-radius:10px;">`
+            : `<a href="${m.anexo.url}" target="_blank">📎 ${m.anexo.nome}</a>`;
         }
 
         box.innerHTML += `
           <div class="mensagem ${tipo}">
-            <div class="conteudo">
-              <span class="autor ${tipo}">${m.autor}</span>
-              ${m.texto ? `<div class="texto">${m.texto}</div>` : ""}
-              ${anexo}
-            </div>
+            <span class="autor ${tipo}">${m.autor}</span>
+            ${m.texto || ""}
+            ${anexo}
             <div class="hora">${hora}</div>
           </div>
         `;
@@ -138,23 +108,17 @@ function iniciarChat() {
     }
   );
 
-  /* 📤 ENVIAR */
+  /* ENVIAR */
   btn.onclick = async () => {
     const texto = input.value.trim();
-    const file = inputArquivo?.files?.[0] || null;
-
+    const file = fileInput?.files?.[0] || null;
     if (!texto && !file) return;
 
     const snap = await getDoc(doc(db, "tickets", ticketAtual));
-    if (snap.data().status === "encerrado") {
-      alert("Ticket encerrado.");
-      return;
-    }
+    if (snap.data().status === "encerrado") return;
 
     let anexo = null;
-    if (file) {
-      anexo = await uploadArquivo(file);
-    }
+    if (file) anexo = await uploadArquivo(file);
 
     await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
       autor: `${usuario.nome} (${usuario.nivel})`,
@@ -164,6 +128,6 @@ function iniciarChat() {
     });
 
     input.value = "";
-    if (inputArquivo) inputArquivo.value = "";
+    if (fileInput) fileInput.value = "";
   };
 }
