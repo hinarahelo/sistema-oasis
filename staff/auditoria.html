@@ -1,30 +1,99 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Auditoria • Tribunal de Justiça de Oasis</title>
+  <title>Auditoria — Supremo Tribunal de Oasis</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 
-<body class="bg-paper">
+<body class="bg-paper official">
 
+<!-- 🔐 PROTEÇÃO (COORDENAÇÃO) -->
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || usuario.nivel !== "coordenacao") {
+    location.replace("../index.html");
+  }
+</script>
+
+<!-- ================= HEADER ================= -->
 <header class="header small official">
   <img src="../logo-oasis.png" class="logo small">
-  <div>
-    <h1>Tribunal de Justiça de Oasis</h1>
-    <span>Painel de Auditoria Oficial</span>
+  <div class="header-text">
+    <h1>Supremo Tribunal de Oasis</h1>
+    <span>Painel Oficial de Auditoria</span>
   </div>
 </header>
 
+<!-- ================= NAVEGAÇÃO ================= -->
 <nav class="nav-bar official">
-  <button onclick="location.href='dashboard.html'">⬅ Voltar</button>
+  <button type="button" onclick="location.href='coordenacao.html'">
+    ⬅ Voltar
+  </button>
+  <button type="button" onclick="sair()">
+    🚪 Encerrar Sessão
+  </button>
 </nav>
 
+<!-- ================= CONTEÚDO ================= -->
 <main class="content official">
+
   <h2>🧾 Logs de Auditoria</h2>
+  <p class="section-desc">
+    Registro completo de ações institucionais do sistema.
+  </p>
+
   <div id="listaLogs" class="card-list"></div>
+
 </main>
 
-<script type="module" src="auditoria.js"></script>
+<!-- ================= SCRIPT ================= -->
+<script type="module">
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "../firebase.js";
+
+/* 🚪 SAIR */
+window.sair = () => {
+  localStorage.clear();
+  location.replace("../index.html");
+};
+
+/* 📜 LOGS */
+onSnapshot(
+  query(collection(db, "logs"), orderBy("data", "desc")),
+  snap => {
+    const box = document.getElementById("listaLogs");
+    box.innerHTML = "";
+
+    if (snap.empty) {
+      box.innerHTML = "<p>Nenhum log registrado.</p>";
+      return;
+    }
+
+    snap.forEach(d => {
+      const l = d.data();
+      const data = l.data?.toDate
+        ? l.data.toDate().toLocaleString("pt-BR")
+        : "";
+
+      box.innerHTML += `
+        <div class="price-card official">
+          <b>${l.acao}</b><br>
+          Usuário: ${l.usuario || "—"}<br>
+          CID: ${l.cid || "—"}<br>
+          ${l.ticket ? `Ticket: ${l.ticket}<br>` : ""}
+          <small>${data}</small>
+        </div>
+      `;
+    });
+  }
+);
+</script>
+
 </body>
 </html>
