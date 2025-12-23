@@ -56,11 +56,6 @@ body {
   width: 70px;
 }
 
-.logo-grande {
-  width: 140px;
-  margin-bottom: 14px;
-}
-
 /* ======================================================
    NAVBAR
 ====================================================== */
@@ -69,7 +64,6 @@ body {
   padding: 10px;
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
   border-bottom: 2px solid #d4af37;
 }
 
@@ -82,23 +76,8 @@ body {
   cursor: pointer;
 }
 
-.nav-bar button:hover {
-  background: #8c1d1d;
-}
-
 /* ======================================================
-   ABAS
-====================================================== */
-.aba {
-  display: none;
-}
-
-.aba.active {
-  display: block;
-}
-
-/* ======================================================
-   CHAT (BASE ÚNICA PARA TODOS)
+   CHAT
 ====================================================== */
 .chat-box {
   background: #fff;
@@ -111,7 +90,7 @@ body {
 }
 
 /* ======================================================
-   MENSAGEM — PADRÃO ÚNICO
+   MENSAGENS
 ====================================================== */
 .mensagem {
   max-width: 75%;
@@ -120,14 +99,10 @@ body {
   margin-bottom: 10px;
   font-size: 13px;
   line-height: 1.45;
-  background: #f1f1f1;
   display: flex;
   flex-direction: column;
 }
 
-/* ======================================================
-   VARIAÇÃO POR PERFIL (MESMA ESTÉTICA)
-====================================================== */
 .mensagem.cidadao {
   background: #e8f0ff;
   margin-left: auto;
@@ -148,28 +123,18 @@ body {
 ====================================================== */
 .autor {
   font-weight: bold;
-  font-size: 13px;
   margin-bottom: 4px;
 }
 
-.nome-cidadao {
-  color: #1e5eff;
-}
-
-.nome-juridico {
-  color: #c9a227;
-}
-
-.nome-coordenacao {
-  color: #b00000;
-}
+.nome-cidadao { color: #1e5eff; }
+.nome-juridico { color: #c9a227; }
+.nome-coordenacao { color: #b00000; }
 
 /* ======================================================
-   TEXTO DA MENSAGEM
+   TEXTO
 ====================================================== */
-.mensagem .texto {
+.texto {
   font-size: 13px;
-  line-height: 1.45;
 }
 
 /* ======================================================
@@ -183,14 +148,8 @@ body {
 }
 
 /* ======================================================
-   ANEXOS / PREVIEW
+   ANEXOS
 ====================================================== */
-.anexo a {
-  color: #6b0f0f;
-  font-size: 13px;
-  text-decoration: underline;
-}
-
 .preview-img img {
   max-width: 180px;
   border-radius: 10px;
@@ -199,11 +158,10 @@ body {
 
 .preview-pdf {
   margin-top: 6px;
-  font-size: 13px;
 }
 
 /* ======================================================
-   BADGE DE PRIORIDADE
+   BADGE
 ====================================================== */
 .badge {
   display: inline-block;
@@ -211,23 +169,11 @@ body {
   border-radius: 12px;
   font-size: 11px;
   font-weight: bold;
-  margin-bottom: 6px;
-  width: fit-content;
-}
-
-.badge-alta {
-  background: #b00000;
-  color: #fff;
 }
 
 .badge-media {
   background: #c9a227;
   color: #000;
-}
-
-.badge-baixa {
-  background: #2f7d32;
-  color: #fff;
 }
 
 /* ======================================================
@@ -236,7 +182,6 @@ body {
 .chat-input {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
 .chat-input input {
@@ -252,23 +197,9 @@ body {
   border: none;
   background: #6b0f0f;
   color: #fff;
-  cursor: pointer;
 }
 
 .btn-secondary {
   background: #aaa !important;
   color: #000 !important;
-}
-
-/* ======================================================
-   RESPONSIVO
-====================================================== */
-@media (max-width: 700px) {
-  .chat-input {
-    flex-direction: column;
-  }
-
-  .mensagem {
-    max-width: 100%;
-  }
 }
