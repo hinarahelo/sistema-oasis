@@ -1,63 +1,169 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <title>Jurídico — Supremo Tribunal de Oasis</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<body class="bg-paper official">
+import { db } from "../firebase.js";
 
-<!-- 🔐 PROTEÇÃO -->
-<script>
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "juridico") {
-    location.href = "index.html";
-  }
-</script>
+/* ======================================================
+   🔐 USUÁRIO (JURÍDICO / COORDENAÇÃO)
+====================================================== */
+const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-<header class="header small official">
-  <img src="logo-oasis.png" class="logo small" />
-  <div class="header-text">
-    <h1>Supremo Tribunal de Oasis</h1>
-    <span>Painel Jurídico</span>
-  </div>
-</header>
+if (!usuario || !["juridico", "coordenacao"].includes(usuario.nivel)) {
+  location.replace("../index.html");
+}
 
-<nav class="nav-bar official">
-  <button type="button" onclick="mostrarAba('andamento')">🕒 Tickets</button>
-  <button type="button" onclick="sair()">🚪 Encerrar Sessão</button>
-</nav>
+/* ======================================================
+   ESTADO
+====================================================== */
+let ticketAtual = null;
+let unsubscribeMensagens = null;
 
-<main class="content official">
+/* ======================================================
+   ABRIR CHAT (EXPORTADO)
+====================================================== */
+export function abrirChat(ticketId) {
+  ticketAtual = ticketId;
+  iniciarChat();
+}
 
-  <!-- ================= ANDAMENTO ================= -->
-  <section id="andamento" class="aba active">
-    <h2>⚖️ Tickets em Andamento</h2>
+/* ======================================================
+   ☁️ CLOUDINARY
+====================================================== */
+async function uploadArquivo(file) {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", "oasis"); // ✅ mesmo preset do cidadão
 
-    <select id="filtroCategoria" onchange="aplicarFiltro()">
-      <option value="">Todas as categorias</option>
-    </select>
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/SEU_CLOUD_NAME/auto/upload",
+    { method: "POST", body: form }
+  );
 
-    <div id="ticketsCategoria" class="card-list official"></div>
-  </section>
+  const data = await res.json();
 
-  <!-- ================= CHAT ================= -->
-  <section id="chat" class="aba">
-    <h2 id="chatTitulo">💬 Atendimento Jurídico</h2>
+  return {
+    url: data.secure_url,
+    nome: file.name,
+    tipo: file.type
+  };
+}
 
-    <div id="mensagens" class="chat-box official"></div>
+/* ======================================================
+   💬 CHAT
+====================================================== */
+function iniciarChat() {
+  const box = document.getElementById("mensagens");
+  const input = document.getElementById("mensagem");
+  const btn = document.getElementById("btnEnviar");
+  const inputArquivo = document.getElementById("arquivo");
 
-    <div class="chat-input official">
-      <input id="mensagem" placeholder="Digite sua resposta..." />
-      <input type="file" id="arquivo" />
-      <button type="button" onclick="enviarMensagem()">Enviar</button>
-      <button type="button" class="btn-secondary" onclick="mostrarAba('andamento')">⬅ Voltar</button>
-    </div>
-  </section>
+  if (!box || !input || !btn) return;
 
-</main>
+  box.innerHTML = "";
 
-<script type="module" src="juridico.js"></script>
-</body>
-</html>
+  unsubscribeMensagens?.();
+
+  /* 🔒 STATUS DO TICKET */
+  onSnapshot(doc(db, "tickets", ticketAtual), snap => {
+    const t = snap.data();
+    const fechado = t.status === "encerrado";
+
+    input.disabled = btn.disabled = fechado;
+    if (inputArquivo) inputArquivo.disabled = fechado;
+
+    input.placeholder = fechado
+      ? "🔒 Ticket encerrado — somente leitura"
+      : "Digite sua resposta...";
+  });
+
+  /* 💬 MENSAGENS */
+  unsubscribeMensagens = onSnapshot(
+    query(
+      collection(db, "tickets", ticketAtual, "mensagens"),
+      orderBy("criadoEm", "asc")
+    ),
+    snap => {
+      box.innerHTML = "";
+
+      snap.forEach(d => {
+        const m = d.data();
+
+        let tipo = "cidadao";
+        if (m.autor?.includes("juridico")) tipo = "juridico";
+        if (m.autor?.includes("coordenacao")) tipo = "coordenacao";
+
+        const hora = m.criadoEm
+          ? m.criadoEm.toDate().toLocaleString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : "";
+
+        let anexo = "";
+        if (m.anexo) {
+          anexo = `
+            <div class="anexo">
+              📎 <a href="${m.anexo.url}" target="_blank">
+                ${m.anexo.nome}
+              </a>
+            </div>
+          `;
+        }
+
+        box.innerHTML += `
+          <div class="mensagem ${tipo}">
+            <div class="conteudo">
+              <span class="autor ${tipo}">${m.autor}</span>
+              ${m.texto ? `<div class="texto">${m.texto}</div>` : ""}
+              ${anexo}
+            </div>
+            <div class="hora">${hora}</div>
+          </div>
+        `;
+      });
+
+      box.scrollTop = box.scrollHeight;
+    }
+  );
+
+  /* 📤 ENVIAR */
+  btn.onclick = async () => {
+    const texto = input.value.trim();
+    const file = inputArquivo?.files?.[0] || null;
+
+    if (!texto && !file) return;
+
+    const snap = await getDoc(doc(db, "tickets", ticketAtual));
+    if (snap.data().status === "encerrado") {
+      alert("Ticket encerrado.");
+      return;
+    }
+
+    let anexo = null;
+    if (file) {
+      anexo = await uploadArquivo(file);
+    }
+
+    await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
+      autor: `${usuario.nome} (${usuario.nivel})`,
+      texto: texto || "",
+      anexo,
+      criadoEm: serverTimestamp()
+    });
+
+    input.value = "";
+    if (inputArquivo) inputArquivo.value = "";
+  };
+}
