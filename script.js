@@ -10,7 +10,9 @@ import {
   serverTimestamp,
   doc,
   getDoc,
-  orderBy
+  orderBy,
+  setDoc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { notificarDiscord } from "./discord.js";
@@ -37,7 +39,11 @@ if (!usuario || usuario.nivel !== "cidadao") location.href = "index.html";
 let ticketAtual = null;
 let unsubscribeMensagens = null;
 let unsubscribeStatus = null;
+let unsubscribeDigitando = null;
 let arquivoSelecionado = null;
+let ultimoAutor = null;
+let ultimaData = null;
+let typingTimeout = null;
 
 /* ======================================================
    ABAS
@@ -170,7 +176,7 @@ window.abrirCategoria = async categoria => {
 };
 
 /* ======================================================
-   💬 CHAT (COM PREVIEW)
+   💬 CHAT (AGRUPADO + DATA + DIGITANDO)
 ====================================================== */
 function iniciarChat() {
   const box = document.getElementById("mensagens");
@@ -178,132 +184,113 @@ function iniciarChat() {
   const btn = document.querySelector(".chat-input button");
 
   box.innerHTML = "";
+  ultimoAutor = null;
+  ultimaData = null;
+
   if (unsubscribeMensagens) unsubscribeMensagens();
   if (unsubscribeStatus) unsubscribeStatus();
+  if (unsubscribeDigitando) unsubscribeDigitando();
 
   unsubscribeStatus = onSnapshot(doc(db, "tickets", ticketAtual), s => {
     const t = s.data();
     input.disabled = btn.disabled = t.status === "encerrado";
-    input.placeholder = t.status === "encerrado" ? "🔒 Ticket encerrado" : "Digite sua mensagem...";
+    input.placeholder =
+      t.status === "encerrado"
+        ? "🔒 Ticket encerrado — leitura apenas"
+        : "Digite sua mensagem...";
   });
+
+  unsubscribeDigitando = onSnapshot(
+    collection(db, "tickets", ticketAtual, "digitando"),
+    snap => {
+      document.getElementById("digitando")?.remove();
+      snap.forEach(d => {
+        if (d.id !== usuario.cid) {
+          box.insertAdjacentHTML(
+            "beforeend",
+            `<div id="digitando" class="digitando">✍️ ${d.data().nome} está digitando...</div>`
+          );
+        }
+      });
+    }
+  );
 
   unsubscribeMensagens = onSnapshot(
     query(collection(db, "tickets", ticketAtual, "mensagens"), orderBy("criadoEm")),
     snap => {
       box.innerHTML = "";
+      ultimoAutor = null;
+      ultimaData = null;
 
       snap.forEach(d => {
         const m = d.data();
+        if (!m.criadoEm) return;
+
+        const dataObj = m.criadoEm.toDate();
+        const dataStr = dataObj.toLocaleDateString("pt-BR");
+        const horaStr = dataObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+        if (dataStr !== ultimaData) {
+          box.innerHTML += `<div class="data-separador">──────── ${dataStr} ────────</div>`;
+          ultimaData = dataStr;
+          ultimoAutor = null;
+        }
+
         let tipo = "cidadao", classe = "nome-cidadao";
         if (m.autor?.includes("juridico")) (tipo = "juridico"), (classe = "nome-juridico");
         if (m.autor?.includes("coordenacao")) (tipo = "coordenacao"), (classe = "nome-coordenacao");
 
-        const dh = m.criadoEm
-          ? m.criadoEm.toDate().toLocaleString("pt-BR", {
-              timeZone: "America/Sao_Paulo",
-              day: "2-digit", month: "2-digit", year: "numeric",
-              hour: "2-digit", minute: "2-digit"
-            })
-          : "";
-
-        let preview = "";
-        if (m.anexo) {
-          const url = m.anexo.url;
-          if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-            preview = `
-              <div class="preview-img">
-                <a href="${url}" target="_blank" download>
-                  <img src="${url}" alt="preview">
-                </a>
-              </div>`;
-          } else if (url.match(/\.pdf$/i)) {
-            preview = `
-              <div class="preview-pdf">
-                📄 <a href="${url}" target="_blank" download>Baixar PDF</a>
-              </div>`;
-          } else {
-            preview = `
-              <div class="anexo">
-                📎 <a href="${url}" target="_blank" download>⬇️ ${m.anexo.nome}</a>
-              </div>`;
-          }
-        }
+        const mostrarAutor = m.autor !== ultimoAutor;
 
         box.innerHTML += `
-          <div class="mensagem ${tipo}">
-            <div class="conteudo">
-              <span class="autor ${classe}">${m.autor}</span>
-              ${m.texto || ""}
-              ${preview}
-            </div>
-            <div class="hora">${dh}</div>
-          </div>`;
+          <div class="mensagem ${tipo} nova">
+            ${mostrarAutor ? `<span class="autor ${classe}">${m.autor}</span>` : ""}
+            <div class="texto">${m.texto || ""}</div>
+            <div class="hora">${horaStr}</div>
+          </div>
+        `;
+
+        ultimoAutor = m.autor;
       });
+
       box.scrollTop = box.scrollHeight;
     }
   );
 }
 
 /* ======================================================
-   📎 ARQUIVO
+   DIGITANDO
 ====================================================== */
-const fileInput = document.getElementById("arquivo");
-fileInput.addEventListener("change", () => {
-  arquivoSelecionado = fileInput.files[0];
-  document.getElementById("arquivoPreview")?.remove();
-  if (arquivoSelecionado) {
-    fileInput.insertAdjacentHTML(
-      "afterend",
-      `<div id="arquivoPreview">📎 ${arquivoSelecionado.name}
-        <button type="button" onclick="removerArquivo()">❌</button>
-      </div>`
-    );
-  }
-});
-window.removerArquivo = () => {
-  arquivoSelecionado = null;
-  fileInput.value = "";
-  document.getElementById("arquivoPreview")?.remove();
-};
-
-/* ======================================================
-   ☁️ CLOUDINARY
-====================================================== */
-async function uploadCloudinary(file) {
-  const fd = new FormData();
-  fd.append("file", file);
-  fd.append("upload_preset", "oasis_upload");
-  const r = await fetch("https://api.cloudinary.com/v1_1/dnd90frwv/auto/upload", {
-    method: "POST",
-    body: fd
+const inputMensagem = document.getElementById("mensagem");
+inputMensagem?.addEventListener("input", () => {
+  if (!ticketAtual) return;
+  setDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid), {
+    nome: `${usuario.nome} (${usuario.nivel})`,
+    at: serverTimestamp()
   });
-  const d = await r.json();
-  return { nome: file.name, url: d.secure_url };
-}
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    deleteDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid));
+  }, 2000);
+});
 
 /* ======================================================
    📤 ENVIAR
 ====================================================== */
 window.enviarMensagem = async () => {
   const texto = document.getElementById("mensagem").value.trim();
-  if (!texto && !arquivoSelecionado) return alert("Mensagem ou anexo obrigatório.");
+  if (!texto && !arquivoSelecionado) return;
 
   const t = await getDoc(doc(db, "tickets", ticketAtual));
-  if (t.data().status === "encerrado") return alert("Ticket encerrado.");
-
-  let anexo = null;
-  if (arquivoSelecionado) {
-    anexo = await uploadCloudinary(arquivoSelecionado);
-    removerArquivo();
-  }
+  if (t.data().status === "encerrado") return;
 
   await addDoc(collection(db, "tickets", ticketAtual, "mensagens"), {
     autor: `${usuario.nome} (${usuario.nivel})`,
     texto,
-    anexo,
     criadoEm: serverTimestamp()
   });
 
   await registrarLog("Mensagem enviada");
   document.getElementById("mensagem").value = "";
+  deleteDoc(doc(db, "tickets", ticketAtual, "digitando", usuario.cid));
 };
