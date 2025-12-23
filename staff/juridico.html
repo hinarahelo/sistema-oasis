@@ -25,8 +25,8 @@
 </header>
 
 <nav class="nav-bar official">
-  <button onclick="mostrarAba('andamento')">🕒 Tickets</button>
-  <button onclick="sair()">🚪 Encerrar Sessão</button>
+  <button type="button" onclick="mostrarAba('andamento')">🕒 Tickets</button>
+  <button type="button" onclick="sair()">🚪 Encerrar Sessão</button>
 </nav>
 
 <main class="content official">
@@ -35,12 +35,11 @@
   <section id="andamento" class="aba active">
     <h2>⚖️ Tickets em Andamento</h2>
 
-    <!-- FILTRO -->
     <select id="filtroCategoria" onchange="aplicarFiltro()">
       <option value="">Todas as categorias</option>
     </select>
 
-    <div id="ticketsCategoria" class="card-list"></div>
+    <div id="ticketsCategoria" class="card-list official"></div>
   </section>
 
   <!-- ================= CHAT ================= -->
@@ -52,8 +51,8 @@
     <div class="chat-input official">
       <input id="mensagem" placeholder="Digite sua resposta..." />
       <input type="file" id="arquivo" />
-      <button onclick="enviarMensagem()">Enviar</button>
-      <button class="btn-secondary" onclick="mostrarAba('andamento')">⬅ Voltar</button>
+      <button type="button" onclick="enviarMensagem()">Enviar</button>
+      <button type="button" class="btn-secondary" onclick="mostrarAba('andamento')">⬅ Voltar</button>
     </div>
   </section>
 
