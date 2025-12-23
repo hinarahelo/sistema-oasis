@@ -34,8 +34,8 @@ body {
   position: fixed;
   inset: 0;
   background: url("logo-oasis.png") no-repeat center;
-  background-size: 520px;
-  opacity: 0.04;
+  background-size: 620px;
+  opacity: 0.045;
   pointer-events: none;
   z-index: 0;
 }
@@ -75,48 +75,73 @@ body {
 .hidden { display: none !important; }
 
 /* ======================================================
-   HEADER
+   HEADER (CENTRALIZADO)
 ====================================================== */
 .header {
   background: linear-gradient(to right, #5b0f0f, #7a1c1c);
   color: #f8f4ee;
-  padding: 24px;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 18px;
   border-bottom: 4px solid #d4af37;
+  text-align: center;
 }
 
-.header.small { padding: 18px 24px; }
+.header.small {
+  padding: 18px 24px;
+}
 
-.logo { width: 110px; }
-.logo.small { width: 70px; }
+.header-text h1 {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.header-text span {
+  font-size: 12px;
+  opacity: .9;
+}
+
+.logo {
+  width: 70px;
+}
 
 /* ======================================================
-   NAVBAR
+   LAYOUT COM MENU LATERAL
 ====================================================== */
-.nav-bar {
-  background: #3b0d0d;
-  padding: 10px;
-  display: flex;
-  gap: 10px;
-  border-bottom: 2px solid #d4af37;
-  flex-wrap: wrap;
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 110px);
 }
 
-.nav-bar button {
+/* ======================================================
+   MENU LATERAL (NAVBAR)
+====================================================== */
+.nav-bar.sidebar {
+  background: #3b0d0d;
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-right: 2px solid #d4af37;
+}
+
+.nav-bar.sidebar button {
   background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
   color: #fff;
   border: none;
-  padding: 10px 18px;
-  border-radius: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 3px 0 #3b0d0d;
+  text-align: left;
+  font-size: 14px;
   transition: all .2s ease;
 }
 
-.nav-bar button:hover {
-  transform: translateY(-2px);
+.nav-bar.sidebar button:hover {
+  transform: translateX(4px);
   box-shadow: 0 6px 12px rgba(0,0,0,.3);
 }
 
@@ -192,7 +217,7 @@ body {
   text-align: center;
   font-size: 11px;
   color: #555;
-  margin: 22px 0;
+  margin: 24px 0;
   position: relative;
 }
 
@@ -297,8 +322,29 @@ body {
 /* ======================================================
    MOBILE
 ====================================================== */
-@media (max-width: 768px) {
-  .content { padding: 16px; }
-  .chat-box { height: 300px; }
-  .mensagem { max-width: 90%; }
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-bar.sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-right: none;
+    border-bottom: 2px solid #d4af37;
+  }
+
+  .nav-bar.sidebar button {
+    flex: 1 1 45%;
+    text-align: center;
+  }
+
+  .mensagem {
+    max-width: 90%;
+  }
+
+  .chat-box {
+    height: 300px;
+  }
 }
