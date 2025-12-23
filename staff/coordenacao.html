@@ -10,7 +10,7 @@
 
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "coordenacao") location.href = "index.html";
+  if (!usuario || usuario.nivel !== "coordenacao") location.href="index.html";
 </script>
 
 <header class="header official">
@@ -42,24 +42,25 @@
 </main>
 
 <script type="module">
-import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection,onSnapshot } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { db } from "./firebase.js";
 
-window.mostrarAba = id => {
-  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+window.mostrarAba=id=>{
+  document.querySelectorAll(".aba").forEach(a=>a.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 };
-window.sair = () => {
+window.sair=()=>{
   localStorage.clear();
-  location.href = "index.html";
+  location.href="index.html";
 };
 
-onSnapshot(collection(db,"tickets"), snap => {
-  const box = document.getElementById("listaTickets");
-  box.innerHTML = "";
-  snap.forEach(d => {
-    const t = d.data();
-    box.innerHTML += `
+onSnapshot(collection(db,"tickets"),snap=>{
+  const box=document.getElementById("listaTickets");
+  box.innerHTML="";
+  snap.forEach(d=>{
+    const t=d.data();
+    box.innerHTML+=`
       <div class="price-card">
         <strong>${t.categoria} — ${t.nome} ${t.cid}</strong><br>
         Status: ${t.status}
@@ -67,12 +68,12 @@ onSnapshot(collection(db,"tickets"), snap => {
   });
 });
 
-onSnapshot(collection(db,"logs"), snap => {
-  const box = document.getElementById("listaLogs");
-  box.innerHTML = "";
-  snap.forEach(d => {
-    const l = d.data();
-    box.innerHTML += `
+onSnapshot(collection(db,"logs"),snap=>{
+  const box=document.getElementById("listaLogs");
+  box.innerHTML="";
+  snap.forEach(d=>{
+    const l=d.data();
+    box.innerHTML+=`
       <div class="price-card">
         ${l.acao}<br>
         ${l.usuario} — ${l.cid}
