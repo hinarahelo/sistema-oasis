@@ -1,60 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Jurídico — Supremo Tribunal de Oasis</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body class="bg-paper official">
 
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "juridico") location.href = "index.html";
+  if (!usuario || usuario.nivel !== "juridico") {
+    location.replace("../index.html");
+  }
 </script>
 
 <header class="header official">
-  <h1>Painel Jurídico</h1>
+  <img src="../logo-oasis.png" class="logo">
+  <div class="header-text">
+    <h1>⚖️ Painel Jurídico</h1>
+    <span>Supremo Tribunal de Oasis</span>
+  </div>
 </header>
+
+<nav class="nav-bar sidebar official">
+  <button onclick="mostrarAba('tickets')">📂 Tickets</button>
+  <button onclick="sair()">🚪 Encerrar Sessão</button>
+</nav>
 
 <main class="content official">
 
-<section class="aba active">
-  <h2>✏️ Editar Dados do Ticket</h2>
-
-  <label>Nome do Cidadão</label>
-  <input id="nomeCidadao">
-
-  <label>ID da Cidade</label>
-  <input id="cidCidade">
-
-  <button onclick="salvar()">Salvar</button>
-</section>
+  <!-- TICKETS -->
+  <section id="tickets" class="aba active">
+    <h2>Tickets em Andamento</h2>
+    <div id="listaTickets"></div>
+  </section>
 
 </main>
 
 <script type="module">
-import { doc, updateDoc, addDoc, serverTimestamp } from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { db } from "./firebase.js";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const ticketId = localStorage.getItem("ticketAtual");
+import { db } from "../firebase.js";
 
-async function salvar() {
-  await updateDoc(doc(db, "tickets", ticketId), {
-    nome: nomeCidadao.value,
-    cid: cidCidade.value
+window.mostrarAba = id => {
+  document.querySelectorAll(".aba").forEach(a => a.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+};
+
+window.sair = () => {
+  localStorage.clear();
+  location.replace("../index.html");
+};
+
+/* ==============================
+   LISTA DE TICKETS
+============================== */
+const q = query(
+  collection(db, "tickets"),
+  where("status", "==", "aberto")
+);
+
+onSnapshot(q, snap => {
+  const box = document.getElementById("listaTickets");
+  box.innerHTML = "";
+
+  snap.forEach(d => {
+    const t = d.data();
+
+    box.innerHTML += `
+      <div class="price-card">
+        <strong>${t.categoria} — ${t.nome} ${t.cid}</strong><br>
+        <small>Status: ${t.status}</small><br><br>
+        <button onclick="abrir('${d.id}')">Abrir atendimento</button>
+      </div>
+    `;
   });
+});
 
-  await addDoc(collection(db, "logs"), {
-    ticket: ticketId,
-    acao: "Dados do cidadão alterados",
-    usuario: "Jurídico",
-    data: serverTimestamp()
-  });
-
-  alert("Atualizado com sucesso");
-}
+window.abrir = id => {
+  location.href = "chat.html?ticket=" + id;
+};
 </script>
 
 </body>
