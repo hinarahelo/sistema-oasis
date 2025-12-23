@@ -8,56 +8,54 @@
 
 <body class="bg-paper official">
 
-<!-- 🔐 PROTEÇÃO -->
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!usuario || usuario.nivel !== "juridico") {
-    location.href = "index.html";
-  }
+  if (!usuario || usuario.nivel !== "juridico") location.href = "index.html";
 </script>
 
-<header class="header small official">
-  <img src="logo-oasis.png" class="logo small" />
-  <div class="header-text">
-    <h1>Supremo Tribunal de Oasis</h1>
-    <span>Painel Jurídico</span>
-  </div>
+<header class="header official">
+  <h1>Painel Jurídico</h1>
 </header>
-
-<nav class="nav-bar official">
-  <button type="button" onclick="mostrarAba('andamento')">🕒 Tickets</button>
-  <button type="button" onclick="sair()">🚪 Encerrar Sessão</button>
-</nav>
 
 <main class="content official">
 
-  <!-- ================= ANDAMENTO ================= -->
-  <section id="andamento" class="aba active">
-    <h2>⚖️ Tickets em Andamento</h2>
+<section class="aba active">
+  <h2>✏️ Editar Dados do Ticket</h2>
 
-    <select id="filtroCategoria" onchange="aplicarFiltro()">
-      <option value="">Todas as categorias</option>
-    </select>
+  <label>Nome do Cidadão</label>
+  <input id="nomeCidadao">
 
-    <div id="ticketsCategoria" class="card-list official"></div>
-  </section>
+  <label>ID da Cidade</label>
+  <input id="cidCidade">
 
-  <!-- ================= CHAT ================= -->
-  <section id="chat" class="aba">
-    <h2 id="chatTitulo">💬 Atendimento Jurídico</h2>
-
-    <div id="mensagens" class="chat-box official"></div>
-
-    <div class="chat-input official">
-      <input id="mensagem" placeholder="Digite sua resposta..." />
-      <input type="file" id="arquivo" />
-      <button type="button" onclick="enviarMensagem()">Enviar</button>
-      <button type="button" class="btn-secondary" onclick="mostrarAba('andamento')">⬅ Voltar</button>
-    </div>
-  </section>
+  <button onclick="salvar()">Salvar</button>
+</section>
 
 </main>
 
-<script type="module" src="juridico.js"></script>
+<script type="module">
+import { doc, updateDoc, addDoc, serverTimestamp } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "./firebase.js";
+
+const ticketId = localStorage.getItem("ticketAtual");
+
+async function salvar() {
+  await updateDoc(doc(db, "tickets", ticketId), {
+    nome: nomeCidadao.value,
+    cid: cidCidade.value
+  });
+
+  await addDoc(collection(db, "logs"), {
+    ticket: ticketId,
+    acao: "Dados do cidadão alterados",
+    usuario: "Jurídico",
+    data: serverTimestamp()
+  });
+
+  alert("Atualizado com sucesso");
+}
+</script>
+
 </body>
 </html>
