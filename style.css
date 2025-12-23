@@ -27,7 +27,7 @@ body {
   position: relative;
 }
 
-/* marca d’água global */
+/* marca d’água */
 .content::before {
   content: "";
   position: fixed;
@@ -49,7 +49,7 @@ body {
 }
 
 /* ======================================================
-   HEADER — INSTITUCIONAL
+   HEADER
 ====================================================== */
 .header {
   background: linear-gradient(to right, #5b0f0f, #7a1c1c);
@@ -63,15 +63,23 @@ body {
   text-align: center;
 }
 
+.header.small {
+  padding: 16px 24px;
+}
+
 .logo {
   width: 76px;
 }
 
-.header-text h1 {
-  font-size: 30px;
+.logo.small {
+  width: 56px;
+}
+
+.header-text h1,
+.header-text h2 {
+  font-size: 28px;
   font-weight: bold;
-  letter-spacing: 1.5px;
-  margin-bottom: 4px;
+  letter-spacing: 1.4px;
 }
 
 .header-text span {
@@ -89,27 +97,29 @@ body {
 }
 
 /* ======================================================
-   SIDEBAR (MENU À ESQUERDA)
+   NAV BAR (GENÉRICA + SIDEBAR)
 ====================================================== */
-.nav-bar.sidebar {
-  background: linear-gradient(to bottom, #3b0d0d, #220606);
-  padding: 26px 16px;
+.nav-bar {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  border-right: 3px solid #d4af37;
+  gap: 12px;
+  padding: 14px;
 }
 
-.nav-bar.sidebar button {
+.nav-bar button {
   background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
   color: #fff;
   border: none;
-  padding: 14px 18px;
+  padding: 12px 18px;
   border-radius: 14px;
   cursor: pointer;
-  text-align: left;
-  font-size: 15px;
-  transition: all .25s ease;
+  font-size: 14px;
+}
+
+.nav-bar.sidebar {
+  flex-direction: column;
+  background: linear-gradient(to bottom, #3b0d0d, #220606);
+  padding: 26px 16px;
+  border-right: 3px solid #d4af37;
 }
 
 .nav-bar.sidebar button:hover {
@@ -118,7 +128,7 @@ body {
 }
 
 /* ======================================================
-   ABAS + TRANSIÇÃO
+   ABAS
 ====================================================== */
 .aba {
   display: none;
@@ -141,69 +151,31 @@ body {
 
 .hidden { display: none !important; }
 
-.aba h2 {
-  font-size: 24px;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-
-.section-desc {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 22px;
-}
-
 /* ======================================================
-   SOLICITAÇÕES
+   LISTAS / CARDS
 ====================================================== */
-.grid-servicos {
+.card-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.grid-servicos button {
-  background: #fdfaf3;
-  border: 2px solid #c9a227;
-  padding: 12px 18px;
-  border-radius: 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all .25s ease;
-}
-
-.grid-servicos button:hover {
-  background: #fff;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0,0,0,.18);
-}
-
-/* ======================================================
-   EM ANDAMENTO
-====================================================== */
-.categoria-grid {
-  max-width: 900px;
-  margin: 24px auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 22px;
-}
-
-.categoria-card,
-.card-ticket {
+.card,
+.card-ticket,
+.categoria-card {
   background: #fff;
   border: 2px solid #d4af37;
   border-radius: 20px;
-  padding: 20px;
+  padding: 18px;
   cursor: pointer;
-  transition: all .25s ease;
+  transition: .25s;
   box-shadow: 0 6px 14px rgba(0,0,0,.12);
 }
 
-.categoria-card:hover,
-.card-ticket:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 14px 26px rgba(0,0,0,.25);
+.card:hover,
+.card-ticket:hover,
+.categoria-card:hover {
+  transform: translateY(-4px);
   background: #fffdf6;
 }
 
@@ -220,32 +192,15 @@ body {
   margin-bottom: 14px;
 }
 
-/* ======================================================
-   SEPARADOR DE DATA
-====================================================== */
 .chat-data {
   text-align: center;
   font-size: 11px;
   color: #555;
   margin: 30px 0;
-  position: relative;
 }
-
-.chat-data::before,
-.chat-data::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 32%;
-  height: 1px;
-  background: #ccc;
-}
-
-.chat-data::before { left: 0; }
-.chat-data::after  { right: 0; }
 
 /* ======================================================
-   MENSAGENS
+   MENSAGENS (HIERARQUIA PRESERVADA)
 ====================================================== */
 .mensagem {
   max-width: 70%;
@@ -253,9 +208,6 @@ body {
   border-radius: 18px;
   margin-bottom: 12px;
   font-size: 14px;
-  line-height: 1.55;
-  display: flex;
-  flex-direction: column;
   box-shadow: 0 3px 8px rgba(0,0,0,.1);
 }
 
@@ -280,19 +232,16 @@ body {
 .autor {
   font-weight: bold;
   font-size: 12px;
-  margin-bottom: 4px;
-  letter-spacing: .6px;
 }
 
 .hora {
   font-size: 10px;
   color: #666;
   text-align: right;
-  margin-top: 6px;
 }
 
 /* ======================================================
-   CHAT INPUT
+   INPUT CHAT
 ====================================================== */
 .chat-input {
   display: flex;
@@ -313,11 +262,19 @@ body {
   border: none;
   background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
   color: #fff;
-  cursor: pointer;
 }
 
 /* ======================================================
-   RODAPÉ
+   BOTÃO SECUNDÁRIO
+====================================================== */
+.btn-secondary {
+  background: #eee;
+  color: #333;
+  border: 1px solid #bbb;
+}
+
+/* ======================================================
+   FOOTER
 ====================================================== */
 .footer {
   text-align: center;
@@ -326,101 +283,12 @@ body {
   margin: 48px 0 14px;
 }
 
-.footer strong {
-  color: #7a1c1c;
-}
-
-/* ======================================================
-   TABELA DE SERVIÇOS — INSTITUCIONAL
-====================================================== */
-.documento-oficial {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.documento-oficial .doc-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.documento-oficial .doc-header h2 {
-  font-size: 24px;
-  letter-spacing: 1.5px;
-  margin-bottom: 6px;
-}
-
-.documento-oficial .doc-header span {
-  font-size: 13px;
-  opacity: .85;
-}
-
-.selo-oficial {
-  margin-top: 10px;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  color: #7a1c1c;
-}
-
-.price-card {
-  background: #fff;
-  border: 2px solid #d4af37;
-  border-radius: 22px;
-  padding: 26px 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 8px 18px rgba(0,0,0,.08);
-}
-
-.price-card h3 {
-  font-size: 17px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid #e5d6a3;
-  padding-bottom: 8px;
-}
-
-.price-card ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.price-card li {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-bottom: 6px;
-  border-bottom: 1px dotted #ddd;
-}
-
-.price-card li:last-child {
-  border-bottom: none;
-}
-
-.price-card li strong {
-  color: #7a1c1c;
-  font-weight: bold;
-  white-space: nowrap;
-}
-
 /* ======================================================
    MOBILE
 ====================================================== */
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
-  }
-
-  .nav-bar.sidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    border-right: none;
-    border-bottom: 3px solid #d4af37;
-  }
-
-  .nav-bar.sidebar button {
-    flex: 1 1 45%;
-    text-align: center;
   }
 
   .mensagem {
