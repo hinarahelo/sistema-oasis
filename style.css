@@ -15,17 +15,16 @@ body {
 }
 
 /* ======================================================
-   LAYOUT GERAL + MARCA D’ÁGUA GLOBAL
+   LAYOUT GERAL + MARCA D’ÁGUA
 ====================================================== */
 .bg-paper {
   background: #f8f4ee;
 }
 
 .content {
-  max-width: 1200px;
-  margin: auto;
-  padding: 24px;
+  padding: 28px;
   position: relative;
+  width: 100%;
 }
 
 /* marca d’água global */
@@ -34,7 +33,7 @@ body {
   position: fixed;
   inset: 0;
   background: url("logo-oasis.png") no-repeat center;
-  background-size: 620px;
+  background-size: 640px;
   opacity: 0.045;
   pointer-events: none;
   z-index: 0;
@@ -50,7 +49,74 @@ body {
 }
 
 /* ======================================================
-   CONTROLE DE ABAS + TRANSIÇÃO
+   HEADER
+====================================================== */
+.header {
+  background: linear-gradient(to right, #5b0f0f, #7a1c1c);
+  color: #f8f4ee;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border-bottom: 4px solid #d4af37;
+  text-align: center;
+}
+
+.logo {
+  width: 68px;
+}
+
+.header-text h1 {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.header-text span {
+  font-size: 12px;
+  opacity: .9;
+}
+
+/* ======================================================
+   LAYOUT PRINCIPAL (SIDEBAR + CONTEÚDO)
+====================================================== */
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 90px);
+}
+
+/* ======================================================
+   SIDEBAR (MENU À ESQUERDA)
+====================================================== */
+.nav-bar.sidebar {
+  background: #3b0d0d;
+  padding: 22px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-right: 2px solid #d4af37;
+}
+
+.nav-bar.sidebar button {
+  background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
+  color: #fff;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  transition: all .2s ease;
+}
+
+.nav-bar.sidebar button:hover {
+  transform: translateX(4px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.3);
+}
+
+/* ======================================================
+   ABAS + TRANSIÇÃO
 ====================================================== */
 .aba {
   display: none;
@@ -75,83 +141,12 @@ body {
 .hidden { display: none !important; }
 
 /* ======================================================
-   HEADER (CENTRALIZADO)
-====================================================== */
-.header {
-  background: linear-gradient(to right, #5b0f0f, #7a1c1c);
-  color: #f8f4ee;
-  padding: 20px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  border-bottom: 4px solid #d4af37;
-  text-align: center;
-}
-
-.header.small {
-  padding: 18px 24px;
-}
-
-.header-text h1 {
-  font-size: 20px;
-  margin-bottom: 2px;
-}
-
-.header-text span {
-  font-size: 12px;
-  opacity: .9;
-}
-
-.logo {
-  width: 70px;
-}
-
-/* ======================================================
-   LAYOUT COM MENU LATERAL
-====================================================== */
-.layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: calc(100vh - 110px);
-}
-
-/* ======================================================
-   MENU LATERAL (NAVBAR)
-====================================================== */
-.nav-bar.sidebar {
-  background: #3b0d0d;
-  padding: 20px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  border-right: 2px solid #d4af37;
-}
-
-.nav-bar.sidebar button {
-  background: linear-gradient(to bottom, #7a1c1c, #5b0f0f);
-  color: #fff;
-  border: none;
-  padding: 12px 16px;
-  border-radius: 14px;
-  cursor: pointer;
-  text-align: left;
-  font-size: 14px;
-  transition: all .2s ease;
-}
-
-.nav-bar.sidebar button:hover {
-  transform: translateX(4px);
-  box-shadow: 0 6px 12px rgba(0,0,0,.3);
-}
-
-/* ======================================================
    SOLICITAÇÕES
 ====================================================== */
 .grid-servicos {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
 
 .grid-servicos button {
@@ -217,7 +212,7 @@ body {
   text-align: center;
   font-size: 11px;
   color: #555;
-  margin: 24px 0;
+  margin: 26px 0;
   position: relative;
 }
 
@@ -226,7 +221,7 @@ body {
   content: "";
   position: absolute;
   top: 50%;
-  width: 35%;
+  width: 34%;
   height: 1px;
   background: #ccc;
 }
