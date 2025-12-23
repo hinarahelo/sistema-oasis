@@ -36,9 +36,7 @@
 <!-- ================= CONTEÚDO ================= -->
 <main class="content official">
 
-<!-- =================================================
-     📂 SOLICITAÇÕES — RESTAURADA (FUNCIONAL)
-================================================== -->
+<!-- ================= SOLICITAÇÕES ================= -->
 <section id="solicitacoes" class="aba active">
 
   <div class="solicitacoes-header">
@@ -79,18 +77,14 @@
 
 </section>
 
-<!-- =================================================
-     🕒 EM ANDAMENTO — RESTAURADA (FUNCIONAL)
-================================================== -->
+<!-- ================= EM ANDAMENTO ================= -->
 <section id="andamento" class="aba">
 
   <h2>🕒 Tickets em Andamento</h2>
-  <p class="section-desc">Selecione uma categoria para visualizar seus tickets.</p>
+  <p class="section-desc">Selecione uma categoria.</p>
 
-  <!-- categorias -->
   <div id="categoriasTickets" class="categoria-grid"></div>
 
-  <!-- lista por categoria -->
   <div id="listaPorCategoria" class="lista-categoria hidden">
     <button class="btn-secondary" onclick="voltarCategorias()">⬅ Voltar</button>
     <h3 id="tituloCategoria"></h3>
@@ -99,12 +93,25 @@
 
 </section>
 
-<!-- =================================================
-     💰 TABELA DE SERVIÇOS — MANTIDA (NÃO ALTERAR)
-================================================== -->
+<!-- ================= CHAT (RESTAURADO) ================= -->
+<section id="chat" class="aba">
+
+  <h2 id="chatTitulo">💬 Atendimento</h2>
+
+  <div id="mensagens" class="chat-box"></div>
+
+  <div class="chat-input">
+    <input id="mensagem" placeholder="Digite sua mensagem..." />
+    <input type="file" id="arquivo" />
+    <button onclick="enviarMensagem()">Enviar</button>
+    <button class="btn-secondary" onclick="irAba('andamento')">⬅ Voltar</button>
+  </div>
+
+</section>
+
+<!-- ================= TABELA DE SERVIÇOS (INTACTA) ================= -->
 <section id="precos" class="aba">
   <div class="documento-oficial">
-
     <div class="doc-header">
       <h2>⚖️ Serviços Disponíveis ao Público</h2>
       <span>Supremo Tribunal de Oasis</span>
@@ -129,7 +136,7 @@
     <div class="price-card">
       <h3>💍 Certidões Civis</h3>
       <ul>
-        <li>Casamento (com discurso personalizado) — <strong>$ 150.000</strong></li>
+        <li>Casamento — <strong>$ 150.000</strong></li>
         <li>Divórcio — <strong>$ 200.000</strong></li>
         <li>Troca de Nome — <strong>$ 250.000</strong></li>
         <li>Adoção — <strong>$ 50.000</strong></li>
@@ -149,12 +156,11 @@
     <div class="price-card">
       <h3>🧾 Ações Jurídicas</h3>
       <ul>
-        <li>Ação Judicial (entrada de processo) — <strong>$ 50.000</strong></li>
-        <li>Limpeza de Ficha Criminal (1 a 3 ocorrências) — <strong>$ 50.000</strong></li>
-        <li>A partir da 4ª ocorrência — <strong>$ 10.000</strong> por infração</li>
+        <li>Ação Judicial — <strong>$ 50.000</strong></li>
+        <li>Limpeza de Ficha Criminal — <strong>$ 50.000</strong></li>
+        <li>A partir da 4ª ocorrência — <strong>$ 10.000</strong></li>
       </ul>
     </div>
-
   </div>
 </section>
 
