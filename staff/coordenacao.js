@@ -3,53 +3,67 @@ import {
   onSnapshot,
   updateDoc,
   doc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { db } from "../firebase.js";
 
-/* 🔐 PROTEÇÃO */
+/* ======================================================
+   🔐 PROTEÇÃO (COORDENAÇÃO)
+====================================================== */
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 if (!usuario || usuario.nivel !== "coordenacao") {
-  location.href = "../index.html";
+  location.replace("../index.html");
 }
 
-/* 🔀 ABAS */
+/* ======================================================
+   🔀 ABAS
+====================================================== */
 window.mostrar = id => {
   document.querySelectorAll(".aba").forEach(a =>
     a.classList.remove("active")
   );
-  document.getElementById(id).classList.add("active");
+  document.getElementById(id)?.classList.add("active");
 };
 
-/* 🚪 LOGOUT */
+/* ======================================================
+   🚪 LOGOUT
+====================================================== */
 window.sair = () => {
   localStorage.clear();
-  location.href = "../index.html";
+  location.replace("../index.html");
 };
 
-/* 🎫 TICKETS */
+/* ======================================================
+   🎫 TICKETS (VISÃO GERAL)
+====================================================== */
 onSnapshot(collection(db, "tickets"), snap => {
   const box = document.getElementById("lista-tickets");
   if (!box) return;
+
   box.innerHTML = "";
 
   snap.forEach(d => {
     const t = d.data();
     const id = d.id;
-    const div = document.createElement("div");
-    div.className = "card";
 
-    div.innerHTML = `
-      📂 <b>${t.categoria}</b><br>
-      👤 ${t.nome}<br>
-      ⚖️ ${t.atendente || "—"}<br>
-      📌 ${t.status}<br><br>
+    const card = document.createElement("div");
+    card.className = "price-card official";
+
+    card.innerHTML = `
+      <b>${t.categoria || "—"}</b><br>
+      👤 Cidadão: ${t.nome || "—"}<br>
+      🆔 CID: ${t.cid || "—"}<br>
+      📌 Status: ${t.status || "—"}<br>
+      ⚖️ Encerrado por: ${t.encerradoPor || "—"}
+      <br><br>
     `;
 
     if (t.status !== "encerrado") {
       const btn = document.createElement("button");
-      btn.textContent = "⚖️ Encerrar Ticket";
+      btn.textContent = "🔒 Encerrar Ticket";
       btn.onclick = async () => {
         await updateDoc(doc(db, "tickets", id), {
           status: "encerrado",
@@ -57,27 +71,39 @@ onSnapshot(collection(db, "tickets"), snap => {
           encerradoEm: serverTimestamp()
         });
       };
-      div.appendChild(btn);
+      card.appendChild(btn);
     }
 
-    box.appendChild(div);
+    box.appendChild(card);
   });
 });
 
-/* 📜 LOGS */
-onSnapshot(collection(db, "logs"), snap => {
-  const box = document.getElementById("lista-logs");
-  if (!box) return;
-  box.innerHTML = "";
+/* ======================================================
+   📜 LOGS / AUDITORIA
+====================================================== */
+onSnapshot(
+  query(collection(db, "logs"), orderBy("data", "desc")),
+  snap => {
+    const box = document.getElementById("lista-logs");
+    if (!box) return;
 
-  snap.forEach(d => {
-    const l = d.data();
-    box.innerHTML += `
-      <div class="card">
-        <b>${l.acao}</b><br>
-        ${l.usuario} (${l.nivel})<br>
-        ${l.detalhes || ""}
-      </div>
-    `;
-  });
-});
+    box.innerHTML = "";
+
+    snap.forEach(d => {
+      const l = d.data();
+
+      const data = l.data
+        ? l.data.toDate().toLocaleString("pt-BR")
+        : "";
+
+      box.innerHTML += `
+        <div class="price-card official">
+          <b>${l.acao}</b><br>
+          👤 ${l.usuario || "—"}<br>
+          🆔 CID: ${l.cid || "—"}<br>
+          🕒 ${data}
+        </div>
+      `;
+    });
+  }
+);
